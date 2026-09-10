@@ -1,0 +1,1 @@
+LD1 šaltinio failai bus laikomi tiesiogiai šiame kataloge. Paleidimo failas: LD1.sce. Reikalingi: ld1_config.sci, ld1_utils.sci, ld1_circuit.sci, ld1_gui.sci, ld1_callbacks.sci.
