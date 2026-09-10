@@ -12,8 +12,26 @@ base = get_absolute_file_path("LD1.sce");
 exec(base + "ld1_config.sci", -1);
 exec(base + "ld1_utils.sci", -1);
 exec(base + "ld1_circuit.sci", -1);
-exec(base + "ld1_gui.sci", -1);
-exec(base + "ld1_callbacks.sci", -1);
+
+// GUI suskaidytas į mažesnius GitHub šaltinio failus funkcijų ribose.
+exec(base + "ld1_gui_01.sci", -1);
+exec(base + "ld1_gui_02.sci", -1);
+exec(base + "ld1_gui_03.sci", -1);
+exec(base + "ld1_gui_04.sci", -1);
+
+// Valdymo logika suskaidyta funkcijų ribose; vykdymo tvarka išlaikyta.
+exec(base + "ld1_callbacks_01.sci", -1);
+exec(base + "ld1_callbacks_02.sci", -1);
+exec(base + "ld1_callbacks_03.sci", -1);
+exec(base + "ld1_callbacks_04.sci", -1);
+exec(base + "ld1_callbacks_05.sci", -1);
+exec(base + "ld1_callbacks_06.sci", -1);
+exec(base + "ld1_callbacks_07.sci", -1);
+exec(base + "ld1_callbacks_08.sci", -1);
+exec(base + "ld1_callbacks_09.sci", -1);
+exec(base + "ld1_callbacks_10.sci", -1);
+exec(base + "ld1_callbacks_11.sci", -1);
+exec(base + "ld1_callbacks_12.sci", -1);
 
 LD1 = struct();
 LD1.base = base;
