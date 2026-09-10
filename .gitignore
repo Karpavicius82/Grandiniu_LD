@@ -1,0 +1,12 @@
+# Local Scilab sessions and student exports.
+*.sod
+*.sod.*
+LD1*_rezultatai.csv
+LD2_studentas.csv
+LD2_studento_atsakymai.csv
+LD2_matavimu_zurnalas.csv
+LD2_daznine_lentele.csv
+LD2_parametrai.csv
+LD2_isvados.txt
+__pycache__/
+*.pyc
