@@ -1,0 +1,13 @@
+Shared archive loaded.
+Link done.
+MODEL_TEMPLATE_PROBE_PASS checks=844 max_scaled_error=4.441e-14
+CPP_MNA_COMPARISONS_PASS count=583
+Covered: DC divider, RC/RL, series/parallel RLC, power, multiple sources, balanced/unbalanced three-phase, DC limits.
+Scope: numerical feasibility only; no industrial acceptance or full LD coverage claimed.
+Shared archive loaded.
+Link done.
+SCILAB_CPP_BOUNDARY_PASS: 650 rows, real/imaginary arrays, per-row invalid input rejection.
+CONFIRMED_FINDING: LD1 numeric parser executes expressions; do not use it for report import.
+JSON_BOUNDARY_PASS: UTF-8/path spaces, explicit single-item arrays, escaped markup.
+CONFIRMED_CONTRACT: JSON null scalar decodes to []; missingness needs an explicit status.
+SYNTHETIC_REPORT_EXPORT_PASS: 650 single-file HTML reports with JSON data.

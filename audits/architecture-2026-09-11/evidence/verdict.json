@@ -1,0 +1,78 @@
+{
+  "scope": "architecture feasibility only; not approved production software",
+  "platform": "Linux-6.12.107+deb13-amd64-x86_64-with-glibc2.41",
+  "windows_runtime_tested": false,
+  "time_utc": "2026-09-11T07:11:10.705707+00:00",
+  "work_dir": "/tmp/ld-architecture-audit-xaxg2z8g",
+  "leak_sanitizer_in_this_run": false,
+  "numeric_checks": 844,
+  "cpp_scilab_mna_comparisons": 583,
+  "synthetic_650_report_results": {
+    "correct": 564,
+    "incorrect": 48,
+    "missing": 38
+  },
+  "adversarial_results": {
+    "review": 12,
+    "correct": 1,
+    "duplicate": 1
+  },
+  "status": "FEASIBILITY_CHECKS_PASS_ACCEPTANCE_OPEN",
+  "runs": [
+    {
+      "check": "configure",
+      "returncode": 0,
+      "seconds": 0.248
+    },
+    {
+      "check": "build",
+      "returncode": 0,
+      "seconds": 14.564
+    },
+    {
+      "check": "sanitizers",
+      "returncode": 0,
+      "seconds": 0.009
+    },
+    {
+      "check": "scilab_boundaries",
+      "returncode": 0,
+      "seconds": 1.102
+    },
+    {
+      "check": "cpp_650_reports",
+      "returncode": 0,
+      "seconds": 0.174
+    },
+    {
+      "check": "cpp_replay",
+      "returncode": 0,
+      "seconds": 0.178
+    },
+    {
+      "check": "cpp_adversarial",
+      "returncode": 0,
+      "seconds": 0.005
+    },
+    {
+      "check": "existing_package",
+      "returncode": 0,
+      "seconds": 0.049
+    }
+  ],
+  "base_commit": "c2f2f940b2c111746cafe47d8e5f3c80aa7fc680",
+  "source_sha256": {
+    "probes/CMakeLists.txt": "3bd4557a4ab26ef9525855269fdbc9ffbc88ae522da8c87df91d606dcc488157",
+    "probes/boundary_probe.sce": "48ee692bf7d96abf2c61b0881d1577e751b187e41f6ff62dc22e8d22879361a4",
+    "probes/core_probe.cpp": "0944b85f1199183fd9770947690b4fdec4b10dc59d8a612285e396fa6ee28b8a",
+    "probes/model_probe.sce": "e95ced397a46d09d5b74ba4267bc285e43dfa49b1fc5c77caa9fc120ee346ffd",
+    "probes/native_probe.cpp": "48393f50763082b67872cf8599523fb4fa4c7a00246ca5be7765aeb472ba1ef0",
+    "probes/report_probe.cpp": "29671721ebee5d3d449b3e1bf7e291688ffdce0d34af45f16babd9d21c39324b",
+    "run_audit.py": "982c039392bcbff4eb44b06514cb69b3777367d6565a55d3b48ed77ce330e749",
+    "dependencies.lock.json": "7a33162f60c06d8f1aaca266c317dee6692839dffd0d9ebae0aeb9f2d930b5df"
+  },
+  "dependency_sha256": {
+    "eigen-5.0.0.tar.gz": "315c881e19e17542a7d428c5aa37d113c89b9500d350c433797b730cd449c056",
+    "json.hpp": "aaf127c04cb31c406e5b04a63f1ae89369fccde6d8fa7cdda1ed4f32dfc5de63"
+  }
+}

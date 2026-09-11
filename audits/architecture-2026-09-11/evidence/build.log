@@ -1,0 +1,14 @@
+[ 20%] Building CXX object CMakeFiles/native_probe.dir/native_probe.cpp.o
+[ 20%] Building CXX object CMakeFiles/core_probe.dir/core_probe.cpp.o
+[ 30%] Linking CXX shared library native_probe.so
+[ 30%] Built target native_probe
+[ 40%] Building CXX object CMakeFiles/report_probe.dir/report_probe.cpp.o
+[ 50%] Building CXX object CMakeFiles/report_probe.dir/core_probe.cpp.o
+[ 60%] Linking CXX shared library core_probe.so
+[ 60%] Built target core_probe
+[ 70%] Building CXX object CMakeFiles/sanitizer_probe.dir/native_probe.cpp.o
+[ 80%] Building CXX object CMakeFiles/sanitizer_probe.dir/core_probe.cpp.o
+[ 90%] Linking CXX executable report_probe
+[ 90%] Built target report_probe
+[100%] Linking CXX executable sanitizer_probe
+[100%] Built target sanitizer_probe

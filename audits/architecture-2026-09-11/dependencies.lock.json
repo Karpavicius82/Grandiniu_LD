@@ -1,0 +1,16 @@
+{
+  "eigen": {
+    "version": "5.0.0",
+    "url": "https://gitlab.com/libeigen/eigen/-/archive/5.0.0/eigen-5.0.0.tar.gz",
+    "file": "eigen-5.0.0.tar.gz",
+    "sha256": "315c881e19e17542a7d428c5aa37d113c89b9500d350c433797b730cd449c056",
+    "license": "MPL-2.0; preserve upstream notices and review chosen modules"
+  },
+  "nlohmann_json": {
+    "version": "3.12.0",
+    "url": "https://raw.githubusercontent.com/nlohmann/json/v3.12.0/single_include/nlohmann/json.hpp",
+    "file": "json.hpp",
+    "sha256": "aaf127c04cb31c406e5b04a63f1ae89369fccde6d8fa7cdda1ed4f32dfc5de63",
+    "license": "MIT; preserve upstream notices"
+  }
+}

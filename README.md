@@ -55,3 +55,11 @@ paleidikliai naudoja `studentui/` versiją. Pradiniai šaltiniai išlaikyti atsk
 ## Pastaba
 
 Studentų sugeneruotos ataskaitos ir asmens duomenys į saugyklą neįtraukiami.
+
+## Plėtra iki 13 LD
+
+[Techninė C++ / Scilab patikra](audits/architecture-2026-09-11/README.md) aprašo
+bendrą branduolį, atkuriamus integracijos ir ataskaitų bandymus, rastus trūkumus
+bei atviras Windows ir aprobacijos sąlygas.
+[Minimalūs priėmimo kriterijai](audits/architecture-2026-09-11/MINIMALUS_PRIEMIMAS.md)
+atskiria patikrintas galimybes nuo dar neįgyvendintų produkto reikalavimų.
