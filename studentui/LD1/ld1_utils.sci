@@ -1,18 +1,5 @@
 function v = ld1_parse_number(s)
-    // Priima ir lietuvišką dešimtainį kablelį.
-    v = %nan;
-    if size(s, "*") == 0 then return; end
-    s = stripblanks(string(s));
-    s = strsubst(s, ",", ".");
-    if s == "" then return; end
-    try
-        vv = evstr(s);
-        if size(vv, "*") == 1 & isreal(vv) then
-            v = vv;
-        end
-    catch
-        v = %nan;
-    end
+    v=bench_safe_number(s);
 endfunction
 
 function tf = ld1_close_enough(userValue, expectedValue)

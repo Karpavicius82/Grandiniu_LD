@@ -1,0 +1,56 @@
+name: Windows and Linux acceptance
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  native:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-22.04, windows-2022]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Fetch locked dependencies
+        run: python tools/fetch_core_deps.py "${{ runner.temp }}/ld-deps"
+      - name: Configure
+        run: cmake -S core -B build -DLD_DEPS="${{ runner.temp }}/ld-deps" -DCMAKE_BUILD_TYPE=Release
+      - name: Build
+        run: cmake --build build --config Release --parallel 2
+      - name: Complete reports and adversarial imports
+        run: ctest --test-dir build -C Release --output-on-failure
+      - name: Install binaries into portable package
+        run: cmake --install build --config Release --prefix studentui
+      - name: Install Scilab on Linux
+        if: runner.os == 'Linux'
+        shell: bash
+        run: |
+          curl --fail --location --retry 3 https://www.scilab.org/download/2026.1.0/scilab-2026.1.0.bin.x86_64-linux-gnu.tar.xz -o "$RUNNER_TEMP/scilab.tar.xz"
+          tar -xJf "$RUNNER_TEMP/scilab.tar.xz" -C "$RUNNER_TEMP"
+          echo "SCILAB_BIN=$RUNNER_TEMP/scilab-2026.1.0/bin/scilab" >> "$GITHUB_ENV"
+      - name: Install Scilab on Windows
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $installer = Join-Path $env:RUNNER_TEMP 'scilab.exe'
+          Invoke-WebRequest https://www.scilab.org/download/2026.1.0/scilab-2026.1.0.bin.x64.exe -OutFile $installer
+          $target = Join-Path $env:RUNNER_TEMP 'Scilab'
+          $p = Start-Process -FilePath $installer -ArgumentList '/VERYSILENT', '/SUPPRESSMSGBOXES', '/NORESTART', '/SP-', "/DIR=$target" -Wait -PassThru
+          if ($p.ExitCode -ne 0) { throw "Scilab installer exit $($p.ExitCode)" }
+          "SCILAB_BIN=$target\bin\Scilex.exe" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
+      - name: Scilab to C++ to HTML to folder grading
+        run: python tools/test_automatic_reports.py --scilab "${{ env.SCILAB_BIN }}" --runtime studentui
+      - name: Portable student and teacher package
+        run: python tools/package_native.py --platform "${{ runner.os }}"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Grandiniu-LD-${{ runner.os }}
+          path: dist/Grandiniu_LD-${{ runner.os }}.zip
+          if-no-files-found: error

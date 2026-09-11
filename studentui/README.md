@@ -1,10 +1,22 @@
 # Laboratorinių darbų stendai studentui
 
 Abu darbai naudoja tą pačią sąsają: kairėje grandinė ir prietaisai, dešinėje
-vieno etapo užduotis ir atsakymai. **Patikrinti** po teisingo atsakymo tampa
-**Toliau**. Papildomi veiksmai yra skiltyje **Pagalba**.
+vieno etapo užduotis ir atsakymai. Atsiskaitymo režime **Įrašyti ir toliau**
+išsaugo jūsų atsakymus. Mokymosi režime **Patikrinti** parodo klaidas.
+Papildomi veiksmai ir režimo pasirinkimas yra skiltyje **Pagalba**.
+
+Pabaigoje spauskite **Išsaugoti ataskaitą**. Sukurtą vieną HTML failą iš
+naudotojo aplanko `Grandiniu_LD_darbai` persiųskite dėstytojui. Nebaigtą
+ataskaitą taip pat galima išsaugoti per Pagalbą. Juodraščiai saugomi automatiškai
+įrašant atsakymus ir pereinant į kitą etapą; juos atverkite per Pagalbą.
+
+Dėstytojui: vykdykite `DESTYTOJUI.sce` ir pasirinkite aplanką su ataskaitomis.
+Programa sukuria `vertinimai.html`, `suvestine.csv` ir `vertinimai.json`.
 
 ## Paleidimas
+
+Reikia Scilab 2026.1.0 ir jūsų OS atitinkančio paketo su `bin/ldcore.dll`
+(Windows) arba `bin/ldcore.so` (Linux). Kompiliatorius studentui nereikalingas.
 
 Linux: `./PALEISTI.sh`. Scilab aplinkoje: vykdykite `STENDAS.sce` ir pasirinkite darbą.
 Atskirai galima vykdyti `LD1/LD1.sce` arba `LD2/LD2.sce`.

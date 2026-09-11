@@ -3,7 +3,7 @@
 // Visi įtampos ir srovės dydžiai yra RMS.
 // ============================================================================
 
-function r = ld2_rc_values(E, f, R, C)
+function r = ld2_reference_rc_values(E, f, R, C)
     if f <= 0 | R <= 0 | C <= 0 then
         r = struct("X", %inf, "Z", %inf, "I", 0.0, "UR", 0.0, ...
                    "UX", E, "P", 0.0, "PHI_Z", -90.0, "PHI_I", 90.0);
@@ -19,7 +19,7 @@ function r = ld2_rc_values(E, f, R, C)
                "P", I^2 * R, "PHI_Z", -phi, "PHI_I", phi);
 endfunction
 
-function r = ld2_rl_values(E, f, R, L)
+function r = ld2_reference_rl_values(E, f, R, L)
     if f < 0 | R <= 0 | L <= 0 then
         r = struct("X", 0.0, "Z", R, "I", E/R, "UR", E, ...
                    "UX", 0.0, "P", E^2/R, "PHI_Z", 0.0, "PHI_I", 0.0);
@@ -35,7 +35,7 @@ function r = ld2_rl_values(E, f, R, L)
                "P", I^2 * R, "PHI_Z", phi, "PHI_I", -phi);
 endfunction
 
-function r = ld2_rlc_values(E, f, R, L, C)
+function r = ld2_reference_rlc_values(E, f, R, L, C)
     if R <= 0 | L <= 0 | C <= 0 then
         error("R, L ir C turi būti teigiami.");
     end
@@ -111,4 +111,25 @@ function [f, ur] = ld2_dense_resonance_curve(E, R, L, C, fmax)
         r = ld2_rlc_values(E, f(k), R, L, C);
         ur(k) = r.UR;
     end
+endfunction
+
+// Student measurements and teacher references use the same C++ engine.
+// The independent formulas above remain explicit numerical test oracles.
+function r=ld2_rc_values(E,f,R,C)
+    global BENCH_CORE_READY;
+    if ~or(BENCH_CORE_READY==%t) then r=ld2_reference_rc_values(E,f,R,C);return;end
+    v=bench_cpp_ac(1,E,f,R,0,C);
+    r=struct("X",v(2),"Z",v(3),"I",v(4),"UR",v(5),"UX",v(7),"P",v(9),"PHI_Z",v(10),"PHI_I",-v(10));
+endfunction
+function r=ld2_rl_values(E,f,R,L)
+    global BENCH_CORE_READY;
+    if ~or(BENCH_CORE_READY==%t) then r=ld2_reference_rl_values(E,f,R,L);return;end
+    v=bench_cpp_ac(2,E,f,R,L,0);
+    r=struct("X",v(1),"Z",v(3),"I",v(4),"UR",v(5),"UX",v(6),"P",v(9),"PHI_Z",v(10),"PHI_I",-v(10));
+endfunction
+function r=ld2_rlc_values(E,f,R,L,C)
+    global BENCH_CORE_READY;
+    if ~or(BENCH_CORE_READY==%t) then r=ld2_reference_rlc_values(E,f,R,L,C);return;end
+    v=bench_cpp_ac(3,E,f,R,L,C);
+    r=struct("XL",v(1),"XC",v(2),"Z",v(3),"I",v(4),"UR",v(5),"UL",v(6),"UC",v(7),"ULC",v(8),"P",v(9),"PHI",v(10));
 endfunction

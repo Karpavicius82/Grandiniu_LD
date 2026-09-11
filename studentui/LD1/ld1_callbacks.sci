@@ -44,6 +44,7 @@ endfunction
 function ld1_init_state()
     global LD1;
     LD1.step=1;
+    if ~isfield(LD1,"assessment") then LD1.assessment=%f;end
     LD1.panel="series";
     LD1.powerOn=%f;
     LD1.VR1=1000;
@@ -69,6 +70,8 @@ function ld1_init_state()
 
     // Studentų įrašai ir matavimai saugomi atskirai kiekvienam etapui.
     // Grįžus atgal nieko nereikia spręsti iš naujo.
+    LD1.report_wires=list(); LD1.report_meter=emptystr(1,9);
+    for k=1:9; LD1.report_wires(k)=emptystr(0,2); end
     LD1.stepQ=emptystr(9,3);
     LD1.stepType=zeros(1,9);
     LD1.stepYesNo=zeros(1,9);
@@ -230,6 +233,9 @@ function ld1_save_step_inputs()
     global LD1;
     if ~isfield(LD1,"ui") then return; end
     if LD1.step<1 | LD1.step>9 then return; end
+    if LD1.demoMode then return; end
+    LD1.report_wires(LD1.step)=LD1.wires;
+    LD1.report_meter(LD1.step)=LD1.meterMode;
     for k=1:3
         LD1.stepQ(LD1.step,k)=string(LD1.ui.qEdit(k).string);
     end
@@ -242,6 +248,14 @@ function ld1_save_step_inputs()
     if LD1.ui.yes.value<>0 then yn=1; end
     if LD1.ui.no.value<>0 then yn=2; end
     LD1.stepYesNo(LD1.step)=yn;
+    if LD1.step==2 then
+        LD1.res.Rseries1000=ld1_parse_number(LD1.stepQ(2,1));LD1.res.Iseries1000=ld1_parse_number(LD1.stepQ(2,2));
+    elseif LD1.step==4 then
+        LD1.res.Rseries500=ld1_parse_number(LD1.stepQ(4,1));LD1.res.Iseries500=ld1_parse_number(LD1.stepQ(4,2));
+    elseif LD1.step==6 then LD1.res.Rparallel1000=ld1_parse_number(LD1.stepQ(6,1));
+    elseif LD1.step==8 then
+        LD1.res.I1=ld1_parse_number(LD1.stepQ(8,1));LD1.res.I2=ld1_parse_number(LD1.stepQ(8,2));LD1.res.It=ld1_parse_number(LD1.stepQ(8,3));
+    end
     if LD1.lastMeasurementStep==LD1.step & ~isnan(LD1.lastMeasurement) then
         LD1.stepMeas(LD1.step)=LD1.lastMeasurement;
         LD1.stepMeasUnit(LD1.step)=LD1.lastMeasurementUnit;
@@ -1152,6 +1166,9 @@ endfunction
 
 function ld1_toggle_solution()
     global LD1;
+    if LD1.assessment & ~LD1.demoMode then
+        ld1_set_status("Pavyzdžiai pasiekiami mokymosi režime.","info","Režimą galite pakeisti Pagalbos meniu.");return;
+    end
     if LD1.demoMode then
         ld1_restore_solution_state();
         return;
@@ -1546,7 +1563,7 @@ function ld1_check_step()
         if ~ld1_close_enough(uR,R) then ld1_set_status("Rbendr reikšmė neteisinga.","error","Naudokite Rbendr = R1 + VR1. Abi varžos turi būti omais; VR1 = 1000 Ω."); return; end
         if isnan(uI) then ld1_set_status("Srovės laukas tuščias arba įrašas nėra skaičius.","error","Skaičiuokite I = 10 V / Rbendr. Gautus amperus padauginkite iš 1000 ir įrašykite mA."); return; end
         if ~ld1_close_enough(uI,I) then ld1_set_status("Apskaičiuota srovė neteisinga.","error","Naudokite I = E/Rbendr, E=10 V. Nepamirškite A → mA: ×1000."); return; end
-        LD1.res.Rseries1000=R; LD1.res.Iseries1000=I;
+        LD1.res.Rseries1000=uR; LD1.res.Iseries1000=uI;
         ld1_mark_done("Teoriniai skaičiavimai ties VR1 = 1 kΩ teisingi.");
 
     case 3 then
@@ -1571,9 +1588,9 @@ function ld1_check_step()
         if ~LD1.powerOn then ld1_set_status("Maitinimo šaltinis išjungtas.","error","Įjunkite 10 V DC ir paspauskite MATUOTI."); return; end
         if LD1.lastMeasurementStep<>4 | isnan(LD1.lastMeasurement) then ld1_set_status("Trūksta srovės matavimo.","error","Paspauskite MATUOTI, tada palyginkite su apskaičiuota I."); return; end
         if ~ld1_any_yesno_selected() then ld1_set_status("Nepasirinktas Taip/Ne.","error","Pažymėkite, ar išmatuota ir apskaičiuota srovė sutampa 5 % ribose."); return; end
-        meas=LD1.lastMeasurement; err=abs(meas-I)/max(I,1e-9); expectedYes=(err<=0.05);
+        meas=LD1.lastMeasurement; err=abs(meas-uI)/max(uI,1e-9); expectedYes=(err<=0.05);
         if ld1_yes_selected()<>expectedYes then ld1_set_status("Taip/Ne pasirinkimas neatitinka rezultato.","error","≤5 % skirtumas → Taip; >5 % → Ne."); return; end
-        LD1.res.Rseries500=R; LD1.res.Iseries500=I; LD1.res.Mseries500=meas; LD1.res.Errseries500=err*100;
+        LD1.res.Rseries500=uR; LD1.res.Iseries500=uI; LD1.res.Mseries500=meas; LD1.res.Errseries500=err*100;
         ld1_mark_done("VR1 = 500 Ω bandymas baigtas. Sumažinus Rbendr, srovė padidėjo.");
 
     case 5 then
@@ -1592,7 +1609,7 @@ function ld1_check_step()
         if ~ld1_any_yesno_selected() then ld1_set_status("Nepasirinktas Taip/Ne.","error","Palyginkite UAB su 10 V ir pažymėkite atsakymą."); return; end
         expectedYes=(abs(LD1.lastMeasurement-LD1.cfg.E)/LD1.cfg.E<=0.05);
         if ld1_yes_selected()<>expectedYes then ld1_set_status("Taip/Ne pasirinkimas neatitinka UAB palyginimo.","error","Jei UAB nuo 10 V skiriasi ≤5 %, rinkitės Taip; kitu atveju Ne."); return; end
-        LD1.res.Rparallel1000=R; LD1.res.Uparallel1000=LD1.lastMeasurement; LD1.parallelBaseVoltage=LD1.lastMeasurement;
+        LD1.res.Rparallel1000=uR; LD1.res.Uparallel1000=LD1.lastMeasurement; LD1.parallelBaseVoltage=LD1.lastMeasurement;
         ld1_mark_done("UAB matavimas užfiksuotas: "+ld1_num(LD1.lastMeasurement,3)+" V.");
 
     case 7 then
@@ -1622,7 +1639,7 @@ function ld1_check_step()
         if ~ld1_any_yesno_selected() then ld1_set_status("Nepasirinktas Taip/Ne.","error","Palyginkite išmatuotą bendrą srovę su I1+I2 ir pažymėkite atsakymą."); return; end
         meas=LD1.lastMeasurement; err=abs(meas-It)/max(It,1e-9); expectedYes=(err<=0.05);
         if ld1_yes_selected()<>expectedYes then ld1_set_status("Taip/Ne pasirinkimas neatitinka skaitinio palyginimo.","error","Jei |Imat−(I1+I2)|/(I1+I2) ≤5 %, rinkitės Taip; kitu atveju Ne."); return; end
-        LD1.res.I1=I1; LD1.res.I2=I2; LD1.res.It=It; LD1.res.MIt=meas; LD1.res.KclErr=err*100;
+        LD1.res.I1=u1; LD1.res.I2=u2; LD1.res.It=ut; LD1.res.MIt=meas; LD1.res.KclErr=err*100;
         ld1_mark_done("Kirchhofo srovės dėsnis patikrintas: I ≈ I1 + I2. Skirtumas = "+ld1_num(err*100,2)+" %.");
     end
 endfunction

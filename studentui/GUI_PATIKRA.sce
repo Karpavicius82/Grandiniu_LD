@@ -5,6 +5,7 @@ try
     if ~isdir(root+"tests/results") then mkdir(root+"tests/results"); end
     exec(root+"LD1/LD1_LOAD.sce",-1); exec(root+"LD2/LD2_LOAD.sce",-1);
     exec(root+"tests/workflows.sci",-1);
+    bench_core_require();
     for n=[1 17 64]
         bench_ld1_workflow(n,root);
         bench_ld2_workflow(n,root,%t);

@@ -23,7 +23,7 @@ try
         "out",[n 4],4,"d",[n 1],5,"i");
     assert_checktrue(and(status(1:3)<>0)); assert_checktrue(and(status(4:$)==0));
     mprintf("SCILAB_CPP_BOUNDARY_PASS: 650 rows, real/imaginary arrays, per-row invalid input rejection.\n");
-    // Harmless demonstration of the current LD1 expression parser's side effect.
+    // Regression: the previously found expression execution is now rejected.
     global audit_expression_executed;
     audit_expression_executed=%f;
     function value=audit_harmless_expression()
@@ -31,8 +31,9 @@ try
         audit_expression_executed=%t; value=7;
     endfunction
     value=ld1_parse_number("audit_harmless_expression()");
-    assert_checktrue(audit_expression_executed & value==7);
-    mprintf("CONFIRMED_FINDING: LD1 numeric parser executes expressions; do not use it for report import.\n");
+    assert_checkfalse(audit_expression_executed);
+    assert_checktrue(isnan(value));
+    mprintf("FIX_VERIFIED: LD1 numeric parser rejects expressions without executing them.\n");
     assert_checktrue(isnan(ld2_safe_number("audit_harmless_expression()")));
     assert_checkequal(ld2_safe_number("1,25"),1.25);
     assert_checktrue(isnan(ld2_safe_number("1e999")));

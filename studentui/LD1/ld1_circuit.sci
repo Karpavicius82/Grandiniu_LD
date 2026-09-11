@@ -110,7 +110,16 @@ function out = ld1_solve_network()
     Vnode(srcP)=LD1.cfg.E;
     Vnode(srcN)=0;
 
+    global BENCH_CORE_READY;
+    nativeCurrent=[];
     unknown = find(reachable & ~fixed);
+    if BENCH_CORE_READY==%t then
+        [Vnode,nativeCurrent,nativeStatus]=bench_cpp_dc(edges,reachable,srcP,srcN,LD1.cfg.E);
+        if nativeStatus<>0 then
+            out.message="C++ modelis: grandinė neapibrėžta arba sujungta netinkamai.";return;
+        end
+        unknown=[];
+    end
     if ~isempty(unknown) then
         nu = size(unknown,"*");
         A = zeros(nu,nu);
@@ -157,6 +166,7 @@ function out = ld1_solve_network()
             edgeI(k)=(Vterm(i1)-Vterm(i2))/R;
         end
     end
+    if BENCH_CORE_READY==%t then edgeI=nativeCurrent; end
     out.edgeCurrents=edgeI;
 
     sourceCurrent = 0;

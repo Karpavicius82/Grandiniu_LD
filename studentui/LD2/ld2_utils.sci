@@ -16,24 +16,7 @@ function s = ld2_value_or_dash(x, unit)
 endfunction
 
 function v = ld2_safe_number(txt)
-    v = %nan;
-    if type(txt) <> 10 then return; end
-    if size(txt,"*") <> 1 then return; end
-    t = stripblanks(txt);
-    if t == "" then return; end
-    t = strsubst(t, ",", ".");
-    t = strsubst(strsubst(t,"D","e"),"d","e");
-    // Restrict the alphabet before strtod (also excludes hexadecimal input).
-    allowed = "0123456789.eE+-";
-    for k=1:length(t)
-        if size(strindex(allowed,part(t,k)),"*")==0 then return; end
-    end
-    [number, tail] = strtod(t);
-    if tail <> "" then return; end
-    if size(number,"*")<>1 then return; end
-    if ~isreal(number) then return; end
-    if isnan(number) | isinf(number) then return; end
-    v = number;
+    v=bench_safe_number(txt);
 endfunction
 
 function ld2_set_status(msg, kind)

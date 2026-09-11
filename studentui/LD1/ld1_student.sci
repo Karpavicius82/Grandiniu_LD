@@ -6,11 +6,13 @@ function ld1_student_main(root)
             if is_handle_valid(LD1.fig) then show_window(LD1.fig); return; end
         end
     end
+    bench_core_require();
     [ok,st,cfg]=student_enroll("LD1");
     if ~ok then return; end
-    LD1=struct("base",root,"cfg",cfg,"student",st);
+    LD1=struct("base",root,"cfg",cfg,"student",st,"assessment",%t);
     student_remember(st);
     ld1_start();
+    LD1.autosave_enabled=%t;
 endfunction
 
 function ld1_student_details()
@@ -143,7 +145,8 @@ function ld1_student_sync()
     if LD1.demoMode then
         LD1.ui.checkStep.string="Grįžti į savo darbą";
         LD1.ui.studentProgress.string="Pavyzdys · "+string(LD1.step)+" / 9";
-    elseif LD1.step==9 then LD1.ui.checkStep.string="Išsaugoti CSV";
+    elseif LD1.step==9 then LD1.ui.checkStep.string="Išsaugoti ataskaitą";
+    elseif isfield(LD1,"assessment") & LD1.assessment then LD1.ui.checkStep.string="Įrašyti ir toliau →";
     elseif LD1.done(LD1.step) then LD1.ui.checkStep.string="Toliau →";
     else LD1.ui.checkStep.string="Patikrinti";
     end
@@ -152,7 +155,9 @@ endfunction
 function ld1_student_primary()
     global LD1;
     if LD1.demoMode then ld1_toggle_solution();
-    elseif LD1.step==9 then ld1_export_results();
+    elseif LD1.step==9 then bench_export_current("LD1");
+    elseif isfield(LD1,"assessment") & LD1.assessment then
+        ld1_save_step_inputs();bench_autosave("LD1");ld1_set_step(LD1.step+1);
     elseif LD1.done(LD1.step) then ld1_next_step();
     else ld1_check_step(); end
     ld1_student_sync();
@@ -162,14 +167,14 @@ function ld1_student_answer_changed()
     global LD1;
     if LD1.demoMode then return; end
     LD1.done(LD1.step)=%f;
-    ld1_save_step_inputs(); ld1_student_sync();
+    ld1_save_step_inputs(); bench_autosave("LD1"); ld1_student_sync();
 endfunction
 
 function ld1_student_help()
     global LD1;
     if LD1.demoMode then ld1_toggle_solution(); ld1_student_sync(); return; end
     n=x_choose(["Kaip sujungti šį stendą";"Teorija";"Parodyti pavyzdį"; ...
-        "Atkurti šio etapo stendą";"Etapai";"Pradėti darbą iš naujo";"Studentas ir priskirtos reikšmės"],"Pagalba");
+        "Atkurti šio etapo stendą";"Etapai";"Pradėti darbą iš naujo";"Studentas ir priskirtos reikšmės";"Išsaugoti ataskaitą dėstytojui";"Atverti juodraštį";"Atsiskaitymo / mokymosi režimas"],"Pagalba");
     select n
     case 1 then ld1_show_wiring_guide();
     case 2 then ld1_show_help();
@@ -188,6 +193,9 @@ function ld1_student_help()
         end
     case 6 then ld1_restart();
     case 7 then ld1_student_details();
+    case 8 then bench_export_current("LD1");
+    case 9 then bench_open_snapshot("LD1");
+    case 10 then bench_mode("LD1");
     end
     ld1_student_sync();
 endfunction

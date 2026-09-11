@@ -19,13 +19,15 @@ function ld2_student_main(root)
             end
         end
     end
+    bench_core_require();
     [ok,st,cfg]=student_enroll("LD2");
     if ~ok then return; end
     LD2=struct("root",root,"cfg",cfg,"state",ld2_initial_state(cfg), ...
         "ui",struct("headless",%f,"suppress_render",%f),"example_active",%f,"example_backup",struct());
-    LD2.state.student=st;
+    LD2.state.student=st;LD2.state.assessment=%t;
     student_remember(st);
     ld2_build_gui(); ld2_go_step(1,%f);
+    LD2.autosave_enabled=%t;
 endfunction
 
 function ld2_student_details()
@@ -144,7 +146,7 @@ function ld2_render_answers()
     elseif step==12 then
         h=student_button(p,[0.07 0.48 0.86 0.06],"Rezultatų suvestinė","ld2_show_summary_window()"); ld2_track(h);
         h=student_button(p,[0.07 0.39 0.86 0.06],"Įrašyti išvadas","ld2_edit_conclusions()"); ld2_track(h);
-        h=student_button(p,[0.07 0.30 0.86 0.06],"Eksportuoti CSV","ld2_export_csv()"); ld2_track(h);
+        h=student_button(p,[0.07 0.30 0.86 0.06],"Ataskaita dėstytojui","bench_export_current(""LD2"")"); ld2_track(h);
     end
 endfunction
 
@@ -152,8 +154,9 @@ function ld2_render_action_row()
     global LD2;
     label="Patikrinti";
     if LD2.state.completed(LD2.state.step) then label="Toliau →"; end
+    if LD2.state.assessment then label="Įrašyti ir toliau →";end
     if LD2.state.step==1 then label="Pradėti →"; end
-    if LD2.state.step==12 & LD2.state.completed(12) then label="Išsaugoti darbą"; end
+    if LD2.state.step==12 then label="Išsaugoti ataskaitą"; end
     if LD2.example_active then label="Grįžti į savo darbą"; end
     h=student_button(LD2.ui.right,[0.07 0.085 0.86 0.075],label,"ld2_student_primary()",%t);
     LD2.ui.studentPrimary=h; ld2_track(h);
@@ -164,16 +167,24 @@ endfunction
 function ld2_student_answers_changed()
     global LD2;
     ld2_save_answers();
-    if ~LD2.example_active then LD2.ui.studentPrimary.string="Patikrinti"; end
+    bench_autosave("LD2");
+    if ~LD2.example_active then
+        if LD2.state.assessment then LD2.ui.studentPrimary.string="Įrašyti ir toliau →";
+        else LD2.ui.studentPrimary.string="Patikrinti";end
+    end
 endfunction
 
 function ld2_student_primary()
     global LD2;
     ld2_save_answers();
     if LD2.example_active then ld2_show_solution();
+    elseif LD2.state.assessment then
+        bench_autosave("LD2");
+        if LD2.state.step==12 then bench_export_current("LD2");
+        else ld2_go_step(LD2.state.step+1,%f);end
     elseif LD2.state.step==1 then ld2_check_step(); ld2_next();
     elseif LD2.state.completed(LD2.state.step) then
-        if LD2.state.step==12 then ld2_save_work(); else ld2_next(); end
+        if LD2.state.step==12 then bench_export_current("LD2"); else ld2_next(); end
     else ld2_check_step(); end
 endfunction
 
@@ -181,7 +192,7 @@ function ld2_student_help()
     global LD2;
     n=x_choose(["Šio etapo instrukcija ir formulės";"Parodyti pavyzdį / mano darbą"; ...
         "Grafikai";"Matavimų žurnalas";"Išsaugoti darbą";"Atverti išsaugotą darbą"; ...
-        "Etapai";"Studentas ir priskirtos reikšmės";"Pradėti iš naujo"],"Pagalba ir papildomi veiksmai");
+        "Etapai";"Studentas ir priskirtos reikšmės";"Pradėti iš naujo";"Išsaugoti ataskaitą dėstytojui";"Atverti automatinį juodraštį";"Atsiskaitymo / mokymosi režimas"],"Pagalba ir papildomi veiksmai");
     select n
     case 1 then ld2_help_current();
     case 2 then ld2_show_solution();
@@ -202,6 +213,9 @@ function ld2_student_help()
         if k>0 then ld2_step_button(k); end
     case 8 then ld2_student_details();
     case 9 then ld2_restart();
+    case 10 then bench_export_current("LD2");
+    case 11 then bench_open_snapshot("LD2");
+    case 12 then bench_mode("LD2");
     end
 endfunction
 

@@ -871,6 +871,9 @@ endfunction
 
 function ld2_show_solution()
     global LD2;
+    if LD2.state.assessment & ~LD2.example_active then
+        ld2_set_status("Pavyzdžiai pasiekiami mokymosi režime. Režimą galite pakeisti Pagalbos meniu.","info");return;
+    end
     if LD2.example_active then
         ld2_clear_dynamic();
         LD2.state=LD2.example_backup;

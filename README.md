@@ -1,6 +1,10 @@
 # Grandinių virtualūs laboratoriniai darbai (Scilab)
 
-Interaktyvūs elektros grandinių laboratoriniai darbai su vienoda, paprastesne LD1 ir LD2 sąsaja.
+Interaktyvūs elektros grandinių laboratoriniai darbai: Scilab sąsaja, bendras C++ branduolys ir automatinis LD1 / LD2 ataskaitų vertinimas.
+
+**Studentas pateikia vieną HTML ataskaitą. Dėstytojas pasirenka darbų aplanką ir gauna balus, klaidų komentarus bei CSV suvestinę.** [Naudojimas, rubrika ir surinkimas](core/README.md).
+
+Windows / Linux paketai su C++ branduoliu kuriami [GitHub Actions](https://github.com/Karpavicius82/Grandiniu_LD/actions/workflows/native.yml). Šaltinių kopijai pirmiausia reikia surinkti branduolį pagal `core/README.md`.
 
 ## Studentui
 
@@ -13,13 +17,13 @@ Linux aplinkoje paleiskite:
 Scilab aplinkoje vykdykite šakninį `STENDAS.sce`. Pasirinkęs darbą studentas
 įveda eilės numerį (1–64), vardą ir pavardę bei grupę. Prieš pradedant
 parodomos variantui priskirtos reikšmės. Stende rodoma vieno etapo užduotis;
-mygtukas **Patikrinti** po teisingo atsakymo tampa **Toliau**.
+atsiskaitymo režime **Įrašyti ir toliau** išsaugo tikrus atsakymus. Mokymosi režime **Patikrinti** leidžia gauti grįžtamąjį ryšį.
 
 LD1 turi naujus 64 pastovius virtualius variantus. LD2 išlaiko originalų
 `LD2-64-A-2026` priskyrimą. Vardas, grupė ir variantas išlieka eksportuose;
 LD2 juos išlaiko ir išsaugotame darbe. Pakeitus tik vardą ar grupę atliktas darbas išlieka.
 
-[Naudojimas ir variantai](studentui/README.md) · [Paruoštas ZIP paketas](dist/Grandiniu_LD-studentui.zip)
+[Naudojimas ir variantai](studentui/README.md) · [Ankstesnis Scilab paketas](dist/Grandiniu_LD-studentui.zip)
 
 ## Automatinė patikra
 

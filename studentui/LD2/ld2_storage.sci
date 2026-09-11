@@ -54,6 +54,7 @@ function session=ld2_read_session(path)
         if session.state.step<1 | session.state.step>12 then error("Netinkamas etapo numeris."); end
         if or(size(session.state.answers_text)<>[12 8]) then error("Netinkami atsakymų matmenys."); end
     if ~isfield(session.state,"student") then session.state.student=student_empty("LD2"); end
+    if ~isfield(session.state,"assessment") then session.state.assessment=%f;end
     st=session.state.student;
     if st.number>0 then
         checked=student_profile(st.number,st.name,st.group,"LD2");

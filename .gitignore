@@ -10,3 +10,7 @@ LD2_parametrai.csv
 LD2_isvados.txt
 __pycache__/
 *.pyc
+build/
+studentui/bin/
+dist/Grandiniu_LD-Linux.zip
+dist/Grandiniu_LD-Windows.zip

@@ -76,6 +76,7 @@ function bench_ld1_workflow(n,root)
     end
     assert_checkequal(LD1.step,9); assert_checktrue(and(LD1.done));
     bench_button(LD1.ui.checkStep);
+    ld1_export_results(); // Legacy CSV remains available for compatibility.
     exported=mgetl(LD1.base+LD1.student.variant_id+"_rezultatai.csv");
     assert_checktrue(or(exported=="Variantas;"+ascii(34)+LD1.student.variant_id+ascii(34)));
     // Same variant identity edits retain work; changing variant resets it.
