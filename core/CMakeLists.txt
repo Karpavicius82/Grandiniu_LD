@@ -42,3 +42,5 @@ add_test(NAME grading COMMAND "${Python3_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DI
 if(NOT LD_SANITIZE)
   add_test(NAME native_abi COMMAND "${Python3_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/tests/test_native.py" "$<TARGET_FILE:ldcore>")
 endif()
+# Instrukcijų <-> registrų konsistencija (tas pats Python interpretatorius kaip kiti testai).
+add_test(NAME instruction_registry COMMAND "${Python3_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/../tools/check_instruction_registry.py" --root "${CMAKE_CURRENT_SOURCE_DIR}/..")

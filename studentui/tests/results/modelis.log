@@ -62,4 +62,5 @@ PASS V61: LD1 matavimai ir visi 12 LD2 etapų
 PASS V62: LD1 matavimai ir visi 12 LD2 etapų
 PASS V63: LD1 matavimai ir visi 12 LD2 etapų
 PASS V64: LD1 matavimai ir visi 12 LD2 etapų
+REGISTRY_OK: LD1 78 kodų, LD2 145 kodų — unikalūs, pavyzdiniai T01/B01 rasti
 HEADLESS_PASS: 64 LD1 + 64 LD2 variantai, įvesties atmetimas, 768 LD2 etapų, sesijos atkūrimas

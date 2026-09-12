@@ -154,17 +154,18 @@ endfunction
 function fix = ld1_current_connection_fix()
     global LD1;
     if LD1.step<=4 then
-        fix="Išjunkite maitinimą. Tiksliai: +→R1(1); R1(2)→VR1(1); VR1(2)→+/mA; COM→−. Jei etapas >1, spauskite Pagalba → Atkurti stendą.";
+        fix="Išjunkite maitinimą [B01]. Tiksliai: [T01]→[T03]; [T04]→[T09]; [T10]→[T11]; [T12]→[T02]. Jei etapas >1, spauskite ATKURTI ETAPO STENDĄ [B12].";
     elseif LD1.step<=7 then
-        fix="Išjunkite maitinimą. Naudokite atskirus A/B lizdus: +→A1, −→B1; R3 tarp A2-B2; R2+VR1 tarp A3-B3; V tarp A4-B4.";
+        fix="Išjunkite maitinimą [B01]. Naudokite atskirus A/B lizdus: [T01]→[T13], [T02]→[T17]; R3 tarp [T14]-[T18]; R2+VR1 tarp [T15]-[T19]; V tarp [T16]-[T20].";
     elseif LD1.step==8 then
         targetA=ld1_terminal_button_text(LD1.kclTargetA);
-        fix="8 etape kitų 6 laidų nelieskite. Prijunkite tik: šaltinio +→+/mA ir COM→"+targetA+". Jei būsena sugadinta – Pagalba → Atkurti stendą.";
+        tpart="";
+        if exists("ld1_terminal_code")==1 then tpart=" ["+ld1_terminal_code(LD1.kclTargetA)+"]"; end
+        fix="8 etape kitų 6 laidų nelieskite. Prijunkite tik: šaltinio + [T01]→+/mA [T11] ir COM [T12]→"+targetA+tpart+". Jei būsena sugadinta – ATKURTI ETAPO STENDĄ [B12].";
     else
         fix="Šiame etape laidų jungti nereikia.";
     end
 endfunction
-
 function W = ld1_series_canonical_wires()
     W=["SRC_P" "R1_1";
        "R1_2" "VR1_1";
@@ -285,55 +286,118 @@ function ld1_show_wiring_guide()
     case 1 then
         txt=["1 ETAPAS – NUOSEKLI GRANDINĖ";
              "";
-             "Maitinimas turi būti IŠJUNGTAS.";
-             "1. Šaltinio +  →  R1(1)";
-             "2. R1(2)       →  VR1(1)";
-             "3. VR1(2)      →  multimetro +/mA";
-             "4. Multimetro COM → šaltinio −";
-             "5. Multimetras: A (DC).";
+             "Maitinimas [B01] turi būti IŠJUNGTAS.";
+             "1. Šaltinio + [T01]  →  R1(1) [T03]";
+             "2. R1(2) [T04]       →  VR1(1) [T09]";
+             "3. VR1(2) [T10]      →  multimetro +/mA [T11]";
+             "4. Multimetro COM [T12] → šaltinio − [T02]";
+             "5. Multimetras: A (DC) [B07].";
              "";
              "Turi būti 4 laidai ir viena uždara nuosekli kilpa."];
     case 2 then
-        txt=["2 ETAPAS – JUNGIMAS NEKEIČIAMAS";"Naudokite 1 etapo nuoseklią schemą.";"VR1 = 1000 Ω. Šiame etape tik skaičiuojama."];
+        txt=["2 ETAPAS – JUNGIMAS NEKEIČIAMAS";"Naudokite 1 etapo nuoseklią schemą.";"VR1 = 1000 Ω [B04]. Šiame etape tik skaičiuojama."];
     case 3 then
-        txt=["3 ETAPAS – SROVĖS MATAVIMAS";"Jungimas toks pats kaip 1 etape.";"Multimetras A (DC), nuosekliai. Įjunkite 10 V ir spauskite MATUOTI."];
+        txt=["3 ETAPAS – SROVĖS MATAVIMAS";"Jungimas toks pats kaip 1 etape.";"Multimetras A (DC) [B07], nuosekliai. Įjunkite 10 V [B01] ir spauskite MATUOTI [B06]."];
     case 4 then
-        txt=["4 ETAPAS – VR1 = 500 Ω";"Jungimas toks pats kaip 1 etape.";"Pakeiskite tik VR1 į 500 Ω, apskaičiuokite ir išmatuokite srovę."];
+        txt=["4 ETAPAS – VR1 = 500 Ω";"Jungimas toks pats kaip 1 etape.";"Pakeiskite tik VR1 į 500 Ω [B03] arba [V01], apskaičiuokite ir išmatuokite srovę [B06]."];
     case 5 then
         txt=["5 ETAPAS – LYGIAGRETI GRANDINĖ";
              "";
-             "Maitinimas turi būti IŠJUNGTAS.";
-             "1. Šaltinis: +→A1, −→B1";
-             "2. Šaka 1: A2→R3(1), R3(2)→B2";
-             "3. Šaka 2: A3→R2(1), R2(2)→VR1(1), VR1(2)→B3";
-             "4. Voltmetras: +/V→A4, COM→B4";
-             "5. Multimetras: V (DC).";
+             "Maitinimas [B01] turi būti IŠJUNGTAS.";
+             "1. Šaltinis: + [T01]→A1 [T13], − [T02]→B1 [T17]";
+             "2. Šaka 1: A2 [T14]→R3(1) [T07], R3(2) [T08]→B2 [T18]";
+             "3. Šaka 2: A3 [T15]→R2(1) [T05], R2(2) [T06]→VR1(1) [T09], VR1(2) [T10]→B3 [T19]";
+             "4. Voltmetras: +/V [T11]→A4 [T16], COM [T12]→B4 [T20]";
+             "5. Multimetras: V (DC) [B08].";
              "";
              "A1=A2=A3=A4 yra tas pats mazgas A; B1=B2=B3=B4 – mazgas B."];
     case 6 then
-        txt=["6 ETAPAS – UAB MATAVIMAS";"Jungimas toks pats kaip 5 etape.";"VR1 = 1000 Ω. Voltmetras tarp A ir B: +→A4, COM→B4."];
+        txt=["6 ETAPAS – UAB MATAVIMAS";"Jungimas toks pats kaip 5 etape.";"VR1 = 1000 Ω [B04]. Voltmetras tarp A ir B: + [T11]→A4 [T16], COM [T12]→B4 [T20]."];
     case 7 then
-        txt=["7 ETAPAS – VR1 KEITIMAS";"Jungimas toks pats kaip 5 etape.";"Pakeiskite tik VR1 (pvz., 500 Ω) ir iš naujo išmatuokite UAB."];
+        txt=["7 ETAPAS – VR1 KEITIMAS";"Jungimas toks pats kaip 5 etape.";"Pakeiskite tik VR1 (pvz., 500 Ω [B03]) ir iš naujo išmatuokite UAB [B06]."];
     case 8 then
         targetA=ld1_terminal_button_text(LD1.kclTargetA);
+        tpart="";
+        if exists("ld1_terminal_code")==1 then tpart=" ["+ld1_terminal_code(LD1.kclTargetA)+"]"; end
         txt=["8 ETAPAS – BENDROS SROVĖS MATAVIMAS";
              "";
-             "SROVĖS KELIAS TURI BŪTI: +10 V → AMPERMETRAS → MAZGAS A → DVI ŠAKOS → MAZGAS B → 0 V.";
+             "SROVĖS KELIAS TURI BŪTI: +10 V [T01] → AMPERMETRAS → MAZGAS A → DVI ŠAKOS → MAZGAS B → 0 V [T02].";
              "Programa jau paliko 6 teisingus ir užrakintus laidus.";
-             "R3 lieka tarp A-B; R2+VR1 lieka tarp A-B; B lieka sujungtas su šaltinio −.";
+             "R3 lieka tarp [T14]-[T18]; R2+VR1 tarp [T15]-[T19]; B [T17] lieka sujungtas su šaltinio − [T02].";
              "";
              "Prijunkite TIK 2 laidus:";
-             "1. Šaltinio + → ampermetro +/mA.";
-             "2. Ampermetro COM → "+targetA+".";
+             "1. Šaltinio + [T01] → ampermetro +/mA [T11].";
+             "2. Ampermetro COM [T12] → "+targetA+tpart+".";
              "";
-             "Po sujungimo turi būti 8 laidai. VR1=0 Ω. PATIKRINTI SUJUNGIMĄ → ĮJUNGTI 10 V → MATUOTI.";
-             "Jei vis tiek neaišku – Pagalba → Pavyzdys parodo pilnai veikiančią schemą."];
+             "Po sujungimo turi būti 8 laidai. VR1=0 Ω [B02]. PATIKRINTI SUJUNGIMĄ [B09] → ĮJUNGTI 10 V [B01] → MATUOTI [B06].";
+             "Jei vis tiek neaišku – PAVYZDYS / SPRENDIMAS [B17] parodo pilnai veikiančią schemą."];
     else
-        txt=["9 ETAPAS – REZULTATAI";"Laidų jungti nebereikia."];
+        txt=["9 ETAPAS – REZULTATAI";"Laidų jungti nebereikia.";"PATIKRINTI IR UŽFIKSUOTI ETAPĄ [B14] eksportuoja CSV; [B17] rodo pilną pavyzdį."];
     end
     messagebox(txt,"LD1 – kaip tiksliai sujungti","info");
 endfunction
 
+function ld1_show_stand_map()
+    // STENDO ŽEMĖLAPIS [B13]: visų numerių žinynas kontaktams, mygtukams,
+    // etapams ir atsakymų laukeliams. Langas kuriamas TIK iš mygtuko
+    // callbacko, o be registro ar be GUI (headless) saugiai išeiname.
+    global LD1;
+    if ~isfield(LD1,"ui") then return; end
+    if exists("ld1_terminal_ids")<>1 | exists("ld1_button_registry")<>1 then
+        ld1_set_status("Elementų numerių registras (ld1_ids.sci) neįkeltas.","warn");
+        return;
+    end
+    lines=emptystr(0,1);
+    lines($+1,1)="KONTAKTAI – T NUMERIAI (pažymėti ir ant stendo prie kiekvieno lizdo):";
+    tids=ld1_terminal_ids();
+    for k=1:size(tids,"*")
+        lines($+1,1)="  "+ld1_terminal_name(tids(k));
+    end
+    lines($+1,1)=" ";
+    lines($+1,1)="Mazgas A: T13–T16 yra elektriškai bendri; mazgas B: T17–T20 bendri";
+    lines($+1,1)="(lygiagrečios grandinės stende).";
+    lines($+1,1)=" ";
+    lines($+1,1)="MYGTUKAI – B NUMERIAI:";
+    [ids,cbs,labels,hints]=ld1_button_registry();
+    for k=1:size(ids,"*")
+        lines($+1,1)="  ["+ids(k)+"] "+labels(k)+" – "+hints(k);
+    end
+    lines($+1,1)=" ";
+    lines($+1,1)="ETAPAI – E NUMERIAI: [E01]–[E09] mygtukai viršutinėje juostoje.";
+    lines($+1,1)="ATSAKYMŲ LAUKELIAI – A NUMERIAI: [Aetapas.laukelis], pvz. [A03.02] yra";
+    lines($+1,1)="3 etapo 2 laukelis. Vietos: 27 laukeliai [A01.01]–[A09.03].";
+    lines($+1,1)=" ";
+    lines($+1,1)="KITI VALDIKLIAI: [V01] VR1 slankiklis; [V02] peržiūros režimo žymė;";
+    lines($+1,1)="[H01] pagalbinių langų mygtukas Uždaryti.";
+    lines($+1,1)="Taip/Ne ir Nuosekli/Lygiagreti/Mišri jungikliai palikti be numerių.";
+    ld1_show_text_window("[B13] STENDO ŽEMĖLAPIS – visų numerių registras",lines);
+endfunction
+
+function ld1_show_text_window(title,rows)
+    // Paprastas sąrašo langas su [H01] Uždaryti mygtuku.
+    global LD1;
+    if ~isfield(LD1,"ui") then return; end
+    f=figure("default_axes","off","dockable","off","menubar","none","toolbar","none");
+    f.figure_name=title;
+    f.axes_size=[940 640];
+    f.figure_position=[40 40];
+    f.resize="on";
+    uicontrol(f,"style","listbox","units","normalized", ..
+        "position",[0.025 0.11 0.95 0.86], ..
+        "string",rows,"fontname","Arial","fontunits","pixels","fontsize",13, ..
+        "backgroundcolor",[1 1 1]);
+    uicontrol(f,"style","pushbutton","units","normalized", ..
+        "position",[0.68 0.02 0.29 0.06], ..
+        "string","[H01] Uždaryti","tag","H01", ..
+        "tooltipstring","[H01] Uždaro šį žinyno langą.", ..
+        "fontsize",10,"fontweight","bold", ..
+        "callback",msprintf("ld1_aux_close(%d)",f.figure_id));
+endfunction
+
+function ld1_aux_close(fid)
+    f=findobj("figure_id",fid);
+    if f<>[] then delete(f); end
+endfunction
 function ld1_restore_current_stage_board()
     // Atkuriama tik dabartinio etapo saugi pradinė būsena, o ne visas laboratorinis darbas.
     global LD1;
@@ -419,7 +483,7 @@ function ld1_prepare_review_stage(n)
     if n<9 then
         // Saugiai išjungiame, bet nevalome LD1.stepMeas(n).
         LD1.powerOn=%f;
-        LD1.ui.power.string="IŠJUNGTA";
+        ld1_button_string(LD1.ui.power,"IŠJUNGTA");
         LD1.ui.power.backgroundcolor=[0.94 0.82 0.82];
         LD1.ui.sourceDisplay.string="0 V DC";
         LD1.lastMeasurement=%nan; LD1.lastMeasurementUnit=""; LD1.lastMeasurementStep=0;
@@ -443,7 +507,9 @@ function ld1_terminal_click(id)
             if ld1_terminal_wire_count(a)>0 then
                 LD1.pendingTerminal="";
                 if LD1.step==8 & a=="VR1_2" then
-                    fix="VR1(2) šiame etape jau teisingai jungiasi į B3. Ampermetro COM junkite į "+ld1_terminal_button_text(LD1.kclTargetA)+", ne į VR1.";
+                    tpart="";
+                    if exists("ld1_terminal_code")==1 then tpart=" ["+ld1_terminal_code(LD1.kclTargetA)+"]"; end
+                    fix="VR1(2) [T10] šiame etape jau teisingai jungiasi į B3 [T19]. Ampermetro COM [T12] junkite į "+ld1_terminal_button_text(LD1.kclTargetA)+tpart+", ne į VR1.";
                 else
                     fix=ld1_current_connection_fix();
                 end
@@ -454,7 +520,9 @@ function ld1_terminal_click(id)
             if ld1_terminal_wire_count(b)>0 then
                 LD1.pendingTerminal="";
                 if LD1.step==8 & b=="VR1_2" then
-                    fix="VR1(2) šiame etape jau teisingai jungiasi į B3. Ampermetro COM junkite į "+ld1_terminal_button_text(LD1.kclTargetA)+", ne į VR1.";
+                    tpart="";
+                    if exists("ld1_terminal_code")==1 then tpart=" ["+ld1_terminal_code(LD1.kclTargetA)+"]"; end
+                    fix="VR1(2) [T10] šiame etape jau teisingai jungiasi į B3 [T19]. Ampermetro COM [T12] junkite į "+ld1_terminal_button_text(LD1.kclTargetA)+tpart+", ne į VR1.";
                 else
                     fix=ld1_current_connection_fix();
                 end
@@ -479,7 +547,9 @@ endfunction
 function ld1_remove_last_wire()
     global LD1;
     if LD1.step==8 & size(LD1.wires,1)<=6 then
-        ld1_set_status("8 etapo šeši baziniai laidai yra užrakinti.","info","Atšaukti galima tik jūsų pridėtus ampermetro laidus. Prijunkite: +→+/mA ir COM→"+ld1_terminal_button_text(LD1.kclTargetA)+".");
+        tpart="";
+        if exists("ld1_terminal_code")==1 then tpart=" ["+ld1_terminal_code(LD1.kclTargetA)+"]"; end
+        ld1_set_status("8 etapo šeši baziniai laidai yra užrakinti.","info","Atšaukti galima tik jūsų pridėtus ampermetro laidus. Prijunkite: [T01]→[T11] ir [T12]→"+ld1_terminal_button_text(LD1.kclTargetA)+tpart+".");
         return;
     end
     if size(LD1.wires,1)==0 then
@@ -498,7 +568,7 @@ endfunction
 function ld1_clear_wires()
     global LD1;
     if LD1.step<>1 & LD1.step<>5 then
-        ld1_set_status("Šiame etape visa schema nuo atsitiktinio išvalymo užrakinta.","info","Jei reikia teisingos pradinės būsenos, spauskite Pagalba → Atkurti stendą.");
+        ld1_set_status("Šiame etape visa schema nuo atsitiktinio išvalymo užrakinta.","info","Jei reikia teisingos pradinės būsenos, spauskite ATKURTI ETAPO STENDĄ [B12].");
         return;
     end
     LD1.wires=emptystr(0,2);
@@ -512,7 +582,7 @@ endfunction
 function ld1_force_power_off()
     global LD1;
     LD1.powerOn=%f;
-    LD1.ui.power.string="IŠJUNGTA";
+    ld1_button_string(LD1.ui.power,"IŠJUNGTA");
     LD1.ui.power.backgroundcolor=[0.94 0.82 0.82];
     LD1.ui.sourceDisplay.string="0 V DC";
     ld1_invalidate_measurement();
@@ -602,7 +672,7 @@ function ld1_restore_voltage_stage_wiring()
     LD1.ui.modeA.value=0; LD1.ui.modeV.value=1;
     ld1_set_parallel_meter_layout(%f);
     LD1.powerOn=%f;
-    LD1.ui.power.string="IŠJUNGTA";
+    ld1_button_string(LD1.ui.power,"IŠJUNGTA");
     LD1.ui.power.backgroundcolor=[0.94 0.82 0.82];
     LD1.ui.sourceDisplay.string="0 V DC";
     LD1.lastMeasurement=%nan; LD1.lastMeasurementUnit=""; LD1.lastMeasurementStep=0;
@@ -617,12 +687,12 @@ function ld1_toggle_power()
     LD1.powerOn=~LD1.powerOn;
     ld1_invalidate_measurement();
     if LD1.powerOn then
-        LD1.ui.power.string="ĮJUNGTA";
+        ld1_button_string(LD1.ui.power,"ĮJUNGTA");
         LD1.ui.power.backgroundcolor=[0.72 0.92 0.74];
         LD1.ui.sourceDisplay.string=string(LD1.cfg.E)+" V DC";
-        ld1_set_status("Maitinimo šaltinis įjungtas: E = "+string(LD1.cfg.E)+" V. Naujam rodmeniui paspauskite MATUOTI.","ok");
+        ld1_set_status("Maitinimo šaltinis [B01] įjungtas: E = "+string(LD1.cfg.E)+" V. Naujam rodmeniui paspauskite MATUOTI [B06].","ok");
     else
-        LD1.ui.power.string="IŠJUNGTA";
+        ld1_button_string(LD1.ui.power,"IŠJUNGTA");
         LD1.ui.power.backgroundcolor=[0.94 0.82 0.82];
         LD1.ui.sourceDisplay.string="0 V DC";
         ld1_set_status("Maitinimo šaltinis išjungtas. Ankstesnis matavimo rodmuo panaikintas.","info");
@@ -720,11 +790,11 @@ endfunction
 
 function [ok,msg,fix] = ld1_validate_series_topology()
     global LD1;
-    ok=%f; msg=""; fix="Išjunkite maitinimą ir junkite tiksliai: +→R1(1), R1(2)→VR1(1), VR1(2)→+/mA, COM→−.";
-    if LD1.meterMode<>"A" then msg="Srovės matavimui pasirinktas neteisingas multimetro režimas."; fix="Pasirinkite A (DC). Tada palikite ampermetrą nuoseklioje kilpoje."; return; end
+    ok=%f; msg=""; fix="Išjunkite maitinimą [B01] ir junkite tiksliai: [T01]→[T03], [T04]→[T09], [T10]→[T11], [T12]→[T02].";
+    if LD1.meterMode<>"A" then msg="Srovės matavimui pasirinktas neteisingas multimetro režimas."; fix="Pasirinkite A (DC) [B07]. Tada palikite ampermetrą nuoseklioje kilpoje."; return; end
     if size(LD1.wires,1)<>4 then
         msg="Nuosekliai grandinei turi būti tiksliai 4 laidai; dabar yra "+string(size(LD1.wires,1))+".";
-        fix="Išjunkite maitinimą. Naudokite 4 jungtis: +→R1(1); R1(2)→VR1(1); VR1(2)→+/mA; COM→−. Patogiausia: IŠVALYTI LAIDUS ir Pagalba → Kaip sujungti."; return;
+        fix="Išjunkite maitinimą [B01]. Naudokite 4 jungtis: [T01]→[T03]; [T04]→[T09]; [T10]→[T11]; [T12]→[T02]. Patogiausia: IŠVALYTI LAIDUS [B11] ir KAIP SUJUNGTI [B05]."; return;
     end
     [parent,roots]=ld1_wire_roots();
     ids=["SRC_P";"SRC_N";"R1_1";"R1_2";"VR1_1";"VR1_2";"M_P";"M_N"];
@@ -740,7 +810,7 @@ function [ok,msg,fix] = ld1_validate_series_topology()
         roots(ld1_term_index("M_P")) roots(ld1_term_index("M_N"))];
     deg=zeros(1,4); adj=zeros(4,4);
     for k=1:4
-        if ep(k,1)==ep(k,2) then msg="Vienas elementas užtrumpintas laidu."; fix="IŠVALYTI LAIDUS ir sujunkite pagal Pagalba → Kaip sujungti. Nė vieno elemento gnybtų nejunkite tiesiogiai tarpusavyje."; return; end
+        if ep(k,1)==ep(k,2) then msg="Vienas elementas užtrumpintas laidu."; fix="IŠVALYTI LAIDUS [B11] ir sujunkite pagal KAIP SUJUNGTI [B05]. Nė vieno elemento gnybtų nejunkite tiesiogiai tarpusavyje."; return; end
         a=find(u==ep(k,1)); b=find(u==ep(k,2)); a=a(1); b=b(1);
         deg(a)=deg(a)+1; deg(b)=deg(b)+1; adj(a,b)=1; adj(b,a)=1;
     end
@@ -749,7 +819,6 @@ function [ok,msg,fix] = ld1_validate_series_topology()
     end
     ok=%t; msg="Nuosekli grandinė sujungta teisingai."; fix="";
 endfunction
-
 function tf = ld1_two_series_between(pair1,pair2,p,n)
     tf=%f;
     // Tikriname visas pasyvių elementų orientacijas ir abi šakos kryptis.
@@ -773,51 +842,52 @@ endfunction
 function [ok,msg,fix] = ld1_validate_parallel_voltage_topology()
     global LD1;
     ok=%f; msg="";
-    fix="Išjunkite maitinimą. +→A1, −→B1; A2→R3(1), R3(2)→B2; A3→R2(1), R2(2)→VR1(1), VR1(2)→B3; V+→A4, COM→B4.";
-    if LD1.meterMode<>"V" then msg="UAB matavimui pasirinktas neteisingas multimetro režimas."; fix="Pasirinkite V (DC). Voltmetro + turi būti A mazge, COM – B mazge."; return; end
+    fix="Išjunkite maitinimą [B01]. [T01]→[T13], [T02]→[T17]; [T14]→[T07], [T08]→[T18]; [T15]→[T05], [T06]→[T09], [T10]→[T19]; [T11]→[T16], [T12]→[T20].";
+    if LD1.meterMode<>"V" then msg="UAB matavimui pasirinktas neteisingas multimetro režimas."; fix="Pasirinkite V (DC) [B08]. Voltmetro + [T11] turi būti A mazge, COM [T12] – B mazge."; return; end
     if size(LD1.wires,1)<>9 then
         msg="5–7 etapų lygiagrečiai schemai turi būti 9 laidai; dabar yra "+string(size(LD1.wires,1))+".";
-        fix="Spauskite Pagalba → Kaip sujungti ir patikrinkite 9 jungtis. Jei tai ne 5 etapas, greičiausia išeitis – Pagalba → Atkurti stendą."; return;
+        fix="Spauskite KAIP SUJUNGTI [B05] ir patikrinkite 9 jungtis. Jei tai ne 5 etapas, greičiausia išeitis – ATKURTI ETAPO STENDĄ [B12]."; return;
     end
     [parent,roots]=ld1_wire_roots();
     p=roots(ld1_term_index("SRC_P")); n=roots(ld1_term_index("SRC_N"));
-    if p==n then msg="Maitinimo šaltinis užtrumpintas."; fix="Išjunkite maitinimą, pašalinkite laidą tarp A ir B / šaltinio + ir −, tada spauskite Pagalba → Kaip sujungti."; return; end
+    if p==n then msg="Maitinimo šaltinis užtrumpintas."; fix="Išjunkite maitinimą [B01], pašalinkite laidą tarp A ir B / šaltinio + ir −, tada spauskite KAIP SUJUNGTI [B05]."; return; end
     if ~ld1_parallel_resistor_core(roots,p,n) then
         msg="Lygiagrečios šakos sujungtos neteisingai."; return;
     end
     mp=ld1_endpoint_root_set("M_P","M_N",roots);
     if ~ld1_unordered_pair_equal(mp,[p n]) then
-        msg="Voltmetras neprijungtas tarp tų pačių A ir B mazgų."; fix="Voltmetro +/V junkite į A4, COM – į B4. Kitų šakų nekeiskite."; return;
+        msg="Voltmetras neprijungtas tarp tų pačių A ir B mazgų."; fix="Voltmetro +/V [T11] junkite į A4 [T16], COM [T12] – į B4 [T20]. Kitų šakų nekeiskite."; return;
     end
     ok=%t; msg="Lygiagreti grandinė ir voltmetras sujungti teisingai."; fix="";
 endfunction
-
 function [ok,msg,fix] = ld1_validate_parallel_total_current_topology()
     // 2-7-3 pav. logika: ampermetras bendrame teigiamame laide prieš mazgą A.
     global LD1;
     ok=%f; msg="";
     targetA=ld1_terminal_button_text(LD1.kclTargetA);
-    fix="Kitų 6 laidų nelieskite. Prijunkite TIK: šaltinio +→+/mA ir COM→"+targetA+". Jei abejojate – Pagalba → Atkurti stendą.";
-    if LD1.meterMode<>"A" then msg="Bendrai srovei matuoti pasirinktas neteisingas multimetro režimas."; fix="Pasirinkite A (DC), tada junkite šaltinio +→+/mA ir COM→"+targetA+"."; return; end
+    tpart="";
+    if exists("ld1_terminal_code")==1 then tpart=" ["+ld1_terminal_code(LD1.kclTargetA)+"]"; end
+    fix="Kitų 6 laidų nelieskite. Prijunkite TIK: šaltinio + [T01]→+/mA [T11] ir COM [T12]→"+targetA+tpart+". Jei abejojate – ATKURTI ETAPO STENDĄ [B12].";
+    if LD1.meterMode<>"A" then msg="Bendrai srovei matuoti pasirinktas neteisingas multimetro režimas."; fix="Pasirinkite A (DC) [B07], tada junkite šaltinio + [T01]→+/mA [T11] ir COM [T12]→"+targetA+tpart+"."; return; end
     if size(LD1.wires,1)<6 then
-        msg="Trūksta vieno ar kelių bazinių 8 etapo laidų."; fix="Spauskite Pagalba → Atkurti stendą. Programa grąžins 6 bazinius laidus; tada pridėsite tik 2 ampermetro laidus."; return;
+        msg="Trūksta vieno ar kelių bazinių 8 etapo laidų."; fix="Spauskite ATKURTI ETAPO STENDĄ [B12]. Programa grąžins 6 bazinius laidus; tada pridėsite tik 2 ampermetro laidus."; return;
     elseif size(LD1.wires,1)>8 then
-        msg="8 etape yra per daug laidų."; fix="Spauskite Pagalba → Atkurti stendą ir pridėkite tik dvi jungtis: +→+/mA bei COM→"+targetA+"."; return;
+        msg="8 etape yra per daug laidų."; fix="Spauskite ATKURTI ETAPO STENDĄ [B12] ir pridėkite tik dvi jungtis: [T01]→[T11] bei [T12]→"+targetA+tpart+"."; return;
     end
     mpCount=ld1_terminal_wire_count("M_P"); mnCount=ld1_terminal_wire_count("M_N");
     if mpCount==0 & mnCount==0 then
         msg="Ampermetras dar visai neprijungtas.";
-        fix="Atlikite dvi jungtis iš eilės: 1) šaltinio +→+/mA; 2) COM→"+targetA+". Tada PATIKRINTI SUJUNGIMĄ."; return;
+        fix="Atlikite dvi jungtis iš eilės: 1) [T01]→[T11]; 2) [T12]→"+targetA+tpart+". Tada PATIKRINTI SUJUNGIMĄ [B09]."; return;
     elseif mpCount==0 then
         msg="Trūksta ampermetro +/mA pusės jungties.";
-        fix="Prijunkite šaltinio + prie ampermetro +/mA (oranžiniai kontaktai). COM jungties nekeiskite."; return;
+        fix="Prijunkite šaltinio + [T01] prie ampermetro +/mA [T11] (oranžiniai kontaktai). COM jungties nekeiskite."; return;
     elseif mnCount==0 then
         msg="Trūksta ampermetro COM pusės jungties.";
-        fix="Prijunkite ampermetro COM prie "+targetA+" (violetiniai kontaktai). +/mA jungties nekeiskite."; return;
+        fix="Prijunkite ampermetro COM [T12] prie "+targetA+tpart+" (violetiniai kontaktai). +/mA jungties nekeiskite."; return;
     end
     if size(LD1.wires,1)<>8 then
         msg="Prijungti abu ampermetro gnybtai, bet bendras laidų skaičius nėra 8.";
-        fix="Spauskite Pagalba → Atkurti stendą. Tada pridėkite tik: šaltinio +→+/mA ir COM→"+targetA+"."; return;
+        fix="Spauskite ATKURTI ETAPO STENDĄ [B12]. Tada pridėkite tik: [T01]→[T11] ir [T12]→"+targetA+tpart+"."; return;
     end
 
     [parent,roots]=ld1_wire_roots();
@@ -825,24 +895,23 @@ function [ok,msg,fix] = ld1_validate_parallel_total_current_topology()
     a=roots(ld1_term_index("NODE_A1")); b=roots(ld1_term_index("NODE_B1"));
     mp=roots(ld1_term_index("M_P")); mn=roots(ld1_term_index("M_N"));
 
-    if sp==sn then msg="Maitinimo šaltinis užtrumpintas."; fix="Išjunkite maitinimą ir spauskite Pagalba → Atkurti stendą. Tada prijunkite tik dvi pažymėtas poras."; return; end
+    if sp==sn then msg="Maitinimo šaltinis užtrumpintas."; fix="Išjunkite maitinimą [B01] ir spauskite ATKURTI ETAPO STENDĄ [B12]. Tada prijunkite tik dvi pažymėtas poras."; return; end
     if sp==a then
-        msg="Šaltinio + vis dar turi tiesioginį kelią į mazgą A, todėl srovė apeina ampermetrą."; fix="Pašalinkite tiesioginį +→A laidą. Turi likti tik +→+/mA→COM→"+targetA+"."; return;
+        msg="Šaltinio + vis dar turi tiesioginį kelią į mazgą A, todėl srovė apeina ampermetrą."; fix="Pašalinkite tiesioginį +→A laidą. Turi likti tik [T01]→[T11]→[T12]→"+targetA+tpart+"."; return;
     end
     if b<>sn then
-        msg="Mazgas B nebėra sujungtas su šaltinio − (0 V)."; fix="Atkurkite B grįžtamąjį laidą: B1→šaltinio −. Paprasčiausia – Pagalba → Atkurti stendą."; return;
+        msg="Mazgas B nebėra sujungtas su šaltinio − (0 V)."; fix="Atkurkite B grįžtamąjį laidą: [T17]→[T02]. Paprasčiausia – ATKURTI ETAPO STENDĄ [B12]."; return;
     end
     if ~(mp==sp & mn==a) then
-        msg="Ampermetro +/mA ir COM prijungti ne ta tvarka arba ne į bendrą + laidą."; fix="Oranžiniai: šaltinio +↔+/mA. Violetiniai: COM↔"+targetA+". Ampermetras turi būti prieš srovės išsišakojimą."; return;
+        msg="Ampermetro +/mA ir COM prijungti ne ta tvarka arba ne į bendrą + laidą."; fix="Oranžiniai: [T01]↔[T11]. Violetiniai: [T12]↔"+targetA+tpart+". Ampermetras turi būti prieš srovės išsišakojimą."; return;
     end
-    if mp==mn then msg="Ampermetras užtrumpintas laidu."; fix="Pašalinkite laidą tarp +/mA ir COM. Jungti reikia per grandinę: šaltinio +→+/mA, COM→"+targetA+"."; return; end
+    if mp==mn then msg="Ampermetras užtrumpintas laidu."; fix="Pašalinkite laidą tarp [T11] ir [T12]. Jungti reikia per grandinę: [T01]→[T11], [T12]→"+targetA+tpart+"."; return; end
     if ~ld1_parallel_resistor_core(roots,a,b) then
-        msg="Viena iš dviejų lygiagrečių šakų sugadinta."; fix="R3 turi likti tarp A2-B2, o R2+VR1 tarp A3-B3. Spauskite Pagalba → Atkurti stendą, tada junkite tik ampermetro 2 laidus."; return;
+        msg="Viena iš dviejų lygiagrečių šakų sugadinta."; fix="R3 turi likti tarp [T14]-[T18], o R2+VR1 tarp [T15]-[T19]. Spauskite ATKURTI ETAPO STENDĄ [B12], tada junkite tik ampermetro 2 laidus."; return;
     end
 
     ok=%t; msg="Teisingai: visa bendra srovė teka per ampermetrą ir tik tada mazge A pasidalija į I1 ir I2."; fix="";
 endfunction
-
 function ld1_check_wiring()
     global LD1;
     if LD1.panel=="series" then
@@ -860,11 +929,11 @@ function ld1_set_power_quiet(on)
     global LD1;
     LD1.powerOn=on;
     if on then
-        LD1.ui.power.string="ĮJUNGTA";
+        ld1_button_string(LD1.ui.power,"ĮJUNGTA");
         LD1.ui.power.backgroundcolor=[0.72 0.92 0.74];
         LD1.ui.sourceDisplay.string=string(LD1.cfg.E)+" V DC";
     else
-        LD1.ui.power.string="IŠJUNGTA";
+        ld1_button_string(LD1.ui.power,"IŠJUNGTA");
         LD1.ui.power.backgroundcolor=[0.94 0.82 0.82];
         LD1.ui.sourceDisplay.string="0 V DC";
     end
@@ -1011,7 +1080,7 @@ function ld1_restore_solution_state()
     end
     LD1.ui.resultsTable.string=S.resultsString;
     LD1.ui.checkStep.string=S.checkStepString;
-    LD1.ui.solution.string="Pagalba → Pavyzdys";
+    ld1_button_string(LD1.ui.solution,"Pagalba → Pavyzdys");
     ld1_update_actual_values();
     if ~isnan(LD1.lastMeasurement) then
         LD1.ui.meterDisplay.string=ld1_num(LD1.lastMeasurement,3)+" "+LD1.lastMeasurementUnit;
@@ -1175,7 +1244,7 @@ function ld1_toggle_solution()
     end
     ld1_snapshot_solution_state();
     LD1.demoMode=%t;
-    LD1.ui.solution.string="GRĮŽTI Į SAVO DARBĄ";
+    ld1_button_string(LD1.ui.solution,"GRĮŽTI Į SAVO DARBĄ");
     ld1_apply_solution_state();
     ld1_set_solution_lock(%t);
     ld1_set_status("RODOMAS TEISINGAS PAVYZDYS – jūsų darbas nepakeistas.","warn","Peržiūrėkite laidus, režimą, VR1, formules ir rodmenį. Tada spauskite GRĮŽTI Į SAVO DARBĄ ir atkartokite.");
@@ -1186,21 +1255,21 @@ function ld1_show_help()
     txt=["LD1 – TEORIJA IR STENDO ATMINTINĖ";
          "";
          "STENDO VALDYMAS";
-         "• Laidui prijungti: spauskite vieną rodomą lizdą, tada kitą.";
+         "• Laidui prijungti: spauskite vieną rodomą lizdą, tada kitą.";"• Kontaktų numerius (T01–T20) rodo gnybtų žymės ir STENDO ŽEMĖLAPIS [B13].";
          "• 1 ir 5 etapuose jungiate visą schemą; 2–4 ir 6–7 etapuose patikrinti laidai užrakinami.";
          "• 8 etape aktyvūs tik 4 lizdai: šaltinio +, +/mA, COM ir nurodytas A lizdas.";
-         "• PATIKRINTI SUJUNGIMĄ parodo: kas blogai + kaip tiksliai pataisyti.";
-         "• Pagalba → Kaip sujungti parodo visą dabartinio etapo jungimo sąrašą.";
-         "• Pagalba → Pavyzdys laikinai parodo pilnai teisingą, veikiantį dabartinio etapo variantą.";
+         "• PATIKRINTI SUJUNGIMĄ [B09] parodo: kas blogai + kaip tiksliai pataisyti.";
+         "• KAIP SUJUNGTI [B05] parodo visą dabartinio etapo jungimo sąrašą.";
+         "• PAVYZDYS / SPRENDIMAS [B17] laikinai parodo pilnai teisingą, veikiantį dabartinio etapo variantą.";
          "• Grįžus iš PAVYZDŽIO jūsų laidai, atsakymai ir matavimai lieka tokie, kokie buvo.";
-         "• Pagalba → Atkurti stendą atkuria tik šio etapo saugią pradinę būseną.";
-         "• TOLIAU leidžia ir PRaleisti nebaigtą etapą; toks etapas pažymimas geltonai ir jį galima užbaigti vėliau.";
-         "• DĖSTYTOJO / PERŽIŪROS REŽIMAS leidžia atidaryti bet kurį 1–9 etapą be ankstesnių atlikimo.";
+         "• ATKURTI ETAPO STENDĄ [B12] atkuria tik šio etapo saugią pradinę būseną.";
+         "• TOLIAU [B16] leidžia ir PRaleisti nebaigtą etapą; toks etapas pažymimas geltonai ir jį galima užbaigti vėliau.";
+         "• DĖSTYTOJO / PERŽIŪROS REŽIMAS [V02] leidžia atidaryti bet kurį 1–9 etapą be ankstesnių atlikimo.";
          "";
          "MATAVIMO TAISYKLĖS";
          "• Ampermetras jungiamas NUOSEKLIAI su matuojama srove.";
          "• Voltmetras jungiamas LYGIAGREČIAI tarp A ir B.";
-         "• Skaitinis rodmuo atsiranda tik paspaudus MATUOTI.";
+         "• Skaitinis rodmuo atsiranda tik paspaudus MATUOTI [B06].";
          "";
          "REIKALINGOS FORMULĖS";
          "• Omo dėsnis: I = U/R.";
@@ -1211,7 +1280,7 @@ function ld1_show_help()
          "• Kirchhoffas mazge: Ibendr = I1 + I2.";
          "• 8 etape VR1=0 Ω: I1=E/R3, I2=E/R2.";
          "";
-         "PASTABOS APIE VIRTUALIĄ LABORATORIJĄ";
+         "PASTABOS APIE VIRTUALIĄ LABORATORORIJĄ";
          "• Atsakymų skaitinė tolerancija yra programos mokomoji taisyklė, ne originalaus aprašo tekstas.";
          "• 8 etape voltmetras vizualiai nuimamas, kad stendas būtų aiškesnis; 13–14 punktams jo rodmens nereikia.";
          "• Varžos įvedamos omais: 1 kΩ = 1000 Ω."];
@@ -1297,8 +1366,8 @@ function ld1_prepare_step_common()
     ld1_hide_all_answers();
     LD1.ui.resultsTable.visible="off";
     LD1.ui.resultsTable.position=[0.04 0.10 0.92 0.78];
-    LD1.ui.checkStep.string="PATIKRINTI IR UŽFIKSUOTI ETAPĄ";
-    LD1.ui.solution.string="Pagalba → Pavyzdys";
+    ld1_button_string(LD1.ui.checkStep,"PATIKRINTI IR UŽFIKSUOTI ETAPĄ");
+    ld1_button_string(LD1.ui.solution,"Pagalba → Pavyzdys");
     LD1.ui.instructionFrame.visible="on";
     LD1.ui.instructionFrame.position=[0.035 0.735 0.93 0.245];
     LD1.ui.standFrame.visible="on";
@@ -1384,7 +1453,9 @@ function ld1_set_step(n)
     end
     LD1.step=n;
     LD1.lastMeasurement=%nan; LD1.lastMeasurementUnit=""; LD1.lastMeasurementStep=0;
-    LD1.ui.meterDisplay.string="—";
+    // 9 etape lenta išvaloma, todėl grįžtant rodmens valdiklis gali būti dar
+    // nesukurtas – jį atkurs artėjantis ld1_redraw_panel.
+    if is_handle_valid(LD1.ui.meterDisplay) then LD1.ui.meterDisplay.string="—"; end
 
     if n<=4 & LD1.panel<>"series" then ld1_switch_panel("series"); end
     if n>=5 & n<=8 & LD1.panel<>"parallel" then ld1_switch_panel("parallel"); end
@@ -1399,24 +1470,23 @@ function ld1_set_step(n)
 
     select n
     case 1 then
-        LD1.powerOn=%f; LD1.ui.power.string="IŠJUNGTA"; LD1.ui.power.backgroundcolor=[0.94 0.82 0.82]; LD1.ui.sourceDisplay.string="0 V DC";
+        LD1.powerOn=%f; ld1_button_string(LD1.ui.power,"IŠJUNGTA"); LD1.ui.power.backgroundcolor=[0.94 0.82 0.82]; LD1.ui.sourceDisplay.string="0 V DC";
         ld1_apply_meter_mode_quiet("A");
         LD1.VR1=1000; LD1.ui.vrSlider.value=1000; LD1.ui.vrText.string="1000 Ω"; ld1_update_actual_values();
         ld1_set_instruction("1. SUJUNKITE NUOSEKLIĄ GRANDINĘ", [
-            "1) Šaltinio + → R1(1).";
-            "2) R1(2) → VR1(1).";
-            "3) VR1(2) → multimetro +/mA; COM → šaltinio −.";
-            "4) Multimetras A (DC), maitinimas IŠJUNGTAS. Turi būti 4 laidai.";
-            "5) Jei neaišku – spauskite Pagalba → Kaip sujungti. Tada pasirinkite NUOSEKLI."]);
+            "1) Šaltinio + [T01] → R1 [T03].";
+            "2) R1 [T04] → VR1 [T09].";
+            "3) VR1 [T10] → +/mA [T11]; COM [T12] → šaltinio − [T02].";
+            "4) Multimetras A (DC) [B07], maitinimas [B01] IŠJUNGTAS. Turi būti 4 laidai.";
+            "5) Jei neaišku – KAIP SUJUNGTI [B05]. Tada pasirinkite NUOSEKLI."]);
         ld1_show(LD1.ui.typeSeries,%t); ld1_show(LD1.ui.typeParallel,%t); ld1_show(LD1.ui.typeMixed,%t);
-        ld1_set_status("Sujunkite vieną uždarą nuoseklią kilpą.","info","Tikslus laidų sąrašas pasiekiamas mygtuku Pagalba → Kaip sujungti.");
+        ld1_set_status("Sujunkite vieną uždarą nuoseklią kilpą.","info","Tikslus laidų sąrašas pasiekiamas mygtuku KAIP SUJUNGTI [B05].");
     case 2 then
         LD1.VR1=1000; LD1.ui.vrSlider.value=1000; LD1.ui.vrText.string="1000 Ω"; ld1_update_actual_values();
         ld1_set_instruction("2. TEORINIS SKAIČIAVIMAS", [
-            "Jungimo nekeiskite. VR1 = 1 kΩ (1000 Ω).";
-            "Apskaičiuokite Rbendr = R1 + VR1.";
-            "Apskaičiuokite I = E / Rbendr.";
-            "Srovę įrašykite miliamperais (mA).";
+            "Jungimo nekeiskite. VR1 = 1000 Ω [B04].";
+            "Apskaičiuokite Rbendr = R1 + VR1 ir įrašykite į [A02.01].";
+            "Apskaičiuokite I = E / Rbendr ir įrašykite į [A02.02] (mA).";
             "Šiame etape matuoti nereikia."]);
         ld1_show_numeric_field(1,"Rbendr, Ω"); ld1_show_numeric_field(2,"I skaič., mA");
         ld1_set_status("Apskaičiuokite teorines reikšmes.","info","Jei grįžote iš vėlesnio etapo, ankstesni įrašai bus atkurti automatiškai.");
@@ -1424,72 +1494,74 @@ function ld1_set_step(n)
         LD1.VR1=1000; LD1.ui.vrSlider.value=1000; LD1.ui.vrText.string="1000 Ω"; ld1_update_actual_values();
         ld1_apply_meter_mode_quiet("A");
         ld1_set_instruction("3. IŠMATUOKITE SROVĘ", [
-            "Jungimas toks pats kaip 1 etape; VR1 = 1 kΩ.";
-            "1) Įjunkite 10 V maitinimą.";
-            "2) Multimetras A (DC), nuosekliai. Paspauskite MATUOTI.";
+            "Jungimas toks pats kaip 1 etape; VR1 = 1 kΩ [B04].";
+            "1) Įjunkite 10 V maitinimą [B01].";
+            "2) Multimetras A (DC) [B07]; spauskite MATUOTI [B06].";
             "3) Palyginkite rodmenį su 2 etapo skaičiavimu.";
             "4) Pažymėkite Taip arba Ne."]);
         ld1_show_yes_no("Ar I išmatuota ≈ I apskaičiuota?");
-        ld1_set_status("Paruošta srovės matavimui.","info","Jei sujungimas sugadintas – spauskite Pagalba → Atkurti stendą, tada įjunkite maitinimą ir MATUOTI.");
+        ld1_set_status("Paruošta srovės matavimui.","info","Jei sujungimas sugadintas – spauskite ATKURTI ETAPO STENDĄ [B12], tada įjunkite maitinimą [B01] ir MATUOTI [B06].");
     case 4 then
         LD1.VR1=500; LD1.ui.vrSlider.value=500; LD1.ui.vrText.string="500 Ω"; ld1_update_actual_values();
         ld1_apply_meter_mode_quiet("A");
         ld1_set_instruction("4. VR1 = 500 Ω", [
-            "Jungimo nekeiskite. VR1 nustatytas į 500 Ω.";
-            "1) Apskaičiuokite Rbendr = R1 + VR1.";
-            "2) Apskaičiuokite I = E / Rbendr (mA).";
-            "3) Įjunkite maitinimą, MATUOTI ir palyginkite reikšmes.";
+            "Jungimo nekeiskite. VR1 = 500 Ω [B03].";
+            "1) Apskaičiuokite Rbendr = R1 + VR1 → [A04.01].";
+            "2) Apskaičiuokite I = E / Rbendr (mA) → [A04.02].";
+            "3) Įjunkite maitinimą [B01], MATUOTI [B06] ir palyginkite reikšmes.";
             "4) Pažymėkite Taip/Ne. Mažesnė Rbendr turi duoti didesnę I."]);
         ld1_show_numeric_field(1,"Rbendr, Ω"); ld1_show_numeric_field(2,"I skaič., mA");
         ld1_show_yes_no("Ar I išmatuota ≈ I apskaičiuota?");
-        ld1_set_status("Pakartokite nuoseklios grandinės bandymą su VR1 = 500 Ω.","info","Jungimo keisti nereikia – keičiasi tik VR1 ir srovė.");
+        ld1_set_status("Pakartokite nuoseklios grandinės bandymą su VR1 = 500 Ω.","info","Jungimo keisti nereikia – keičiasi tik VR1 [B03] ir srovė.");
     case 5 then
         LD1.kclPrepared=%f;
         ld1_set_parallel_meter_layout(%f);
-        LD1.powerOn=%f; LD1.ui.power.string="IŠJUNGTA"; LD1.ui.power.backgroundcolor=[0.94 0.82 0.82]; LD1.ui.sourceDisplay.string="0 V DC";
+        LD1.powerOn=%f; ld1_button_string(LD1.ui.power,"IŠJUNGTA"); LD1.ui.power.backgroundcolor=[0.94 0.82 0.82]; LD1.ui.sourceDisplay.string="0 V DC";
         ld1_apply_meter_mode_quiet("V");
         LD1.VR1=1000; LD1.ui.vrSlider.value=1000; LD1.ui.vrText.string="1000 Ω"; ld1_update_actual_values();
         ld1_set_instruction("5. SUJUNKITE LYGIAGREČIĄ GRANDINĘ", [
-            "1) Šaltinis: +→A1, −→B1. Šaka 1: A2→R3→B2.";
-            "2) Šaka 2: A3→R2→VR1→B3 (R2 ir VR1 nuosekliai).";
-            "3) Voltmetras: +/V→A4, COM→B4; režimas V (DC).";
-            "4) A1=A2=A3=A4; B1=B2=B3=B4. Maitinimas IŠJUNGTAS.";
-            "5) Iš viso turi būti 9 laidai. Visą sąrašą rodo Pagalba → Kaip sujungti."]);
+            "1) Šaltinis: + [T01]→A1 [T13], − [T02]→B1 [T17].";
+            "2) Šaka 1: A2 [T14]→R3 [T07]; R3 [T08]→B2 [T18].";
+            "3) Šaka 2: A3 [T15]→R2 [T05]; R2 [T06]→VR1 [T09]; VR1 [T10]→B3 [T19].";
+            "4) Voltmetras: +/V [T11]→A4 [T16]; COM [T12]→B4 [T20]; režimas V (DC) [B08].";
+            "5) Mazgai: T13–T16 ir T17–T20 bendri. Iš viso 9 laidai."]);
         ld1_show(LD1.ui.typeSeries,%t); ld1_show(LD1.ui.typeParallel,%t); ld1_show(LD1.ui.typeMixed,%t);
-        ld1_set_status("Sujunkite dvi lygiagrečias šakas tarp A ir B bei voltmetrą tarp A-B.","info","Jei kontaktai painūs – spauskite Pagalba → Kaip sujungti: ten nurodytas kiekvienas konkretus lizdas.");
+        ld1_set_status("Sujunkite dvi lygiagrečias šakas tarp A ir B bei voltmetrą tarp A-B.","info","Jei kontaktai painūs – spauskite KAIP SUJUNGTI [B05]: ten nurodytas kiekvienas konkretus lizdas.");
     case 6 then
         ld1_apply_meter_mode_quiet("V");
         LD1.VR1=1000; LD1.ui.vrSlider.value=1000; LD1.ui.vrText.string="1000 Ω"; ld1_update_actual_values();
         ld1_set_instruction("6. APSKAIČIUOKITE IR IŠMATUOKITE", [
-            "Jungimas toks pats kaip 5 etape; VR1 = 1 kΩ.";
-            "1) Apskaičiuokite bendrą lygiagrečios grandinės varžą.";
-            "2) Įjunkite 10 V maitinimą.";
-            "3) Voltmetru išmatuokite UAB tarp A ir B – spauskite MATUOTI.";
-            "4) Pažymėkite, ar UAB ≈ 10 V."]);
+            "Jungimas toks pats kaip 5 etape; VR1 = 1 kΩ [B04].";
+            "1) Bendrą lygiagrečios grandinės varžą apskaičiuokite → [A06.01].";
+            "2) Įjunkite 10 V maitinimą [B01].";
+            "3) Voltmetru išmatuokite UAB: MATUOTI [B06] (režimas V [B08]).";
+            "4) Pažymėkite, ar UAB ≈ 10 V (Taip/Ne)."]);
         ld1_show_numeric_field(1,"Rbendr, Ω"); ld1_show_yes_no("Ar UAB ≈ 10 V?");
-        ld1_set_status("Paruošta UAB skaičiavimui ir matavimui.","info","Voltmetro +/V turi būti A4, COM – B4. Jei ne – Pagalba → Atkurti stendą.");
+        ld1_set_status("Paruošta UAB skaičiavimui ir matavimui.","info","Voltmetro +/V [T11] turi būti A4 [T16], COM [T12] – B4 [T20]. Jei ne – ATKURTI ETAPO STENDĄ [B12].");
     case 7 then
         ld1_apply_meter_mode_quiet("V");
         ld1_set_instruction("7. PAKEISKITE VR1 IR STEBĖKITE UAB", [
-            "Jungimo nekeiskite – voltmetras lieka tarp A4 ir B4.";
-            "1) Pakeiskite VR1 nuo 1 kΩ, pvz., į 500 Ω.";
-            "2) Dar kartą paspauskite MATUOTI.";
+            "Jungimo nekeiskite – voltmetras lieka tarp [T16] ir [T20].";
+            "1) Pakeiskite VR1 nuo 1 kΩ, pvz., į 500 Ω [B03] arba slankikliu [V01].";
+            "2) Dar kartą paspauskite MATUOTI [B06].";
             "3) Palyginkite naują UAB su 6 etapo reikšme.";
             "4) Pažymėkite, ar UAB pakito."]);
         ld1_show_yes_no("Ar pakeitus VR1, UAB pakito?");
-        ld1_set_status("Pakeiskite tik VR1 ir atlikite naują UAB matavimą.","info","Jei sujungimas pasikeitė netyčia – Pagalba → Atkurti stendą ir kartokite tik VR1 pakeitimą.");
+        ld1_set_status("Pakeiskite tik VR1 ir atlikite naują UAB matavimą.","info","Jei sujungimas pasikeitė netyčia – ATKURTI ETAPO STENDĄ [B12] ir kartokite tik VR1 pakeitimą.");
     case 8 then
         if ~LD1.kclPrepared then ld1_prepare_kcl_stage(); end
         targetA=ld1_terminal_button_text(LD1.kclTargetA);
+        tpart="";
+        if exists("ld1_terminal_code")==1 then tpart=" ["+ld1_terminal_code(LD1.kclTargetA)+"]"; end
         ld1_set_instruction("8. BENDRA SROVĖ IR KIRCHHOFO DĖSNIS", [
-            "Ampermetras turi būti BENDRAME laide prieš srovės išsišakojimą mazge A.";
-            "1) Šaltinio + → ampermetro +/mA.";
-            "2) Ampermetro COM → "+targetA+". Kitų 6 užrakintų laidų nelieskite.";
-            "3) VR1=0 Ω. PATIKRINTI SUJUNGIMĄ → įjungti 10 V → MATUOTI.";
-            "4) Skaičiuoti: I1=10/R3; I2=10/R2; I=I1+I2. Tada palyginti su ampermetru."]);
+            "Ampermetras [B07] – BENDRAME laide prieš srovės išsišakojimą mazge A.";
+            "1) Šaltinio + [T01] → +/mA [T11].";
+            "2) COM [T12] → "+targetA+tpart+"; kitų 6 užrakintų laidų nelieskite.";
+            "3) VR1=0 Ω [B02]; PATIKRINTI SUJUNGIMĄ [B09]; 10 V [B01]; MATUOTI [B06].";
+            "4) I1=10/R3 → [A08.01]; I2=10/R2 → [A08.02]; I=I1+I2 → [A08.03]."]);
         ld1_show_numeric_field(1,"I1 = 10/R3, mA"); ld1_show_numeric_field(2,"I2 = 10/R2, mA"); ld1_show_numeric_field(3,"I = I1+I2, mA");
         ld1_show_yes_no("Ar ampermetro I ≈ I1 + I2?");
-        ld1_set_status("8 etape turite pridėti tik 2 ampermetro laidus.","info","Jei neaišku – Pagalba → Pavyzdys parodo pilnai sujungtą ir veikiantį 8 etapą; grįžus jūsų darbas lieka nepakeistas.");
+        ld1_set_status("8 etape turite pridėti tik 2 ampermetro laidus.","info","Jei neaišku – PAVYZDYS / SPRENDIMAS [B17] parodo pilnai sujungtą ir veikiantį 8 etapą; grįžus jūsų darbas lieka nepakeistas.");
     case 9 then
         LD1.ui.progress.string="9 / 9 – rezultatų suvestinė";
         LD1.ui.standFrame.visible="off";
@@ -1497,19 +1569,19 @@ function ld1_set_step(n)
         LD1.ui.instructionFrame.position=[0.035 0.43 0.93 0.55];
         ld1_set_instruction("9. PROGRAMOS SUVESTINĖ – IŠ KUR ATSIRADO SKAIČIAI?", [
             "Tai PAPILDOMA virtualios laboratorijos suvestinė; originaliame apraše atskiro 9 matavimo etapo nėra.";
-            "1–2 eilutės: 2–4 etapų nuoseklios grandinės skaičiavimai ir ampermetro rodmenys.";
-            "3 eilutė: 6 etapo lygiagrečios grandinės Rbendr ir UAB voltmetro rodmuo.";
-            "4 eilutė: 8 etapo I1=E/R3, I2=E/R2, jų suma ir bendros srovės ampermetro rodmuo.";
-            "NEATLIKTA = etapas praleistas. Pagalba → Pavyzdys = pilnas idealus variantas su formulėmis."]);
+            "1–2 eilutės: 2–4 etapų [E02]–[E04] nuoseklios grandinės skaičiavimai ir ampermetro rodmenys.";
+            "3 eilutė: 6 etapo [E06] lygiagrečios grandinės Rbendr ir UAB voltmetro rodmuo.";
+            "4 eilutė: 8 etapo [E08] I1=E/R3, I2=E/R2, jų suma ir bendros srovės ampermetro rodmuo.";
+            "NEATLIKTA = etapas praleistas. PAVYZDYS / SPRENDIMAS [B17] = pilnas idealus variantas su formulėmis."]);
         ld1_clear_board_controls();
         ld1_board_text([0.03 0.875 0.94 0.055],"9. JŪSŲ REZULTATAI",15,%t,"left",[1 1 1],[0.10 0.23 0.38]);
         ld1_board_text([0.03 0.815 0.94 0.050],"Lentelė tik SURINKA ankstesnių etapų duomenis – ji nekuria naujų skaičių.",10,%f,"left",[1 1 1],[0.18 0.22 0.28]);
         LD1.ui.resultsTable.position=[0.025 0.12 0.95 0.67];
         LD1.ui.resultsTable.visible="on";
         ld1_update_results_table(%f);
-        LD1.ui.checkStep.string="EKSPORTUOTI MANO REZULTATUS CSV";
+        ld1_button_string(LD1.ui.checkStep,"EKSPORTUOTI MANO REZULTATUS CSV");
         LD1.done(9)=%t;
-        ld1_set_status("9 etapas – tik aiški ankstesnių rezultatų suvestinė.","ok","Jei norite pamatyti, kaip turi atrodyti pilnai atliktas darbas, spauskite Pagalba → Pavyzdys.");
+        ld1_set_status("9 etapas – tik aiški ankstesnių rezultatų suvestinė.","ok","Jei norite pamatyti, kaip turi atrodyti pilnai atliktas darbas, spauskite PAVYZDYS / SPRENDIMAS [B17].");
     end
 
     // Atkuriame to etapo anksčiau įvestus atsakymus ir matavimą.
@@ -1521,7 +1593,6 @@ function ld1_set_step(n)
     end
     ld1_update_step_navigation();
 endfunction
-
 function yes = ld1_yes_selected()
     global LD1;
     yes=(LD1.ui.yes.value<>0);
@@ -1556,7 +1627,7 @@ function ld1_check_step()
         ld1_mark_done("Teisingai: grandinė nuosekli, ampermetras įjungtas nuosekliai.");
 
     case 2 then
-        if abs(LD1.VR1-1000)>1 then ld1_set_status("VR1 nėra 1000 Ω.","error","Paspauskite mygtuką 1 kΩ arba slankikliu nustatykite 1000 Ω."); return; end
+        if abs(LD1.VR1-1000)>1 then ld1_set_status("VR1 nėra 1000 Ω.","error","Paspauskite mygtuką 1 kΩ [B04] arba slankikliu [V01] nustatykite 1000 Ω."); return; end
         [R,I]=ld1_series_theory(1000);
         uR=ld1_parse_number(LD1.ui.qEdit(1).string); uI=ld1_parse_number(LD1.ui.qEdit(2).string);
         if isnan(uR) then ld1_set_status("Rbendr laukas tuščias arba įrašas nėra skaičius.","error","Įrašykite tik skaičių omais. Formulė: Rbendr = R1 + 1000 Ω."); return; end
@@ -1568,8 +1639,8 @@ function ld1_check_step()
 
     case 3 then
         [ok,msg,fix]=ld1_validate_series_topology(); if ~ok then ld1_set_status(msg,"error",fix); return; end
-        if ~LD1.powerOn then ld1_set_status("Maitinimo šaltinis išjungtas.","error","Paspauskite IŠJUNGTA/ĮJUNGTA mygtuką, kad būtų 10 V DC, tada MATUOTI."); return; end
-        if LD1.lastMeasurementStep<>3 | isnan(LD1.lastMeasurement) then ld1_set_status("Šiame etape dar nėra srovės matavimo.","error","Paspauskite MATUOTI. Jei gaunate KLAIDA – pirmiausia PATIKRINTI SUJUNGIMĄ."); return; end
+        if ~LD1.powerOn then ld1_set_status("Maitinimo šaltinis išjungtas.","error","Paspauskite maitinimo mygtuką [B01], kad būtų 10 V DC, tada MATUOTI [B06]."); return; end
+        if LD1.lastMeasurementStep<>3 | isnan(LD1.lastMeasurement) then ld1_set_status("Šiame etape dar nėra srovės matavimo.","error","Paspauskite MATUOTI [B06]. Jei gaunate KLAIDA – pirmiausia PATIKRINTI SUJUNGIMĄ [B09]."); return; end
         if ~ld1_any_yesno_selected() then ld1_set_status("Nepasirinktas atsakymas Taip/Ne.","error","Pažymėkite Taip, jei išmatuota ir apskaičiuota srovė skiriasi ne daugiau kaip 5 %; kitu atveju Ne."); return; end
         theo=LD1.res.Iseries1000; meas=LD1.lastMeasurement;
         if isnan(theo) then [rr,theo]=ld1_series_theory(1000); end
@@ -1580,13 +1651,13 @@ function ld1_check_step()
 
     case 4 then
         [ok,msg,fix]=ld1_validate_series_topology(); if ~ok then ld1_set_status(msg,"error",fix); return; end
-        if abs(LD1.VR1-500)>1 then ld1_set_status("VR1 nėra 500 Ω.","error","Paspauskite 500 Ω mygtuką."); return; end
+        if abs(LD1.VR1-500)>1 then ld1_set_status("VR1 nėra 500 Ω.","error","Paspauskite 500 Ω mygtuką [B03]."); return; end
         [R,I]=ld1_series_theory(500);
         uR=ld1_parse_number(LD1.ui.qEdit(1).string); uI=ld1_parse_number(LD1.ui.qEdit(2).string);
         if isnan(uR) | ~ld1_close_enough(uR,R) then ld1_set_status("Rbendr ties VR1=500 Ω neteisinga.","error","Naudokite Rbendr = R1 + 500 Ω."); return; end
         if isnan(uI) | ~ld1_close_enough(uI,I) then ld1_set_status("I ties VR1=500 Ω neteisinga.","error","Naudokite I = 10 V / Rbendr ir rezultatą įrašykite mA."); return; end
-        if ~LD1.powerOn then ld1_set_status("Maitinimo šaltinis išjungtas.","error","Įjunkite 10 V DC ir paspauskite MATUOTI."); return; end
-        if LD1.lastMeasurementStep<>4 | isnan(LD1.lastMeasurement) then ld1_set_status("Trūksta srovės matavimo.","error","Paspauskite MATUOTI, tada palyginkite su apskaičiuota I."); return; end
+        if ~LD1.powerOn then ld1_set_status("Maitinimo šaltinis išjungtas.","error","Įjunkite 10 V DC [B01] ir paspauskite MATUOTI [B06]."); return; end
+        if LD1.lastMeasurementStep<>4 | isnan(LD1.lastMeasurement) then ld1_set_status("Trūksta srovės matavimo.","error","Paspauskite MATUOTI [B06], tada palyginkite su apskaičiuota I."); return; end
         if ~ld1_any_yesno_selected() then ld1_set_status("Nepasirinktas Taip/Ne.","error","Pažymėkite, ar išmatuota ir apskaičiuota srovė sutampa 5 % ribose."); return; end
         meas=LD1.lastMeasurement; err=abs(meas-uI)/max(uI,1e-9); expectedYes=(err<=0.05);
         if ld1_yes_selected()<>expectedYes then ld1_set_status("Taip/Ne pasirinkimas neatitinka rezultato.","error","≤5 % skirtumas → Taip; >5 % → Ne."); return; end
@@ -1601,11 +1672,11 @@ function ld1_check_step()
 
     case 6 then
         [ok,msg,fix]=ld1_validate_parallel_voltage_topology(); if ~ok then ld1_set_status(msg,"error",fix); return; end
-        if abs(LD1.VR1-1000)>1 then ld1_set_status("VR1 nėra 1000 Ω.","error","Paspauskite 1 kΩ mygtuką."); return; end
+        if abs(LD1.VR1-1000)>1 then ld1_set_status("VR1 nėra 1000 Ω.","error","Paspauskite 1 kΩ mygtuką [B04]."); return; end
         R=ld1_parallel_theory(1000); uR=ld1_parse_number(LD1.ui.qEdit(1).string);
         if isnan(uR) | ~ld1_close_enough(uR,R) then ld1_set_status("Bendra lygiagrečios grandinės varža neteisinga.","error","Pirma Rš2=R2+VR1. Tada Rbendr=(R3·Rš2)/(R3+Rš2). VR1=1000 Ω."); return; end
         if ~LD1.powerOn then ld1_set_status("Maitinimo šaltinis išjungtas.","error","Įjunkite 10 V DC ir spauskite MATUOTI."); return; end
-        if LD1.lastMeasurementStep<>6 | isnan(LD1.lastMeasurement) then ld1_set_status("Trūksta UAB matavimo.","error","Multimetras V (DC), +/V→A4, COM→B4; tada MATUOTI."); return; end
+        if LD1.lastMeasurementStep<>6 | isnan(LD1.lastMeasurement) then ld1_set_status("Trūksta UAB matavimo.","error","Multimetras V (DC) [B08], +/V [T11]→A4 [T16], COM [T12]→B4 [T20]; tada MATUOTI [B06]."); return; end
         if ~ld1_any_yesno_selected() then ld1_set_status("Nepasirinktas Taip/Ne.","error","Palyginkite UAB su 10 V ir pažymėkite atsakymą."); return; end
         expectedYes=(abs(LD1.lastMeasurement-LD1.cfg.E)/LD1.cfg.E<=0.05);
         if ld1_yes_selected()<>expectedYes then ld1_set_status("Taip/Ne pasirinkimas neatitinka UAB palyginimo.","error","Jei UAB nuo 10 V skiriasi ≤5 %, rinkitės Taip; kitu atveju Ne."); return; end
@@ -1614,8 +1685,8 @@ function ld1_check_step()
 
     case 7 then
         [ok,msg,fix]=ld1_validate_parallel_voltage_topology(); if ~ok then ld1_set_status(msg,"error",fix); return; end
-        if LD1.VR1==1000 then ld1_set_status("VR1 dar nepakeistas.","error","Paspauskite, pvz., 500 Ω. Kitų laidų nekeiskite."); return; end
-        if LD1.lastMeasurementStep<>7 | isnan(LD1.lastMeasurement) then ld1_set_status("Po VR1 pakeitimo neatliktas naujas UAB matavimas.","error","Paspauskite MATUOTI dar kartą."); return; end
+        if LD1.VR1==1000 then ld1_set_status("VR1 dar nepakeistas.","error","Paspauskite, pvz., 500 Ω [B03]. Kitų laidų nekeiskite."); return; end
+        if LD1.lastMeasurementStep<>7 | isnan(LD1.lastMeasurement) then ld1_set_status("Po VR1 pakeitimo neatliktas naujas UAB matavimas.","error","Paspauskite MATUOTI [B06] dar kartą."); return; end
         if ~ld1_any_yesno_selected() then ld1_set_status("Nepasirinktas Taip/Ne.","error","Pažymėkite, ar UAB pasikeitė daugiau kaip 5 %."); return; end
         base=LD1.parallelBaseVoltage;
         if isnan(base) & ~isnan(LD1.res.Uparallel1000) then base=LD1.res.Uparallel1000; end
@@ -1628,14 +1699,14 @@ function ld1_check_step()
 
     case 8 then
         [ok,msg,fix]=ld1_validate_parallel_total_current_topology(); if ~ok then ld1_set_status(msg,"error",fix); return; end
-        if abs(LD1.VR1)>1 then ld1_set_status("VR1 nėra 0 Ω.","error","Paspauskite 0 Ω. Kitų 8 etapo laidų nekeiskite."); return; end
+        if abs(LD1.VR1)>1 then ld1_set_status("VR1 nėra 0 Ω.","error","Paspauskite 0 Ω [B02]. Kitų 8 etapo laidų nekeiskite."); return; end
         [I1,I2,It]=ld1_parallel_currents(0);
         u1=ld1_parse_number(LD1.ui.qEdit(1).string); u2=ld1_parse_number(LD1.ui.qEdit(2).string); ut=ld1_parse_number(LD1.ui.qEdit(3).string);
         if isnan(u1) | ~ld1_close_enough(u1,I1) then ld1_set_status("I1 reikšmė neteisinga.","error","I1 yra R3 šakos srovė: I1 = E/R3. E=10 V; rezultatą įrašykite mA."); return; end
         if isnan(u2) | ~ld1_close_enough(u2,I2) then ld1_set_status("I2 reikšmė neteisinga.","error","Kai VR1=0 Ω, antroji šaka turi R2. Skaičiuokite I2 = E/R2 ir įrašykite mA."); return; end
         if isnan(ut) | ~ld1_close_enough(ut,It) then ld1_set_status("Bendra I reikšmė neteisinga.","error","Taikykite Kirchhofo srovės dėsnį: I = I1 + I2."); return; end
-        if ~LD1.powerOn then ld1_set_status("Maitinimo šaltinis išjungtas.","error","Pirmiausia PATIKRINTI SUJUNGIMĄ. Jei jis teisingas, įjunkite 10 V ir MATUOTI."); return; end
-        if LD1.lastMeasurementStep<>8 | isnan(LD1.lastMeasurement) then ld1_set_status("Trūksta bendros srovės matavimo.","error","Kai sujungimas patikrintas ir maitinimas įjungtas, paspauskite MATUOTI."); return; end
+        if ~LD1.powerOn then ld1_set_status("Maitinimo šaltinis išjungtas.","error","Pirmiausia PATIKRINTI SUJUNGIMĄ [B09]. Jei jis teisingas, įjunkite 10 V [B01] ir MATUOTI [B06]."); return; end
+        if LD1.lastMeasurementStep<>8 | isnan(LD1.lastMeasurement) then ld1_set_status("Trūksta bendros srovės matavimo.","error","Kai sujungimas patikrintas [B09] ir maitinimas įjungtas [B01], paspauskite MATUOTI [B06]."); return; end
         if ~ld1_any_yesno_selected() then ld1_set_status("Nepasirinktas Taip/Ne.","error","Palyginkite išmatuotą bendrą srovę su I1+I2 ir pažymėkite atsakymą."); return; end
         meas=LD1.lastMeasurement; err=abs(meas-It)/max(It,1e-9); expectedYes=(err<=0.05);
         if ld1_yes_selected()<>expectedYes then ld1_set_status("Taip/Ne pasirinkimas neatitinka skaitinio palyginimo.","error","Jei |Imat−(I1+I2)|/(I1+I2) ≤5 %, rinkitės Taip; kitu atveju Ne."); return; end

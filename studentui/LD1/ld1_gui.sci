@@ -14,6 +14,69 @@ function s = ld1_multiline(lines)
     end
 endfunction
 
+function [ok,code,label,hint] = ld1_button_lookup(cb)
+    // Saugus numerių registro (ld1_ids.sci) užklausimas. Jei registras
+    // neįkeltas (pvz., PERZIURA.sce exec'uoja failus be ld1_ids.sci),
+    // mygtukai kuriami be numerių – programa lieka veikianti.
+    ok=%f; code=""; label=""; hint="";
+    if exists("ld1_button_info")==1 then
+        [code,label,hint]=ld1_button_info(cb);
+        ok=%t;
+    end
+endfunction
+
+function h = ld1_button(parent,pos,str,cb,fs,bg,bold)
+    // Vienodas mygtukų fabrikas: prideda [Bxx] priešdelį, tag ir pagalbos
+    // tekstą iš registro (ld1_ids.sci). Callback reikšmės NEKEIČIAMOS –
+    // testai mygtukus randa pagal h.callback.
+    if argn(2)<5 then fs=10; end
+    if argn(2)<6 | isempty(bg) then bg=[0.93 0.93 0.93]; end
+    if argn(2)<7 then bold=%f; end
+    [ok,code,label,hint]=ld1_button_lookup(cb);
+    if ok then str="["+code+"] "+str; else code=""; hint=""; end
+    h=uicontrol(parent,"style","pushbutton","units","normalized", ..
+        "position",pos,"string",str,"tag",code, ..
+        "tooltipstring",hint,"fontsize",fs, ..
+        "callback",cb,"backgroundcolor",bg);
+    if bold then h.fontweight="bold"; end
+endfunction
+
+function ld1_register_button(h,cb)
+    // Registruoja jau sukurtą (studentų stendo) mygtuką: [Bxx] priešdelis,
+    // tag ir pagalbos tekstas iš registro. Be registro – palieka kaip yra.
+    [ok,code,label,hint]=ld1_button_lookup(cb);
+    if ~ok then return; end
+    h.string="["+code+"] "+string(h.string);
+    h.tag=code;
+    h.tooltipstring="["+code+"] "+hint;
+endfunction
+
+function h = ld1_stage_button(parent,pos,n,fs)
+    // Etapų numerių mygtukai E01–E09 viršutinėje navigacijos juostoje.
+    code=""; tip=""; str=string(n);
+    if exists("ld1_stage_code")==1 then
+        code=ld1_stage_code(n);
+        str="["+code+"]";
+        tip="["+code+"] Etapo "+string(n)+" atidarymas";
+    end
+    h=uicontrol(parent,"style","pushbutton","units","normalized", ..
+        "position",pos,"string",str,"tag",code, ..
+        "tooltipstring",tip,"fontsize",fs,"fontweight","bold", ..
+        "callback","ld1_jump_step("+string(n)+")");
+endfunction
+
+function ld1_button_string(h,txt)
+    // Pakeičia užregistruoto mygtuko (B šeimos) užrašą, išlaikydamas
+    // [Bxx] priešdelį. Neįregistruotiems valdikliams tiesiog nustato txt.
+    // Nebetaliojantiems valdikliams (pvz., seni įvykiai po lentojimo) – nedarome nieko.
+    if ~is_handle_valid(h) then return; end
+    c=string(h.tag);
+    if length(c)==3 then
+        if part(c,1)=="B" then txt="["+c+"] "+txt; end
+    end
+    h.string=txt;
+endfunction
+
 function label = ld1_terminal_label(id)
     select id
     case "SRC_P" then label="Maitinimo šaltinis +10 V";
@@ -208,14 +271,25 @@ function ld1_create_terminal(id)
         bg=[0.08 0.39 0.37]; fg=[1 1 1];
     end
 
+    tname=ld1_terminal_label(id); tcode="";
+    if exists("ld1_terminal_name")==1 then
+        tname=ld1_terminal_name(id);
+        tcode=ld1_terminal_code(id);
+    end
     ht=uicontrol(LD1.ui.circuitFrame,"style","pushbutton","units","normalized", ..
         "position",pos,"string",ld1_terminal_button_text(id), ..
         "fontsize",9,"fontweight","bold","backgroundcolor",bg, ..
-        "foregroundcolor",fg,"margins",[0 0 0 0],"tooltipstring",ld1_terminal_label(id), ..
-        "callback",cb);
+        "foregroundcolor",fg,"margins",[0 0 0 0],"tooltipstring",tname, ..
+        "tag",tcode,"callback",cb);
     LD1.term.handles($+1)=ht;
     LD1.term.handleIds($+1,1)=id;
     ld1_track_board_handle(ht);
+    // T-žymos tekstas šalia gnybto – per ld1_board_text vamzdyną, kad
+    // būtų valomas kartu su lenta. Mažas šriftas, kad neužstingtų kiti.
+    if tcode<>"" then
+        ld1_board_text([x-0.023 y-h/2-0.027 0.046 0.023], ..
+            "["+tcode+"]",8,%f,"center",[1 1 1],[0.10 0.30 0.50]);
+    end
 endfunction
 
 function ld1_draw_connection_count()
@@ -441,13 +515,13 @@ function ld1_create_gui_classic()
     LD1.ui.stepButtons=list();
     for k=1:9
         xx=0.155+(k-1)*0.050;
-        LD1.ui.stepButtons(k)=uicontrol(nav,"style","pushbutton","units","normalized", ..
-            "position",[xx 0.12 0.043 0.76],"string",string(k),"fontsize",9,"fontweight","bold", ..
-            "callback","ld1_jump_step("+string(k)+")");
+        LD1.ui.stepButtons(k)=ld1_stage_button(nav,[xx 0.12 0.043 0.76],k,9);
     end
     LD1.ui.review=uicontrol(nav,"style","checkbox","units","normalized", ..
-        "position",[0.625 0.08 0.36 0.84],"string","DĖSTYTOJO / PERŽIŪROS REŽIMAS – laisva navigacija", ..
-        "fontsize",9,"value",0,"backgroundcolor",[0.87 0.91 0.96],"callback","ld1_review_toggle()");
+        "position",[0.625 0.08 0.36 0.84],"string","[V02] DĖSTYTOJO / PERŽIŪROS REŽIMAS – laisva navigacija", ..
+        "fontsize",9,"value",0,"tag","V02", ..
+        "tooltipstring","[V02] Leidžia atidaryti bet kurį 1–9 etapą be ankstesnių atlikimo.", ..
+        "backgroundcolor",[0.87 0.91 0.96],"callback","ld1_review_toggle()");
 
     // Kairė: kompaktiškesnis stendas. Dešinei instrukcijų sričiai skirta daugiau pločio.
     LD1.ui.circuitFrame=uicontrol(f,"style","frame","units","normalized", ..
@@ -486,54 +560,49 @@ function ld1_create_gui_classic()
     ld1_label(sf,[0.03 0.91 0.94 0.07],"STENDO VALDYMAS",13,%t);
     ld1_label(sf,[0.03 0.81 0.25 0.065],"Maitinimas:",10,%t);
     LD1.ui.sourceDisplay=ld1_label(sf,[0.30 0.81 0.28 0.065],"0 V DC",10,%f);
-    LD1.ui.power=uicontrol(sf,"style","pushbutton","units","normalized", ..
-        "position",[0.65 0.795 0.32 0.085],"string","IŠJUNGTA", ..
-        "fontsize",10,"fontweight","bold","backgroundcolor",[0.94 0.82 0.82], ..
-        "callback","ld1_toggle_power()");
+    LD1.ui.power=ld1_button(sf,[0.65 0.795 0.32 0.085],"IŠJUNGTA", ..
+        "ld1_toggle_power()",10,[0.94 0.82 0.82],%t);
 
-    ld1_label(sf,[0.03 0.70 0.14 0.06],"VR1:",10,%t);
+    ld1_label(sf,[0.03 0.70 0.15 0.06],"[V01] VR1:",10,%t);
     LD1.ui.vrText=ld1_label(sf,[0.18 0.70 0.28 0.06],"1000 Ω",11,%t);
     LD1.ui.vrSlider=uicontrol(sf,"style","slider","units","normalized", ..
         "position",[0.03 0.625 0.94 0.055],"min",LD1.cfg.VR1_min, ..
         "max",LD1.cfg.VR1_max,"value",1000,"sliderstep",[LD1.cfg.VR1_step 100], ..
+        "tag","V01", ..
+        "tooltipstring","[V01] VR1 varžos slankiklis 0–1000 Ω (žingsnis 10 Ω).", ..
         "snaptoticks","on","callback","ld1_vr_changed()");
-    LD1.ui.vr0=uicontrol(sf,"style","pushbutton","units","normalized", ..
-        "position",[0.03 0.545 0.27 0.065],"string","0 Ω","fontsize",9,"callback","ld1_set_vr(0)");
-    LD1.ui.vr500=uicontrol(sf,"style","pushbutton","units","normalized", ..
-        "position",[0.365 0.545 0.27 0.065],"string","500 Ω","fontsize",9,"callback","ld1_set_vr(500)");
-    LD1.ui.vr1000=uicontrol(sf,"style","pushbutton","units","normalized", ..
-        "position",[0.70 0.545 0.27 0.065],"string","1 kΩ","fontsize",9,"callback","ld1_set_vr(1000)");
+    LD1.ui.vr0=ld1_button(sf,[0.03 0.545 0.27 0.065],"0 Ω","ld1_set_vr(0)",9);
+    LD1.ui.vr500=ld1_button(sf,[0.365 0.545 0.27 0.065],"500 Ω","ld1_set_vr(500)",9);
+    LD1.ui.vr1000=ld1_button(sf,[0.70 0.545 0.27 0.065],"1 kΩ","ld1_set_vr(1000)",9);
 
     ld1_label(sf,[0.03 0.455 0.25 0.06],"Multimetras:",10,%t);
     LD1.ui.modeA=uicontrol(sf,"style","radiobutton","units","normalized", ..
-        "position",[0.28 0.452 0.24 0.065],"string","A (DC)","fontsize",10, ..
+        "position",[0.28 0.452 0.24 0.065],"string","[B07] A (DC)","fontsize",10, ..
+        "tag","B07","tooltipstring","[B07] Ampermetro režimas: multimetras jungiamas NUOSEKLIAI su srove.", ..
         "groupname","meter","value",1,"callback","ld1_meter_mode(""A"")");
     LD1.ui.modeV=uicontrol(sf,"style","radiobutton","units","normalized", ..
-        "position",[0.56 0.452 0.24 0.065],"string","V (DC)","fontsize",10, ..
+        "position",[0.56 0.452 0.24 0.065],"string","[B08] V (DC)","fontsize",10, ..
+        "tag","B08","tooltipstring","[B08] Voltmetro režimas: multimetras jungiamas LYGIAGREČIAI su įtampa.", ..
         "groupname","meter","value",0,"callback","ld1_meter_mode(""V"")");
     LD1.ui.meterDisplay=uicontrol(sf,"style","text","units","normalized", ..
         "position",[0.03 0.355 0.94 0.085],"string","NEPRIJUNGTA", ..
         "fontsize",14,"fontweight","bold","horizontalalignment","center", ..
         "backgroundcolor",[0.06 0.09 0.07],"foregroundcolor",[0.55 1.00 0.58]);
 
-    LD1.ui.measure=uicontrol(sf,"style","pushbutton","units","normalized", ..
-        "position",[0.03 0.265 0.45 0.070],"string","MATUOTI", ..
-        "fontsize",10,"fontweight","bold","callback","ld1_measure()");
-    LD1.ui.checkWiring=uicontrol(sf,"style","pushbutton","units","normalized", ..
-        "position",[0.52 0.265 0.45 0.070],"string","PATIKRINTI SUJUNGIMĄ", ..
-        "fontsize",9,"callback","ld1_check_wiring()");
-    LD1.ui.undoWire=uicontrol(sf,"style","pushbutton","units","normalized", ..
-        "position",[0.03 0.180 0.45 0.065],"string","ATŠAUKTI LAIDĄ", ..
-        "fontsize",9,"callback","ld1_remove_last_wire()");
-    LD1.ui.clearWires=uicontrol(sf,"style","pushbutton","units","normalized", ..
-        "position",[0.52 0.180 0.45 0.065],"string","IŠVALYTI LAIDUS", ..
-        "fontsize",9,"callback","ld1_clear_wires()");
-    LD1.ui.wiringGuide=uicontrol(sf,"style","pushbutton","units","normalized", ..
-        "position",[0.03 0.095 0.45 0.065],"string","KAIP SUJUNGTI", ..
-        "fontsize",9,"fontweight","bold","callback","ld1_show_wiring_guide()");
-    LD1.ui.restoreStage=uicontrol(sf,"style","pushbutton","units","normalized", ..
-        "position",[0.52 0.095 0.45 0.065],"string","ATKURTI ETAPO STENDĄ", ..
-        "fontsize",8,"fontweight","bold","callback","ld1_restore_current_stage_board()");
+    LD1.ui.measure=ld1_button(sf,[0.03 0.265 0.45 0.070],"MATUOTI", ..
+        "ld1_measure()",10,[],%t);
+    LD1.ui.checkWiring=ld1_button(sf,[0.52 0.265 0.45 0.070],"PATIKRINTI SUJUNGIMĄ", ..
+        "ld1_check_wiring()",9);
+    LD1.ui.undoWire=ld1_button(sf,[0.03 0.180 0.45 0.065],"ATŠAUKTI LAIDĄ", ..
+        "ld1_remove_last_wire()",9);
+    LD1.ui.clearWires=ld1_button(sf,[0.52 0.180 0.45 0.065],"IŠVALYTI LAIDUS", ..
+        "ld1_clear_wires()",9);
+    LD1.ui.wiringGuide=ld1_button(sf,[0.03 0.095 0.30 0.065],"KAIP SUJUNGTI", ..
+        "ld1_show_wiring_guide()",9,[],%t);
+    LD1.ui.standMap=ld1_button(sf,[0.35 0.095 0.30 0.065],"STENDO ŽEMĖLAPIS", ..
+        "ld1_show_stand_map()",8);
+    LD1.ui.restoreStage=ld1_button(sf,[0.67 0.095 0.30 0.065],"ATKURTI ETAPO STENDĄ", ..
+        "ld1_restore_current_stage_board()",8,[],%t);
 
     // 3) Studentų atsakymai.
     af=uicontrol(ctrl,"style","frame","units","normalized", ..
@@ -566,17 +635,13 @@ function ld1_create_gui_classic()
         "position",[0.80 0.035 0.16 0.14],"string","Ne","fontsize",9,"groupname","yesno","value",0);
 
     // 4) Patvirtinimas ir navigacija.
-    LD1.ui.checkStep=uicontrol(ctrl,"style","pushbutton","units","normalized", ..
-        "position",[0.035 0.060 0.93 0.035],"string","PATIKRINTI IR UŽFIKSUOTI ETAPĄ", ..
-        "fontsize",9,"fontweight","bold","callback","ld1_check_step()");
-    LD1.ui.prev=uicontrol(ctrl,"style","pushbutton","units","normalized", ..
-        "position",[0.035 0.010 0.18 0.035],"string","← ATGAL","fontsize",8,"callback","ld1_prev_step()");
-    LD1.ui.solution=uicontrol(ctrl,"style","pushbutton","units","normalized", ..
-        "position",[0.225 0.010 0.25 0.035],"string","PAVYZDYS / SPRENDIMAS","fontsize",8,"fontweight","bold","callback","ld1_toggle_solution()");
-    LD1.ui.help=uicontrol(ctrl,"style","pushbutton","units","normalized", ..
-        "position",[0.485 0.010 0.22 0.035],"string","TEORIJA","fontsize",8,"callback","ld1_show_help()");
-    LD1.ui.next=uicontrol(ctrl,"style","pushbutton","units","normalized", ..
-        "position",[0.715 0.010 0.25 0.035],"string","TOLIAU →","fontsize",8,"callback","ld1_next_step()");
+    LD1.ui.checkStep=ld1_button(ctrl,[0.035 0.060 0.93 0.035], ..
+        "PATIKRINTI IR UŽFIKSUOTI ETAPĄ","ld1_check_step()",9,[],%t);
+    LD1.ui.prev=ld1_button(ctrl,[0.035 0.010 0.16 0.035],"← ATGAL","ld1_prev_step()",8);
+    LD1.ui.solution=ld1_button(ctrl,[0.205 0.010 0.31 0.035],"PAVYZDYS / SPRENDIMAS", ..
+        "ld1_toggle_solution()",8,[],%t);
+    LD1.ui.help=ld1_button(ctrl,[0.525 0.010 0.16 0.035],"TEORIJA","ld1_show_help()",8);
+    LD1.ui.next=ld1_button(ctrl,[0.695 0.010 0.27 0.035],"TOLIAU →","ld1_next_step()",8);
 
     // Dviejų eilučių statusas: klaida + konkretus taisymo veiksmas.
     LD1.ui.statusFrame=uicontrol(f,"style","frame","units","normalized", ..
@@ -589,9 +654,8 @@ function ld1_create_gui_classic()
         "position",[0.01 0.07 0.98 0.40],"string","", ..
         "fontsize",9,"horizontalalignment","left","verticalalignment","middle", ..
         "backgroundcolor",[0.90 0.93 0.97],"foregroundcolor",[0.10 0.18 0.28]);
-    LD1.ui.restart=uicontrol(f,"style","pushbutton","units","normalized", ..
-        "position",[0.818 0.020 0.164 0.055],"string","PRADĖTI IŠ NAUJO", ..
-        "fontsize",10,"callback","ld1_restart()");
+    LD1.ui.restart=ld1_button(f,[0.818 0.020 0.164 0.055],"PRADĖTI IŠ NAUJO", ..
+        "ld1_restart()",10);
 endfunction
 
 function ld1_update_terminal_highlight()
@@ -615,6 +679,10 @@ endfunction
 
 function ld1_show_numeric_field(k,label)
     global LD1;
+    // Kiekvienas atsakymo laukelis įgauna viešą A{etapas}.{laukelis} kodą.
+    if exists("ld1_answer_code")==1 then
+        label="["+ld1_answer_code(LD1.step,k)+"] "+label;
+    end
     LD1.ui.qLabel(k).string=label;
     ld1_show(LD1.ui.qLabel(k),%t);
     ld1_show(LD1.ui.qEdit(k),%t);

@@ -31,6 +31,38 @@ function [ok,log]=ld2_selftest()
         end
         [ok,log]=ld2_test_append(ok,log,"Mokslinė įvestis",ld2_safe_number("4.7e-6"),4.7e-6,1d-14);
 
+        // Elementų numerių registro (ld2_ids.sci) vientisumas.
+        codes=ld2_all_codes();
+        [ok,log]=ld2_test_true(ok,log,"Registro kodų sąrašas > 100 ir be pasikartojimų", ...
+            size(codes,1)>100 & size(unique(codes),1)==size(codes,1));
+        [ok,log]=ld2_test_true(ok,log,"Kontaktų kodai: VM_H=T07, LC_M2=T38", ...
+            ld2_terminal_code("VM_H")=="T07" & ld2_terminal_code("LC_M2")=="T38" & ...
+            part(ld2_terminal_name("VM_H"),1:4)=="T07 ");
+        [ok,log]=ld2_test_true(ok,log,"Mygtukų registro atitikmenys: B15, B11, B41", ...
+            ld2_button_info("ld2_measure_voltage()")=="B15" & ...
+            ld2_button_info("ld2_undo_wire()")=="B11" & ...
+            ld2_button_info("ld2_edit_step_note()")=="B41");
+        [rids,rcbs]=ld2_button_registry();
+        defined=size(rcbs,"*")==45;
+        for k=1:size(rcbs,"*")
+            fname=rcbs(k);
+            pp=strindex(fname,"(");
+            if size(pp,"*")>0 then fname=part(fname,1:pp(1)-1); end
+            w=whereis(fname);
+            if w==[] | w=="" then defined=%f; end
+        end
+        [ok,log]=ld2_test_true(ok,log,"Visi 45 registro mygtukų veiksmai apibrėžti",defined);
+        meth_ok=%t;
+        for st=1:12
+            d=ld2_method_data(st);
+            if size(d.method,"*")<3 | size(strindex(d.method(1),"["),"*")==0 then meth_ok=%f; end
+        end
+        [ok,log]=ld2_test_true(ok,log,"12 etapų metodika su kodais",meth_ok);
+        ilines=ld2_instruction_lines(2);
+        [ok,log]=ld2_test_true(ok,log,"Instrukcijos deleguojamos į metodiką su kodais", ...
+            size(ilines,"*")>=5 & size(strindex(ilines(4),"[T01]"),"*")>0 & ...
+            size(strindex(ilines(3),"[B09]"),"*")>0);
+
         // All sample stages use the actual measurement, recording and evaluation code.
         for step=1:12
             ld2_test_new_state();

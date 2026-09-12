@@ -90,12 +90,19 @@ function ld2_build_gui()
         "fontweight","bold", "horizontalalignment","left", ...
         "backgroundcolor",[0.88 0.93 0.98], ...
         "foregroundcolor",[0.05 0.18 0.32]);
+    // [B05]/[B06]/[B37] – nuolatiniai mygtukai, sąmoningai be ld2_track.
     uicontrol(f,"style","pushbutton","units","normalized","position",[0.683 0.025 0.095 0.070], ...
-        "string","IŠSAUGOTI","fontname","Arial","fontunits","pixels","fontsize",12,"callback","ld2_save_work()");
+        "string","[B05] IŠSAUGOTI","fontname","Arial","fontunits","pixels","fontsize",11, ...
+        "tag","B05","tooltipstring","[B05] Išsaugoti darbą. Įrašyti darbo būseną į .sod failą, kad galėtumėte tęsti.", ...
+        "callback","ld2_save_work()");
     uicontrol(f,"style","pushbutton","units","normalized","position",[0.786 0.025 0.095 0.070], ...
-        "string","ATVERTI DARBĄ","fontname","Arial","fontunits","pixels","fontsize",11,"callback","ld2_load_work()");
+        "string","[B06] ATVERTI","fontname","Arial","fontunits","pixels","fontsize",11, ...
+        "tag","B06","tooltipstring","[B06] Atverti darbą. Atkurti šios versijos .sod failą. Generatorius bus išjungtas.", ...
+        "callback","ld2_load_work()");
     uicontrol(f,"style","pushbutton","units","normalized","position",[0.889 0.025 0.094 0.070], ...
-        "string","IŠ NAUJO","fontname","Arial","fontunits","pixels","fontsize",12,"callback","ld2_restart()");
+        "string","[B37] IŠ NAUJO","fontname","Arial","fontunits","pixels","fontsize",11, ...
+        "tag","B37","tooltipstring","[B37] Pradėti iš naujo. Po patvirtinimo išvalyti bandymus; išlaikyti pasirinktą variantą.", ...
+        "callback","ld2_restart()");
 endfunction
 
 function ld2_track(h)
@@ -140,6 +147,19 @@ function h = ld2_button(parent, pos, str, cb, fs, bg)
     h = uicontrol(parent, "style","pushbutton", "units","normalized", ...
         "position",pos, "string",str, "fontname","Arial", "fontunits","pixels", "fontsize",max([11 fs]), ...
         "callback",cb, "backgroundcolor",bg);
+    // Numerių registras: [Bxx] priešdelis (kai telpa), tag ir tooltip.
+    // h.callback lieka NEPAKITĖS – jį tiksliai naudoja testai.
+    registered=%f;
+    try
+        [code,label,hint]=ld2_button_info(cb);
+        registered=%t;
+    catch
+    end
+    if registered then
+        if pos(3)>=0.25 then h.string="["+code+"] "+str; end
+        h.tag=code;
+        h.tooltipstring="["+code+"] "+label+". "+hint;
+    end
     ld2_track(h);
 endfunction
 
@@ -263,9 +283,10 @@ function ld2_render_controls()
 
     // RLC dažnio tyrimo etapai turi atskirą kompaktišką išdėstymą.
     if phase == "RLC" & step >= 9 then
-        ld2_text(fr, [0.035 0.590 0.20 0.10], "Dažnis:", ...
+        ld2_text(fr, [0.035 0.590 0.20 0.10], "[F04] Dažnis, Hz:", ...
             10, %t, "left", [0.985 0.985 0.985], [0.05 0.05 0.05]);
         LD2.ui.freq_edit = ld2_edit(fr, [0.21 0.575 0.25 0.13], ld2_num(LD2.state.freq,3));
+        LD2.ui.freq_edit.tag="F04";
         ld2_text(fr, [0.47 0.590 0.08 0.10], "Hz", ...
             10, %f, "left", [0.985 0.985 0.985], [0.05 0.05 0.05]);
         ld2_button(fr, [0.59 0.570 0.37 0.14], "NUSTATYTI DAŽNĮ", ...
@@ -276,6 +297,8 @@ function ld2_render_controls()
             "min",max([1 LD2.cfg.F_MIN]), "max",LD2.cfg.F_MAX, ...
             "value",max([1 LD2.state.freq]), "callback","ld2_frequency_slider()");
         ld2_track(LD2.ui.freq_slider);
+        LD2.ui.freq_slider.tag="V01";
+        LD2.ui.freq_slider.tooltipstring="[V01] Dažnio slankiklis. Po keitimo matuokite iš naujo.";
         ld2_button(fr, [0.035 0.345 0.205 0.10], "−1 Hz", ...
             "ld2_frequency_delta(-1)", 8.8, [0.94 0.94 0.94]);
         ld2_button(fr, [0.275 0.345 0.205 0.10], "−10 Hz", ...
@@ -367,10 +390,13 @@ function ld2_render_answers()
         rowh = 0.092;
         y = 0.745;
         for k = 1:n
-            ld2_text(fr, [0.035 y 0.57 rowh], labels(k), ...
+            lab = msprintf("[A%02d.%02d] ",step,k)+labels(k);
+            ld2_text(fr, [0.035 y 0.57 rowh], lab, ...
                 9.5, %f, "left", [1 1 1], [0.05 0.05 0.05]);
             vs = LD2.state.answers_text(step,k);
             e = ld2_edit(fr, [0.64 y+0.005 0.31 rowh], vs);
+            e.tag = msprintf("A%02d.%02d",step,k);
+            e.tooltipstring = msprintf("[A%02d.%02d] ",step,k)+labels(k);
             LD2.ui.answer_edits = [LD2.ui.answer_edits e];
             y = y - 0.103;
         end

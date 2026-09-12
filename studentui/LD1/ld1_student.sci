@@ -98,6 +98,10 @@ function ld1_create_gui()
     LD1.ui.checkStep.backgroundcolor=[0.08 0.39 0.37]; LD1.ui.checkStep.foregroundcolor=[1 1 1];
     LD1.ui.prev.position=[0.07 0.015 0.37 0.045]; LD1.ui.prev.string="← Atgal";
     LD1.ui.prev.fontunits="pixels"; LD1.ui.prev.fontsize=13;
+    // STENDO ŽEMĖLAPIS [B13] – tas pats registras, kaip klasikiniame stende.
+    LD1.ui.standMap=student_button(LD1.ui.prev.parent,[0.47 0.015 0.46 0.045],"STENDO ŽEMĖLAPIS","ld1_show_stand_map()");
+    ld1_register_button(LD1.ui.standMap,"ld1_show_stand_map()");
+    LD1.ui.standMap.fontunits="pixels"; LD1.ui.standMap.fontsize=11;
     LD1.ui.next.visible="off"; LD1.ui.solution.visible="off"; LD1.ui.help.visible="off";
     LD1.ui.restart.visible="off";
     LD1.ui.studentHelp=student_button(LD1.fig,[0.87 0.93 0.105 0.044],"Pagalba", "ld1_student_help()");
@@ -116,18 +120,22 @@ function ld1_set_instruction(title,lines)
     LD1.studentDetail=lines;
     titles=["Sujunkite grandinę";"Apskaičiuokite";"Išmatuokite srovę";"Pakartokite bandymą"; ...
         "Sujunkite dvi šakas";"Išmatuokite įtampą";"Pakeiskite varžą";"Bendra srovė";"Jūsų rezultatai"];
-    tips=["Sujunkite šaltinį, R1, VR1 ir ampermetrą į vieną kilpą. Pasirinkite grandinės tipą."; ...
-        "Kai VR1 = 1000 Ω, apskaičiuokite bendrą varžą ir srovę. Srovę rašykite mA."; ...
-        "Įjunkite šaltinį. Ampermetre spauskite Matuoti ir palyginkite su savo skaičiavimu."; ...
-        "VR1 = 500 Ω. Apskaičiuokite varžą bei srovę, išmatuokite ir palyginkite."; ...
-        "Tarp A ir B sujunkite R3 ir antrą šaką R2 + VR1. Voltmetrą junkite tarp A ir B."; ...
-        "VR1 = 1000 Ω. Apskaičiuokite bendrą varžą, įjunkite šaltinį ir išmatuokite UAB."; ...
-        "VR1 pakeiskite į 500 Ω. Dar kartą išmatuokite UAB. Ar įtampa pasikeitė?"; ...
-        "Į bendrą laidą prieš A įterpkite ampermetrą. Apskaičiuokite I1, I2 ir jų sumą, tada išmatuokite."; ...
+    tips=["Sujunkite kilpą: [T01]→[T03]; [T04]→[T09]; [T10]→[T11]; [T12]→[T02]. Režimas A (DC) [B07]. Pabaigoje pasirinkite NUOSEKLI."; ...
+        "VR1 = 1000 Ω [B04]. Rbendr = R1 + VR1 rašykite į [A02.01], o I = E/Rbendr (mA) – į [A02.02]. Matuoti nereikia."; ...
+        "Įjunkite 10 V [B01], režimas A (DC) [B07], spauskite MATUOTI [B06] ir palyginkite rodmenį su savo skaičiavimu."; ...
+        "VR1 = 500 Ω [B03]. Apskaičiuokite Rbendr [A04.01] ir I (mA) [A04.02], tada MATUOTI [B06] ir palyginkite."; ...
+        "Šaltinis [T01]→[T13], [T02]→[T17]; R3 [T14]-[T18]; R2+VR1 [T15]-[T19]; voltmetras [T16]-[T20]. Visa seka: KAIP SUJUNGTI [B05]."; ...
+        "VR1 = 1000 Ω [B04]. Rbendr apskaičiuokite į [A06.01], įjunkite [B01], MATUOTI [B06] (režimas V [B08])."; ...
+        "Pakeiskite VR1, pvz., į 500 Ω [B03] arba slankikliu [V01], tada vėl MATUOTI [B06]. Ar UAB pasikeitė?"; ...
+        "Į bendrą laidą prieš A: [T01]→[T11], COM [T12]→ATARGET. I1→[A08.01], I2→[A08.02], I=I1+I2→[A08.03]."; ...
         "Čia surinkti jūsų skaičiavimai ir matavimai. Neatliktus etapus rasite per Pagalba → Etapai."];
     LD1.ui.instructionTitle.string=student_wrap(titles(LD1.step),24);
     for k=2:5; LD1.ui.instructionLine(k).visible="off"; end
-    LD1.ui.instructionLine(1).string=student_wrap(tips(LD1.step),37);
+    tip=tips(LD1.step);
+    if LD1.step==8 & isfield(LD1,"kclTargetA") & exists("ld1_terminal_code")==1 then
+        tip=strsubst(tip,"ATARGET",ld1_terminal_button_text(LD1.kclTargetA)+" ["+ld1_terminal_code(LD1.kclTargetA)+"]");
+    end
+    LD1.ui.instructionLine(1).string=student_wrap(tip,37);
     LD1.ui.instructionLine(1).visible="on";
     LD1.ui.instructionFrame.position=[0.07 0.67 0.86 0.30];
     LD1.ui.standFrame.visible="off";
@@ -143,12 +151,12 @@ function ld1_student_sync()
     LD1.ui.next.visible="off";
     LD1.ui.checkStep.enable="on";
     if LD1.demoMode then
-        LD1.ui.checkStep.string="Grįžti į savo darbą";
+        ld1_button_string(LD1.ui.checkStep,"Grįžti į savo darbą");
         LD1.ui.studentProgress.string="Pavyzdys · "+string(LD1.step)+" / 9";
-    elseif LD1.step==9 then LD1.ui.checkStep.string="Išsaugoti ataskaitą";
-    elseif isfield(LD1,"assessment") & LD1.assessment then LD1.ui.checkStep.string="Įrašyti ir toliau →";
-    elseif LD1.done(LD1.step) then LD1.ui.checkStep.string="Toliau →";
-    else LD1.ui.checkStep.string="Patikrinti";
+    elseif LD1.step==9 then ld1_button_string(LD1.ui.checkStep,"Išsaugoti ataskaitą");
+    elseif isfield(LD1,"assessment") & LD1.assessment then ld1_button_string(LD1.ui.checkStep,"Įrašyti ir toliau →");
+    elseif LD1.done(LD1.step) then ld1_button_string(LD1.ui.checkStep,"Toliau →");
+    else ld1_button_string(LD1.ui.checkStep,"Patikrinti");
     end
 endfunction
 
@@ -207,6 +215,7 @@ function ld1_student_source(pos)
     LD1.ui.sourceDisplay=student_text(fr,[0.09 0.43 0.82 0.22],"10 V DC",20,%t,bg);
     caption="Įjungti"; if LD1.powerOn then caption="Išjungti"; end
     LD1.ui.power=student_button(fr,[0.09 0.10 0.82 0.25],caption,"ld1_toggle_power()");
+    ld1_register_button(LD1.ui.power,"ld1_toggle_power()");
     LD1.ui.power.enable="on";
     if LD1.demoMode | LD1.step==1 | LD1.step==2 | LD1.step==5 then LD1.ui.power.enable="off"; end
 endfunction
@@ -220,7 +229,8 @@ function ld1_student_resistor(pos,name,value,variable)
         LD1.ui.vrText=h;
         if LD1.step==7 & ~LD1.demoMode then
             h.position=[0.09 0.36 0.82 0.24];
-            student_button(fr,[0.09 0.06 0.82 0.26],"500 Ω","ld1_set_vr(500)");
+            hb=student_button(fr,[0.09 0.06 0.82 0.26],"500 Ω","ld1_set_vr(500)");
+            ld1_register_button(hb,"ld1_set_vr(500)");
         end
     end
 endfunction
@@ -235,6 +245,7 @@ function ld1_student_meter(pos)
     LD1.ui.meterDisplay=student_text(fr,[0.07 0.40 0.86 0.28],reading,20,%t,bg);
     LD1.ui.meterDisplay.horizontalalignment="center";
     LD1.ui.measure=student_button(fr,[0.07 0.08 0.86 0.25],"Matuoti","ld1_measure()",%t);
+    ld1_register_button(LD1.ui.measure,"ld1_measure()");
     if LD1.step==1 | LD1.step==2 | LD1.step==5 | LD1.demoMode then LD1.ui.measure.visible="off"; end
 endfunction
 
@@ -298,6 +309,7 @@ function ld1_redraw_panel()
     ld1_redraw_panel_classic();
     if LD1.step==1 | LD1.step==5 | LD1.step==8 then
         h=student_button(LD1.ui.circuitFrame,[0.04 0.025 0.24 0.05],"Atšaukti laidą","ld1_remove_last_wire()");
+        ld1_register_button(h,"ld1_remove_last_wire()");
         ld1_track_board_handle(h);
         if LD1.demoMode then h.visible="off"; end
         if LD1.pendingTerminal=="" then tip="Laidas: spauskite du gnybtus.";

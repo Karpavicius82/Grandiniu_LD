@@ -63,6 +63,71 @@ try
     try ld2_read_session(root+"tests/results/LD2-invalid.sod"); catch rejected=%t; end
     assert_checktrue(rejected);
     mputl(table1,root+"LD1/VARIANTAI.csv"); mputl(table2,root+"LD2/VARIANTAI.csv");
+    // Instrukcijų <-> registrų konsistencija (analogas: tools/check_instruction_registry.py).
+    codes1=ld1_all_codes(); codes2=ld2_all_codes();
+    n1=size(codes1,1); n2=size(codes2,1);
+    if n1<40 then error("LD1 registras per mažas: "+string(n1)+" kodų (tikėtasi ne mažiau 40)."); end
+    if n2<50 then error("LD2 registras per mažas: "+string(n2)+" kodų (tikėtasi ne mažiau 50)."); end
+    if size(unique(codes1),1)<>n1 then error("LD1 registre pasikartoja kodai."); end
+    if size(unique(codes2),1)<>n2 then error("LD2 registre pasikartoja kodai."); end
+    if size(find(codes1=="T01"),"*")==0 | size(find(codes1=="B01"),"*")==0 then error("LD1 registre trūksta kodų T01 arba B01."); end
+    if size(find(codes2=="T01"),"*")==0 | size(find(codes2=="B01"),"*")==0 then error("LD2 registre trūksta kodų T01 arba B01."); end
+    // Deklaracijos (REGISTRY-CODES) ir generatoriaus (ld*_all_codes) tapatumas abi kryptimis.
+    function r=ldx_digit(ch)
+        r=%f;
+        for d=["0" "1" "2" "3" "4" "5" "6" "7" "8" "9"]
+            if ch==d then r=%t; end
+        end
+    endfunction
+    function [decl,problems]=ldx_declared(path)
+        problems=[]; decl=[];
+        lines=mgetl(path);
+        for i=1:size(lines,"*")
+            k=strindex(lines(i),"REGISTRY-CODES:");
+            if k<>[] then
+                tail=part(lines(i),k(1)+length("REGISTRY-CODES:"):length(lines(i)));
+                toks=tokens(tail);
+                for t=1:size(toks,"*")
+                    tt=toks(t);
+                    dd=strindex(tt,":");
+                    if dd<>[] then
+                        a=part(tt,1:dd(1)-1); b=part(tt,dd(1)+1:length(tt));
+                        ja=length(a); while ja>0 & ldx_digit(part(a,ja)) then ja=ja-1; end
+                        jb=length(b); while jb>0 & ldx_digit(part(b,jb)) then jb=jb-1; end
+                        pa=part(a,1:ja); pb=part(b,1:jb);
+                        na=evstr(part(a,ja+1:length(a))); nb=evstr(part(b,jb+1:length(b)));
+                        if pa<>pb | na>nb then
+                            problems($+1)=tt;
+                        else
+                            fmt=pa+"%0"+string(length(a)-ja)+"d";
+                            for v=na:nb; decl($+1)=msprintf(fmt,v); end
+                        end
+                    else
+                        decl($+1)=tt;
+                    end
+                end
+                break;
+            end
+        end
+        if decl==[] then problems($+1)="REGISTRY-CODES eilutė nerasta: "+path; end
+    endfunction
+    [decl1,pb1]=ldx_declared(root+"LD1/ld1_ids.sci");
+    [decl2,pb2]=ldx_declared(root+"LD2/ld2_ids.sci");
+    if pb1<>[] then error("LD1 deklaracijos klaida: "+strcat(pb1,"; ")); end
+    if pb2<>[] then error("LD2 deklaracijos klaida: "+strcat(pb2,"; ")); end
+    for c=1:n1
+        if size(find(decl1==codes1(c)),"*")==0 then error("LD1 generuotas kodas "+codes1(c)+" nėra REGISTRY-CODES deklaracijoje."); end
+    end
+    for c=1:n2
+        if size(find(decl2==codes2(c)),"*")==0 then error("LD2 generuotas kodas "+codes2(c)+" nėra REGISTRY-CODES deklaracijoje."); end
+    end
+    for c=1:size(decl1,"*")
+        if size(find(codes1==decl1(c)),"*")==0 then error("LD1 deklaruotas kodas "+decl1(c)+" negeneruojamas ld1_all_codes()."); end
+    end
+    for c=1:size(decl2,"*")
+        if size(find(codes2==decl2(c)),"*")==0 then error("LD2 deklaruotas kodas "+decl2(c)+" negeneruojamas ld2_all_codes()."); end
+    end
+    mprintf("REGISTRY_OK: LD1 %d kodų, LD2 %d kodų — unikalūs, pavyzdiniai T01/B01 rasti\n",n1,n2);
     mprintf("HEADLESS_PASS: 64 LD1 + 64 LD2 variantai, įvesties atmetimas, 768 LD2 etapų, sesijos atkūrimas\n");
     exit(0);
 catch

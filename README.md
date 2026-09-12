@@ -46,15 +46,18 @@ sąsajai dar netikrintas.
 
 ## Turinys
 
-- `studentui/` – išbandyta bendra studento sąsaja, LD1 ir LD2 variantai bei automatinė patikra.
-- `LD1/` – pradinis LD1 v1.7 šaltinis.
-- `LD2/` – vystomas LD2 v2.0 šaltinis.
+- `studentui/` – vienintelis aktyvus šaltinis: bendra studento sąsaja, LD1 ir LD2
+  variantai, elementų numerių registrai (T/B/E/F/V/H/W/D/A kodai) ir automatinė patikra.
 - `audits/` – LD2 nepriklausomo kryžminio audito medžiaga, naudota prieš v2.0.
 - `dist/` – paruoštas savarankiškas studento versijos ZIP paketas.
 
 Studento versijos vykdomojo kodo pagrindas – pilni LD1 v1.7 ir LD2 v1.1
-paketai, papildyti originaliu LD2 v2 variantų moduliu. Abu šakniniai
-paleidikliai naudoja `studentui/` versiją. Pradiniai šaltiniai išlaikyti atskirai.
+paketai, papildyti originaliu LD2 v2 variantų moduliu. Senieji šakniniai
+`LD1/` ir `LD2/` medžiai pašalinti (2026-09) – jų istorija išlieka git'e,
+o elementų numerių registro architektūra gyvena `studentui/LD1/ld1_ids.sci`
+ir `studentui/LD2/ld2_ids.sci`; kiekviena [kodo] nuoroda instrukcijose
+mašiniškai tikrinama (`tools/check_instruction_registry.py`, CI testas
+`instruction_registry`).
 
 ## Pastaba
 

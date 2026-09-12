@@ -22,6 +22,12 @@ PASS | Neleidžiama įvestis: 2k
 PASS | Neleidžiama įvestis: <tuščia>
 PASS | Neleidžiama įvestis: 1 2
 PASS | Mokslinė įvestis
+PASS | Registro kodų sąrašas > 100 ir be pasikartojimų
+PASS | Kontaktų kodai: VM_H=T07, LC_M2=T38
+PASS | Mygtukų registro atitikmenys: B15, B11, B41
+PASS | Visi 45 registro mygtukų veiksmai apibrėžti
+PASS | 12 etapų metodika su kodais
+PASS | Instrukcijos deleguojamos į metodiką su kodais
 PASS | Pavyzdys 1: be veikimo klaidos
 PASS | Pavyzdys neįskaito studento etapo 1
 PASS | Pavyzdžio duomenys praeina tikrintuvą 1
