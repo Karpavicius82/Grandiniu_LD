@@ -157,19 +157,32 @@ void parameters(const Json& r,const Json& expected) {
 void grade_dc(Grader& g,const Json& r,const Bank& b) {
     parameters(r,{{"E",10},{"R1",b.r1},{"R2",b.r2},{"R3",b.r3}});
     double i=10000/(b.r1+1000),j=10000/(b.r1+500),i1=10000/b.r3,i2=10000/b.r2;
-    g.answer("s2.q1","2 etapas: bendra varža",b.r1+1000,"Ohm","Rb = R1 + 1000 Ω.",.01,1e-9);
-    g.answer("s2.q2","2 etapas: srovė",i,"mA","I = 10 / Rb × 1000 mA.",.01,1e-9);
-    g.answer("s4.q1","4 etapas: bendra varža",b.r1+500,"Ohm","Rb = R1 + 500 Ω.",.01,1e-9);
-    g.answer("s4.q2","4 etapas: srovė",j,"mA","I = 10 / Rb × 1000 mA.",.01,1e-9);
-    g.answer("s6.q1","6 etapas: lygiagreti varža",b.r3*(b.r2+1000)/(b.r3+b.r2+1000),"Ohm","Rb = R3 × (R2+1000) / (R3+R2+1000).",.01,1e-9);
+    g.answer("s2.q1","2 etapas (nuoseklioji, VR1 = 1000 Ω): bendroji varža Rb = R1 + VR1",b.r1+1000,"Ohm","Rb = R1 + 1000 Ω.",.01,1e-9);
+    g.answer("s2.q2","2 etapas (nuoseklioji, VR1 = 1000 Ω): srovė I = E / Rb",i,"mA","I = 10 / Rb × 1000 mA.",.01,1e-9);
+    g.answer("s4.q1","4 etapas (nuoseklioji, VR1 = 500 Ω): bendroji varža Rb = R1 + VR1",b.r1+500,"Ohm","Rb = R1 + 500 Ω.",.01,1e-9);
+    g.answer("s4.q2","4 etapas (nuoseklioji, VR1 = 500 Ω): srovė I = E / Rb",j,"mA","I = 10 / Rb × 1000 mA.",.01,1e-9);
+    g.answer("s6.q1","6 etapas (lygiagretė): ekvivalentinė varža RAB = R3 ∥ (R2 + VR1)",b.r3*(b.r2+1000)/(b.r3+b.r2+1000),"Ohm","Rb = R3 × (R2+1000) / (R3+R2+1000).",.01,1e-9);
+    const char* kcl[]={"8 etapas (KSD): srovė I1 per R3 šaką",
+                       "8 etapas (KSD): srovė I2 per R2 + VR1 šaką (VR1 = 0)",
+                       "8 etapas (KSD): bendroji srovė I = I1 + I2 prieš mazgą A"};
+    int w=0;
     for(auto q:std::vector<std::pair<std::string,double>>{{"s8.q1",i1},{"s8.q2",i2},{"s8.q3",i1+i2}})
-        g.answer(q.first,"8 etapas: Kirchhofo srovės",q.second,"mA","I1=10/R3×1000; I2=10/R2×1000; I=I1+I2.",.01,1e-9);
-    g.answer("s1.type","1 etapas: grandinės tipas",1,"choice","1 – nuosekli; 2 – lygiagreti; 3 – mišri.",0,0);
-    g.answer("s5.type","5 etapas: grandinės tipas",2,"choice","R3 ir R2+VR1 sudaro lygiagrečias šakas.",0,0);
-    double base=g.measured("s6.measure","6 etapas: UAB",10,"V",.05);
+        g.answer(q.first,kcl[w++],q.second,"mA","I1=10/R3×1000; I2=10/R2×1000; I=I1+I2.",.01,1e-9);
+    g.answer("s1.type","1 etapas (nuoseklioji): grandinės tipo apibrėžimas",1,"choice","1 – nuosekli; 2 – lygiagreti; 3 – mišri.",0,0);
+    g.answer("s5.type","5 etapas (lygiagretė): grandinės tipo apibrėžimas",2,"choice","R3 ir R2+VR1 sudaro lygiagrečias šakas.",0,0);
+    double base=g.measured("s6.measure","6 etapas (lygiagretė): įtampa tarp mazgų A–B, UAB",10,"V",.05);
+    const std::map<int,std::string> meas_label={{3,"3 etapas (nuoseklioji, VR1 = 1000 Ω): srovės I matavimas ampermetru"},
+        {4,"4 etapas (nuoseklioji, VR1 = 500 Ω): srovės I matavimas ampermetru"},
+        {7,"7 etapas (lygiagretė): įtampos UAB matavimas pakeitus VR1"},
+        {8,"8 etapas (KSD): bendrosios srovės I matavimas ampermetru"}};
+    const std::map<int,std::string> comp_label={{3,"3 etapas: išvada — ar skaičiuota srovė I sutampa su išmatuota (±5 %)"},
+        {4,"4 etapas: išvada — ar srovė I (VR1 = 500 Ω) sutampa su matavimu"},
+        {6,"6 etapas: išvada — ar UAB lygi šaltinio įtampai E"},
+        {7,"7 etapas: išvada — ar UAB pasikeitė pakeitus VR1"},
+        {8,"8 etapas: išvada — ar I = I1 + I2 patvirtina Kirchhofo srovės dėsnį"}};
     for(auto p:std::vector<std::pair<int,double>>{{3,i},{4,j},{6,10},{7,10},{8,i1+i2}}) {
         int step=p.first; auto id="s"+std::to_string(step);
-        double v=step==6?base:g.measured(id+".measure",std::to_string(step)+" etapas: matavimas",p.second,step==7?"V":"mA",.05);
+        double v=step==6?base:g.measured(id+".measure",meas_label.at(step),p.second,step==7?"V":"mA",.05);
         double ref=p.second;
         // Comparison is against the student's calculation where the bench asks
         // for it; a wrong calculation loses its own point, not this reasoning point.
@@ -180,10 +193,12 @@ void grade_dc(Grader& g,const Json& r,const Bank& b) {
         if(step==7 && std::isfinite(base)) ref=base;
         bool match=near(v,ref,.05,0);
         double expected=step==7?(match?2:1):(match?1:2);
-        g.answer(id+".compare",std::to_string(step)+" etapas: palyginimas",expected,"choice","Palyginkite užfiksuotas reikšmes: 5 % riba; 1 – Taip, 2 – Ne.",0,0);
+        g.answer(id+".compare",comp_label.at(step),expected,"choice","Palyginkite užfiksuotas reikšmes: 5 % riba; 1 – Taip, 2 – Ne.",0,0);
         if(!std::isfinite(v)) {g.items.back()["points"]=0;g.items.back()["status"]="missing_evidence";g.items.back()["comment"]="Palyginimui trūksta matavimo.";}
     }
-    for(int s:{1,5}) g.add("s"+std::to_string(s)+".wiring",std::to_string(s)+" etapas: sujungimas",
+    const std::map<int,std::string> wire_label={{1,"1 etapas (nuoseklioji): stendo sujungimas — šaltinis → R1 → VR1 → ampermetras"},
+        {5,"5 etapas (lygiagretė): stendo sujungimas — dvi šakos tarp mazgų A ir B"}};
+    for(int s:{1,5}) g.add("s"+std::to_string(s)+".wiring",wire_label.at(s),
         ld1_wiring(r.at("evidence").at("wiring").at("s"+std::to_string(s)),s==1),
         "Patikrinkite šaltinio, rezistorių ir matuoklio sujungimą. Vertinama išsaugota topologija.");
 }
@@ -218,47 +233,56 @@ void grade_ac(Grader& g,const Json& r,const Bank& b) {
         bool rc=kind==1;int s=rc?3:6;auto v=ac(kind,9,rc?b.frc:b.frl,rc?b.r8:b.r9,.5,4.7e-6);
         double refs[]={v[rc?1:0],v[2],v[3]*1000,v[4],v[rc?6:5],v[8]*1000,-v[9]};
         const char* units[]={"Ohm","Ohm","mA","V","V","mW","deg"};
-        const char* labels[]={"reaktyvioji varža","impedanso modulis","srovė","rezistoriaus įtampa","reaktyviojo elemento įtampa","aktyvioji galia","srovės fazė"};
-        for(int q=0;q<7;++q) g.answer("s"+std::to_string(s)+".q"+std::to_string(q+1),std::to_string(s)+" etapas: "+labels[q],refs[q],units[q],"Naudokite kompleksinį impedansą ir RMS dydžius. P=I²R; srovės fazė priešinga impedanso fazei.");
+        const char* labels[]={rc?"talpinė reaktyvioji varža XC = 1/(ωC)":"induktyvioji reaktyvioji varža XL = ωL",
+            rc?"impedanso modulis |Z| = √(R8² + XC²)":"impedanso modulis |Z| = √(R9² + XL²)",
+            "srovė I = E / |Z|",rc?"įtampa rezistoriuje UR8 = I·R8":"įtampa rezistoriuje UR9 = I·R9",
+            rc?"įtampa kondensatoriuje UC2 = I·XC":"įtampa ritėje UL1 = I·XL",
+            "aktyvioji galia P = I²·R","srovės fazė φI"};
+        for(int q=0;q<7;++q) g.answer("s"+std::to_string(s)+".q"+std::to_string(q+1),std::to_string(s)+" etapas ("+(rc?"RC":"RL")+"): "+labels[q],refs[q],units[q],"Naudokite kompleksinį impedansą ir RMS dydžius. P=I²R; srovės fazė priešinga impedanso fazei.");
         std::string prefix=rc?"rc_":"rl_";
-        double mi=g.measured(prefix+"I",prefix+"I",v[3],"A",.002,5e-6);
-        double ur=g.measured(prefix+"UR",prefix+"UR",v[4],"V"),ux=g.measured(prefix+(rc?"UC":"UL"),prefix+"UX",v[rc?6:5],"V");
-        double ue=g.measured(prefix+"UE",prefix+"UE",9,"V");
+        std::string tag=std::to_string(s)+" etapas ("+(rc?"RC":"RL")+"): ";
+        double mi=g.measured(prefix+"I",tag+"srovės I matavimas",v[3],"A",.002,5e-6);
+        double ur=g.measured(prefix+"UR",tag+"įtampa rezistoriuje "+(rc?"UR8":"UR9")+" matavimas",v[4],"V"),
+             ux=g.measured(prefix+(rc?"UC":"UL"),tag+"įtampa "+(rc?"kondensatoriuje UC2":"ritėje UL1")+" matavimas",v[rc?6:5],"V");
+        double ue=g.measured(prefix+"UE",tag+"šaltinio įtampa E matavimas",9,"V");
         bool valid=std::isfinite(mi)&&std::isfinite(ur)&&std::isfinite(ux)&&std::isfinite(ue);
-        dependent(g,"s"+std::to_string(s+1)+".q1","Įtampų vektorinė suma",std::hypot(ur,ux),"V",valid);
-        dependent(g,"s"+std::to_string(s+1)+".q2","Srovė pagal UR/R",ur/(rc?b.r8:b.r9)*1000,"mA",valid);
+        dependent(g,"s"+std::to_string(s+1)+".q1",std::to_string(s+1)+" etapas ("+(rc?"RC":"RL")+" patikra): įtampų vektorinė suma E = √(UR² + U"+(rc?"C2":"L1")+"²)",std::hypot(ur,ux),"V",valid);
+        dependent(g,"s"+std::to_string(s+1)+".q2",std::to_string(s+1)+" etapas ("+(rc?"RC":"RL")+" patikra): srovė I = "+(rc?"UR8 / R8":"UR9 / R9"),ur/(rc?b.r8:b.r9)*1000,"mA",valid);
     }
     const auto& e=r.at("evidence");
     for(auto p:std::vector<std::pair<std::string,int>>{{"RC",2},{"RL",5},{"RLC",8}})
-        g.add("s"+std::to_string(p.second)+".wiring",p.first+" sujungimas",ld2_wiring(e.at("wiring").at(p.first),p.first),"Trūksta pagrindinės grandinės jungčių arba yra papildomų netinkamų laidų.");
+        g.add("s"+std::to_string(p.second)+".wiring",std::to_string(p.second)+" etapas ("+p.first+"): stendo sujungimas",ld2_wiring(e.at("wiring").at(p.first),p.first),"Trūksta pagrindinės grandinės jungčių arba yra papildomų netinkamų laidų.");
     double f0=1/(2*std::acos(-1.0)*std::sqrt(b.l3*b.c4));
     bool valid=true;auto rp=points(e.at("resonance"),b,"UR",valid);auto best=best_point(rp);
     bool resonance=valid&&bracket(rp,best)&&best.u>=.97*5;
-    g.add("s9.experiment","Rezonanso paieškos taškai",resonance,"Užfiksuokite bent 3 dažnius abipus UR maksimumo; maksimumas turi siekti bent 97 % E.");
-    g.answer("s9.q1","Teorinis rezonanso dažnis",f0,"Hz","f0=1/(2π√(LC)).",.005);
-    dependent(g,"s9.q2","Išmatuotas rezonanso dažnis",best.f,"Hz",resonance,.0002);
-    dependent(g,"s9.q3","Išmatuotas periodas",1000/best.f,"ms",resonance,.01);
-    dependent(g,"s9.q4","UR maksimumas",best.u,"V",resonance);
+    g.add("s9.experiment","9 etapas (RLC rezonansas): dažnio paieškos taškai abipus maksimumo",resonance,"Užfiksuokite bent 3 dažnius abipus UR maksimumo; maksimumas turi siekti bent 97 % E.");
+    g.answer("s9.q1","9 etapas: teorinis rezonanso dažnis f0 = 1/(2π√(LC))",f0,"Hz","f0=1/(2π√(LC)).",.005);
+    dependent(g,"s9.q2","9 etapas: rezonanso dažnis fr ties UR13 maksimumu",best.f,"Hz",resonance,.0002);
+    dependent(g,"s9.q3","9 etapas: periodas T = 1000 / fr",1000/best.f,"ms",resonance,.01);
+    dependent(g,"s9.q4","9 etapas: UR13 maksimumas rezonanso dažnyje",best.u,"V",resonance);
     int q=1;
     for(auto target:{"UL","UC","ULC"}) {
         valid=true;auto pp=points(e.at("peaks"),b,target,valid);auto bp=best_point(pp,std::string(target)=="ULC");
         bool ok=valid&&bracket(pp,bp)&&(std::string(target)!="ULC"||bp.u<=.5);
-        g.add("s10.experiment."+std::string(target),std::string(target)+" ekstremumo paieška",ok,"Reikia trijų skirtingų dažnių abipus ekstremumo ir modelį atitinkančių rodmenų.");
-        dependent(g,"s10.q"+std::to_string(q),std::string(target)+" ekstremumas",bp.u,"V",ok);
-        dependent(g,"s10.q"+std::to_string(q+3),std::string(target)+" ekstremumo dažnis",bp.f,"Hz",ok,.0002);++q;
+        g.add("s10.experiment."+std::string(target),"10 etapas (RLC): "+std::string(target)+" ekstremumo paieška",ok,"Reikia trijų skirtingų dažnių abipus ekstremumo ir modelį atitinkančių rodmenų.");
+        dependent(g,"s10.q"+std::to_string(q),"10 etapas: "+std::string(target)+" ekstremumo įtampa",bp.u,"V",ok);
+        dependent(g,"s10.q"+std::to_string(q+3),"10 etapas: dažnis ties "+std::string(target)+" ekstremumu",bp.f,"Hz",ok,.0002);++q;
     }
     double f1=g.observation("f1_meas","Hz"),f2=g.observation("f2_meas","Hz"),u1=g.observation("f1_u","V"),u2=g.observation("f2_u","V");
     double threshold=(std::isfinite(best.u)?best.u:5)/std::sqrt(2.0);
     bool half=std::isfinite(f1)&&std::isfinite(f2)&&f1>0&&f1<f0&&f2>f0&&f2<=10000 &&
         near(u1,threshold,.0301,0)&&near(u2,threshold,.0301,0);
     if(half) half=near(u1,ac(3,5,f1,b.r13,b.l3,b.c4)[4],.002,.005)&&near(u2,ac(3,5,f2,b.r13,b.l3,b.c4)[4],.002,.005);
-    g.add("s11.experiment","Pusės galios dažnių matavimai",half,"Išmatuokite f1 ir f2 skirtingose rezonanso pusėse, ties URmax/√2 slenksčiu (3 % paklaida).");
+    g.add("s11.experiment","11 etapas (pusės galios): f1 ir f2 matavimai ties URmax/√2",half,"Išmatuokite f1 ir f2 skirtingose rezonanso pusėse, ties URmax/√2 slenksčiu (3 % paklaida).");
     double refs[]={threshold,f1,f2,f2-f1,(std::isfinite(best.f)?best.f:f0)/(f2-f1)};
     const char* units[]={"V","Hz","Hz","Hz","1"};double rel[]={.015,.0002,.0002,.02,.02};
-    for(int k=0;k<5;++k) dependent(g,"s11.q"+std::to_string(k+1),"Pusės galios tyrimas: "+std::to_string(k+1),refs[k],units[k],half,rel[k]);
+        const char* half_labels[]={"11 etapas: UR13 slenkstis URmax/√2","11 etapas: žemutinis pusės galios dažnis f1",
+        "11 etapas: viršutinis pusės galios dažnis f2","11 etapas: juostos plotis BW = f2 − f1",
+        "11 etapas: kokybės faktorius Q = fr / BW"};
+    for(int k=0;k<5;++k) dependent(g,"s11.q"+std::to_string(k+1),half_labels[k],refs[k],units[k],half,rel[k]);
     valid=true;auto sweep=points(e.at("sweep"),b,"UR",valid);bool sweep_ok=valid&&sweep.size()==11;
     for(int k=0;k<=10;++k) if(std::none_of(sweep.begin(),sweep.end(),[&](auto p){return p.f==k*1000;})) sweep_ok=false;
-    g.add("s12.sweep","0–10 kHz dažninė lentelė",sweep_ok,"Reikia 11 modelį atitinkančių matavimų: 0, 1000, …, 10000 Hz.");
+    g.add("s12.sweep","12 etapas (RLC): dažninė charakteristika 0–10 kHz (11 taškų)",sweep_ok,"Reikia 11 modelį atitinkančių matavimų: 0, 1000, …, 10000 Hz.");
 }
 } // namespace
 
