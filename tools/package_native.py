@@ -7,6 +7,7 @@ root=Path(__file__).resolve().parents[1];source=root/'studentui'
 ext='.dll' if a.platform=='Windows' else '.so'
 assert (source/'bin'/('ldcore'+ext)).is_file()
 assert (source/'bin'/('ldcheck.exe' if a.platform=='Windows' else 'ldcheck')).is_file()
+assert (source/'bin'/('mokytojas.exe' if a.platform=='Windows' else 'mokytojas')).is_file()
 dest=root/'dist'/f'Grandiniu_LD-{a.platform}.zip';dest.parent.mkdir(exist_ok=True)
 with zipfile.ZipFile(dest,'w',zipfile.ZIP_DEFLATED) as z:
     for f in sorted(source.rglob('*')):
