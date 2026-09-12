@@ -1,5 +1,5 @@
 {
-  "time_utc": "2026-09-12T13:43:39.185622+00:00",
+  "time_utc": "2026-09-12T18:10:53.158672+00:00",
   "scilab": "unknown",
   "command": "./PATIKRINTI.sh visi",
   "status": "PASS",
@@ -15,11 +15,13 @@
     "LD1_GUI_stages_per_variant": 9,
     "LD2_GUI_stages_per_variant": 12,
     "native_controls_callbacks": true,
-    "operating_system_mouse_events": false
+    "operating_system_mouse_events": false,
+    "LD3_model_variants": 64,
+    "LD3_GUI_stages_per_variant": 6
   },
   "source_sha256": {
     "DESTYTOJUI.sce": "6518ec1acc2679736b3bd2b334381aded90c03e6f313559fde5ca1df46af1aa4",
-    "GUI_PATIKRA.sce": "22d085bced72ea79e9bf9190073e55d4ea60ce10ca5a58b6b93177791e67aec0",
+    "GUI_PATIKRA.sce": "93016f2281a3f649c8e0d3dae73ec73c57c4ac8baa3c623c9e71640edccc44db",
     "LD1/LD1.sce": "369863c411bca178ef30347fe4b4ae90a4ba00904abacff9b8b41a81b3eec611",
     "LD1/LD1_LOAD.sce": "b68832be3ae679ba79c5a1160bff946408687428edd7c091e9f6503389d7c038",
     "LD1/ld1_callbacks.sci": "502ad0e8d2b58a2db59c90d82e121d034bb42fd514e6072bc58cac4622e8cbc2",
@@ -48,23 +50,33 @@
     "LD2/ld2_utils.sci": "f4bf3c3a5252a983789a1c5d865fa6caeb8785af088f3ba9a4fec2f35f8f71ac",
     "LD2/ld2_variants.sci": "bb83e4c3e41e7c5cef485c10dd9928869b0ed5056c6ff6985a80cb8694e8dfbc",
     "LD2/ld2_wiring.sci": "433b86664876bb8c1c60a44b73587c6e46008717d5055bf6b9d866f4254606a3",
+    "LD3/LD3.sce": "52d7a4d9d55cd4006874b6ba3a187b094d9cec1d211232b314c53e816e4df918",
+    "LD3/LD3_LOAD.sce": "d768fddf96fd824740786a6b09cbae94529ec5735e753dabe68b49c2ce01895e",
+    "LD3/ld3_callbacks.sci": "d2d71ff546cc68be6df308317054bf2acfb05f6fa1a06ed75c6fff93caaa4594",
+    "LD3/ld3_circuit.sci": "02619001e0dfde09977ab50c3d2fffa8a15916785bd3c64e63d3e465f28773d0",
+    "LD3/ld3_config.sci": "8fccca55200af183207023403a605a4ba89b890d8c1e84cc9492426d52135be2",
+    "LD3/ld3_gui.sci": "a84711d523751b44316df12f93ce22b01ec713d7fa1f8869eb1827be756651d5",
+    "LD3/ld3_ids.sci": "b85995bbd8c32a63cb47b8ca2a69282b6cb0e067f1294b07373ce46c108a4334",
+    "LD3/ld3_student.sci": "77f65297c7b2f3beb70a9d4168495ca81d99bad6fee538c305e1b46bddba04c3",
+    "LD3/ld3_utils.sci": "dccea4a1c5740eaf20be44cba573427b31312e25d390736e2dbf2a616464cd54",
     "PALEISTI.sh": "d135f0d78c8aaf76d2440c05331b9a2b9735a0bc0c20fd967e71952b5282411d",
     "PATIKRINTI.sh": "a2d596ad6c9a5df00d2b7082373ebeb8929836c4f977668515871cec33a470b5",
     "PERZIURA.sce": "53fa236f6574984056d2f21386392b5d4941c5de74fd2ac48fcac6cbffcee0cc",
     "PERZIURA_LD2.sce": "64461ba07fcf298f561d061979c518213bfd81b439d918dbf98c0f8c1a6e7a35",
-    "STENDAS.sce": "ffe1ffeaf1476cc3943f471554af982d07ab1ecc05489a540341c92dc27368a7",
-    "bench_common.sci": "eae289f4458f9274ced47cfc0503a01aec89a8c4ed6a4264b03c32959e43f597",
-    "bench_report.sci": "825bc326098306440dbddcc8a993047e7e396b212325217c7f251b1c951a61f2",
-    "bench_session.sci": "651561b8df3e9a314fefc399f6a9f24f45d0da1471ec82dc21d7efe6ced1fc29",
+    "PERZIURA_LD3.sce": "17ff85ef2dd5d0e5c25d9096e1691f8c94b46b4748fa27d16cdbe7a45746d23b",
+    "STENDAS.sce": "48f19f0e72b02ecfc5ae3b6f36cf8f9acdb7fa9c307289d7324eb101aaeb53a7",
+    "bench_common.sci": "e15ff369f32c0f2985c168faa5de0b219f4aec5cf333ce3b83e31eeec61d2eda",
+    "bench_report.sci": "2aaf183330beaf6e095b69d8be97122ef1ca54bc63b737e1b75aaa66d14352c5",
+    "bench_session.sci": "358c4ba5afb1a5ad6e9dc0a111f5357afa64d7903c6ab1f11ed6d0ed202aa3df",
     "bench_teacher.sci": "8de6d5b3de9924f8f0e301c893d7d3f82c0dd74e158534487d6aebbc0cd6f3c0",
-    "student_profile.sci": "704d1ff45ce3729453358daf6689ca3af9edd2973123d09c59404d89b0e89fdd",
+    "student_profile.sci": "922143ce18a4bed2ce406c03f04f8b5eeaa713bfedb4ad0244e20e68d10549bf",
     "student_style.sci": "5c026e03505c13ae6786cc97e50071777a7f2ff688e27d711fdc7996b1fb7472",
-    "tests/AUTOMATINIS.sce": "69d278598951b6de794523f4e44bb709c0b5a1c65856dd7684244bd15c3728ad",
-    "tests/HEADLESS.sce": "aba3392805c50211c54cd767626517ca701835f2df3e1159e32c9d2a805a303a",
-    "tests/workflows.sci": "64ae55bed606fffb3c0a03ee7b97969585dbeed862d176ddb49649b34d507ba0"
+    "tests/AUTOMATINIS.sce": "55aed6e8fcbd45e0a87c3bb0e4a5e57b78b200bbfee5b1fe26f526929572604e",
+    "tests/HEADLESS.sce": "a83daebec37072116e353b056aaa6850bf6e5aa498bb6e6e29a313cdf5bf4200",
+    "tests/workflows.sci": "59d59af1341781b5133f32cd9c00ffb69305443fecb844a8b43fe1e628b6565a"
   },
   "log_sha256": {
-    "modelis.log": "3ed9768a7049fe4f7d76bf91ef861aefdaae849a1a161af23f61d2da824e01a8",
-    "langai.log": "4d557bf6979a7d5ad340e51316ef482f9553dc727b3c7be15b48160f32cc67a6"
+    "modelis.log": "1690f6a8d62b9367d035471feca6702a110a7c7ac89a6fc3bb0a6f41b6a72fba",
+    "langai.log": "fb50798ccbdd5600df7e435ee487f94986d0a7962d91979dde18014c58adb0a2"
   }
 }

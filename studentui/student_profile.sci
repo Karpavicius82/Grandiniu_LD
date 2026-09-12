@@ -26,6 +26,9 @@ function lines=student_parameter_lines(lab,cfg)
         lines=[msprintf("Šaltinis: %.1f V DC.",cfg.E); ...
             msprintf("R1 = %.0f Ω; R2 = %.0f Ω; R3 = %.0f Ω.",cfg.R1,cfg.R2,cfg.R3); ...
             "VR1 keičiamas pagal etapą: 1000, 500 arba 0 Ω."];
+    elseif lab=="LD3" then
+        lines=[msprintf("R (tiriamasis rezistorius) = %.0f Ω.",cfg.R); ...
+            msprintf("U1 = %.0f V; U2 = %.0f V; U3 = %.0f V (matavimo taškai).",cfg.U1,cfg.U2,cfg.U3)];
     else
         lines=[msprintf("RC: %.1f V RMS; %.1f Hz; R8 = %.0f Ω; C2 = %.2f µF.",cfg.E_RC,cfg.F_RC,cfg.R8,cfg.C2*1e6); ...
             msprintf("RL: %.1f V RMS; %.1f Hz; R9 = %.0f Ω; L1 = %.3f H.",cfg.E_RL,cfg.F_RL,cfg.R9,cfg.L1); ...
@@ -54,6 +57,9 @@ function [ok,st,cfg]=student_enroll(lab,previous)
         try
             st=student_profile(values(1),values(2),values(3),lab);
             if lab=="LD1" then cfg=ld1_variant_config(st.number);
+            elseif lab=="LD3" then
+                cfg=ld3_variant_config(st.number);
+                [valid,why]=ld3_validate_config(cfg); if ~valid then error(why); end
             else
                 cfg=ld2_variant_config(st.number);
                 [valid,why]=ld2_validate_config(cfg); if ~valid then error(why); end

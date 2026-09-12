@@ -19,7 +19,7 @@ with zipfile.ZipFile(root / "dist/Grandiniu_LD-studentui.zip") as archive:
         local = (student / name).read_bytes()
         assert hashlib.sha256(local).hexdigest() == manifest["source_sha256"][name], name
         assert archive.read(prefix + name) == local, f"Missing or outdated ZIP source: {name}"
-    for name in ["README.md", "LD1/VARIANTAI.csv", "LD2/VARIANTAI.csv", "capture_window.py"]:
+    for name in ["README.md", "LD1/VARIANTAI.csv", "LD2/VARIANTAI.csv", "LD3/VARIANTAI.csv", "capture_window.py"]:
         assert archive.read(prefix + name) == (student / name).read_bytes(), name
     for name in ["PALEISTI.sh", "PATIKRINTI.sh"]:
         assert (archive.getinfo(prefix + name).external_attr >> 16) & 0o111, name

@@ -134,7 +134,7 @@ public:
         checkpoint();
         std::string table="\xef\xbb\xbf" "Failas;Statusas;Studentas;Grupė;Darbas;Variantas;Balai;Iš;Įvertinimas_10;Suvestinei;Komentaras\r\n";
         std::string html="<!doctype html><html lang=\"lt\"><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width\"><title>Laboratorinių vertinimas</title><style>body{font:16px system-ui;max-width:1100px;margin:2rem auto;padding:1rem}table{border-collapse:collapse;width:100%}th,td{text-align:left;padding:.5rem;border-bottom:1px solid #ddd}.bad{color:#963e16}details{margin:1rem 0}pre{white-space:pre-wrap}</style><h1>Laboratorinių darbų vertinimas</h1>";
-        html+="<p>Nuskaityta "+std::to_string(cursor)+" iš "+std::to_string(files.size())+" failų. "+(cancelled?"Vertinimas sustabdytas.":"Vertinimas baigtas.")+"</p><p>Rubrika: LD1-1 / LD2-1. Balas = 10 × surinkti taškai / visi taškai; apvalinama iki 0,1. Suvestinei parenkamas geriausias to paties studento to paties darbo bandymas. Visi bandymai pateikti žemiau.</p>";
+        html+="<p>Nuskaityta "+std::to_string(cursor)+" iš "+std::to_string(files.size())+" failų. "+(cancelled?"Vertinimas sustabdytas.":"Vertinimas baigtas.")+"</p><p>Rubrika: LD1-1 / LD2-1 / LD3-1. Balas = 10 × surinkti taškai / visi taškai; apvalinama iki 0,1. Suvestinei parenkamas geriausias to paties studento to paties darbo bandymas. Visi bandymai pateikti žemiau.</p>";
         for(auto& r:results) {
             auto get=[&](const char* k) {return r.contains(k)&&!r.at(k).is_null()?(r.at(k).is_string()?r.at(k).get<std::string>():r.at(k).dump()):"";};
             std::string name,group;if(r.contains("student")){name=r["student"]["name"];group=r["student"]["group"];}

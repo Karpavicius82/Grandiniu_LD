@@ -20,6 +20,12 @@ PASS LD2 V01: etapas 9
 PASS LD2 V01: etapas 10
 PASS LD2 V01: etapas 11
 PASS LD2 V01: etapas 12
+PASS LD3 V01: etapas 1
+PASS LD3 V01: etapas 2
+PASS LD3 V01: etapas 3
+PASS LD3 V01: etapas 4
+PASS LD3 V01: etapas 5
+PASS LD3 V01: etapas 6
 PASS LD1 V17: etapas 1
 PASS LD1 V17: etapas 2
 PASS LD1 V17: etapas 3
@@ -40,6 +46,12 @@ PASS LD2 V17: etapas 9
 PASS LD2 V17: etapas 10
 PASS LD2 V17: etapas 11
 PASS LD2 V17: etapas 12
+PASS LD3 V17: etapas 1
+PASS LD3 V17: etapas 2
+PASS LD3 V17: etapas 3
+PASS LD3 V17: etapas 4
+PASS LD3 V17: etapas 5
+PASS LD3 V17: etapas 6
 PASS LD1 V64: etapas 1
 PASS LD1 V64: etapas 2
 PASS LD1 V64: etapas 3
@@ -60,4 +72,10 @@ PASS LD2 V64: etapas 9
 PASS LD2 V64: etapas 10
 PASS LD2 V64: etapas 11
 PASS LD2 V64: etapas 12
-  "GUI_PASS: LD1 9 ir LD2 12 etapų, variantai 1/17/64, mygtukų funkcijos, matavimai, duomenų išlaikymas, eksportas"
+PASS LD3 V64: etapas 1
+PASS LD3 V64: etapas 2
+PASS LD3 V64: etapas 3
+PASS LD3 V64: etapas 4
+PASS LD3 V64: etapas 5
+PASS LD3 V64: etapas 6
+  "GUI_PASS: LD1 9, LD2 12 ir LD3 6 etapų, variantai 1/17/64, mygtukų funkcijos, matavimai, duomenų išlaikymas, eksportas"

@@ -284,6 +284,49 @@ void grade_ac(Grader& g,const Json& r,const Bank& b) {
     for(int k=0;k<=10;++k) if(std::none_of(sweep.begin(),sweep.end(),[&](auto p){return p.f==k*1000;})) sweep_ok=false;
     g.add("s12.sweep","12 etapas (RLC): dažninė charakteristika 0–10 kHz (11 taškų)",sweep_ok,"Reikia 11 modelį atitinkančių matavimų: 0, 1000, …, 10000 Hz.");
 }
+// LD3: exactly the six canonical wires, order-insensitive, no duplicates or extras.
+bool ld3_wiring(const Json& j,bool& valid) {
+    try {
+        const Json& list=j.is_array()?j:j.at("pairs");
+        auto p=pairs(list);
+        std::set<std::pair<std::string,std::string>> unique;
+        for(auto& e:p) {
+            if(e.first==e.second) return false;
+            if(e.first>e.second) std::swap(e.first,e.second);
+            if(!unique.insert(e).second) return false;
+        }
+        static const std::set<std::pair<std::string,std::string>> canonical={
+            {"A_N","R1A"},{"A_P","K2"},{"E_N","R1B"},{"E_P","K1"},{"R1A","V_P"},{"R1B","V_N"}};
+        return unique==canonical;
+    } catch(const std::exception&) {valid=false;return false;}
+}
+void grade_ld3(Grader& g,const Json& r,const Bank& b) {
+    parameters(r,{{"R",b.r},{"U1",b.u1},{"U2",b.u2},{"U3",b.u3}});
+    const double uu[3]={b.u1,b.u2,b.u3},im[3]={b.u1/b.r*1000,b.u2/b.r*1000,b.u3/b.r*1000};
+    g.answer("s2.q1","2 etapas (teorinė prognozė): srovė I1 = U1 / R",im[0],"mA","I1 = U1 / R; mA = V / Ω × 1000.",.01,1e-9);
+    double uk[3],ik[3];
+    for(int k=0;k<3;++k) {
+        auto s=std::to_string(k+1),step=std::to_string(k+2);
+        uk[k]=g.measured("u"+s,step+" etapas (matavimas): įtampa U"+s+" voltmetru",uu[k],"V",0,.05);
+        ik[k]=g.measured("i"+s,step+" etapas (matavimas): srovė I"+s+" ampermetru",im[k],"mA",.02);
+    }
+    // R at each point depends on the student's own recorded U and I.
+    auto calc=[&](int k){return std::isfinite(uk[k])&&std::isfinite(ik[k])&&ik[k]!=0?uk[k]/ik[k]*1000:NAN;};
+    const double rc[3]={calc(0),calc(1),calc(2)};
+    const bool all=std::isfinite(rc[0])&&std::isfinite(rc[1])&&std::isfinite(rc[2]);
+    dependent(g,"s4.q1","4 etapas (skaičiavimai): varža R1 = U1 / I1",rc[0],"Ohm",std::isfinite(rc[0]),.02);
+    dependent(g,"s4.q2","4 etapas (skaičiavimai): varža R2 = U2 / I2",rc[1],"Ohm",std::isfinite(rc[1]),.02);
+    dependent(g,"s4.q3","4 etapas (skaičiavimai): varža R3 = U3 / I3",rc[2],"Ohm",std::isfinite(rc[2]),.02);
+    dependent(g,"s4.q4","4 etapas (skaičiavimai): vidutinė varža Rvid",all?(rc[0]+rc[1]+rc[2])/3:NAN,"Ohm",all,.02);
+    g.answer("s5.q1","5 etapas (charakteristika): varža iš I(U) nuolydžio",b.r,"Ohm","R = ΔU / ΔI iš I(U) tiesės (mA → A: × 1000).",.02);
+    g.answer("s6.q1","6 etapas (išvada): ar I(U) priklausomybė tiesinė",1,"choice","1 – Taip, 2 – Ne.",0,0);
+    g.answer("s6.q2","6 etapas (išvada): ar varža R pastovi visuose taškuose",1,"choice","1 – Taip, 2 – Ne.",0,0);
+    bool wiring_valid=true;
+    bool wired=ld3_wiring(r.at("evidence").at("wiring").at("s1"),wiring_valid);
+    g.add("s1.wiring","1 etapas (Omo dėsnio stendas): sujungimas — šaltinis → jungiklis → ampermetras → R1, voltmetras lygiagrečiai R1",wired,
+          wiring_valid?"Patikrinkite seką: šaltinis → jungiklis → ampermetras → R1; voltmetras lygiagrečiai R1.":"Sujungimo įrodymo duomenys sugadinti.",
+          wiring_valid?"":"missing_evidence");
+}
 } // namespace
 
 Json read_report(const std::filesystem::path& path) {
@@ -310,7 +353,7 @@ Json read_report(const std::filesystem::path& path) {
 }
 Json grade(const Json& r) {
     require(r.at("schema_version").is_number_integer()&&r.at("schema_version")==1,"unsupported_schema");
-    auto lab=text(r.at("lab_id"));require(lab=="LD1"||lab=="LD2","unsupported_lab");
+    auto lab=text(r.at("lab_id"));require(lab=="LD1"||lab=="LD2"||lab=="LD3","unsupported_lab");
     require(r.at("lab_revision")=="1"&&r.at("rubric_version")==lab+"-1"&&r.at("bank_id")==lab+"-64-A-2026","unsupported_version");
     require(r.at("variant").is_number_integer(),"variant_type");
     require(r.at("variant")>=1 && r.at("variant")<=64,"variant_range");
@@ -321,7 +364,7 @@ Json grade(const Json& r) {
     auto id=text(r.at("submission_id"),128);require(!id.empty(),"submission_identity");
     require(r.at("mode")=="learning"||r.at("mode")=="assessment","mode");
     text(r.at("note"),32000);
-    Grader g(r);if(lab=="LD1") grade_dc(g,r,b);else grade_ac(g,r,b);g.finish();
+    Grader g(r);if(lab=="LD1") grade_dc(g,r,b);else if(lab=="LD2") grade_ac(g,r,b);else grade_ld3(g,r,b);g.finish();
     int points=0;for(auto& item:g.items) points+=item.at("points").get<int>();
     return {{"status","graded"},{"submission_id",id},{"student",s},{"lab_id",lab},{"variant",variant},
             {"mode",r.at("mode")},{"bank_id",r.at("bank_id")},{"lab_revision","1"},{"rubric_version",lab+"-1"},

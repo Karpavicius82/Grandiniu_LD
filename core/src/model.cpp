@@ -12,9 +12,13 @@ Bank bank(int variant) {
     const double rl[]={100,150,180,220,270,330,390,470};
     const double ls[]={10,12,15,18,22,27,33,39};
     const double cs[]={47,56,68,82,100,120,150,180};
+    // LD3 (Ohm's law): resistor R by row a, three source voltages by column b.
+    const double rld[]={33,47,56,68,82,100,120,150};
+    const double uu[][3]={{3,6,9},{4,8,12},{2,5,8},{5,10,12},{3,7,11},{6,9,12},{2,6,10},{4,7,10}};
     double l=ls[a]*1e-3,c=cs[b]*1e-9;
     return {dc[a],dc[b],dc[(a+b)%8],rc[a],35+5.0*(b+1),rl[b],35+5.0*(a+1),
-            std::round(std::sqrt(l/c)/(2.8+.35*(a+1)+.20*(b+1))),l,c};
+            std::round(std::sqrt(l/c)/(2.8+.35*(a+1)+.20*(b+1))),l,c,
+            uu[b][0],uu[b][1],uu[b][2],rld[a]};
 }
 Values ac(int kind,double E,double f,double R,double L,double C) {
     for(double v:{E,f,R,L,C}) if(!std::isfinite(v)) throw std::runtime_error("non_finite");

@@ -1,1 +1,1 @@
-GUI_PASS: LD1 9 ir LD2 12 etapų, variantai 1/17/64, mygtukų funkcijos, matavimai, duomenų išlaikymas, eksportas
+GUI_PASS: LD1 9, LD2 12 ir LD3 6 etapų, variantai 1/17/64, mygtukų funkcijos, matavimai, duomenų išlaikymas, eksportas

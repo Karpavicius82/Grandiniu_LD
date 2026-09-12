@@ -21,7 +21,7 @@ LD_API void ld_write_new(const int*,const int*,const int*,const int*,int*) noexc
 namespace ld {
 using Values=std::array<double,10>;
 Values ac(int kind,double E,double f,double R,double L,double C);
-struct Bank {double r1,r2,r3,r8,frc,r9,frl,r13,l3,c4;};
+struct Bank {double r1,r2,r3,r8,frc,r9,frl,r13,l3,c4,u1,u2,u3,r;};
 Bank bank(int variant);
 void write_new(const std::filesystem::path&,const std::string&);
 int run_batch(const std::filesystem::path&,const std::filesystem::path&);

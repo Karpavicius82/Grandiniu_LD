@@ -3,8 +3,8 @@
 
 Kiekviena [kodo] nuoroda instrukcijose (pvz. [T07], [B12], [A03.01]) .sci/.sce
 failuose po studentui/ turi egzistuoti kodų registre:
-studentui/LD1/ld1_ids.sci arba studentui/LD2/ld2_ids.sci. Kitu atveju CI krenta
-tiek Linux, tiek Windows.
+studentui/LD1/ld1_ids.sci, studentui/LD2/ld2_ids.sci arba studentui/LD3/ld3_ids.sci.
+Kitu atveju CI krenta tiek Linux, tiek Windows.
 
 Registre turi būti deklaratyvi eilutė su markeriu „REGISTRY-CODES:" —
 tarpais atskirtų diapazonų sąrašas: T01:T38, B01:B45, A03.01:A03.07, V01.
@@ -36,7 +36,8 @@ A_RANGE_RE = re.compile(r"^A(\d{2})\.(\d{2}):A(\d{2})\.(\d{2})$")
 
 # Registrų failai pagal LD (keliai nuo repo šaknies). Vienintelis runtime —
 # studentui medis; root LD1/, LD2/ archyvuoti (istorija github'e).
-REGISTRIES = [("LD1", "studentui/LD1/ld1_ids.sci"), ("LD2", "studentui/LD2/ld2_ids.sci")]
+REGISTRIES = [("LD1", "studentui/LD1/ld1_ids.sci"), ("LD2", "studentui/LD2/ld2_ids.sci"),
+             ("LD3", "studentui/LD3/ld3_ids.sci")]
 SCAN_DIRS = ("studentui",)  # kur ieškome [kodo] nuorodų
 SCAN_SUFFIXES = (".sci", ".sce")
 
@@ -250,6 +251,7 @@ def self_test():
         # 1) Geras atvejis: visos nuorodos galiojančios.
         write(tmp, "good/studentui/LD1/ld1_ids.sci", fake_registry(["T01", "B01", "E01"]))
         write(tmp, "good/studentui/LD2/ld2_ids.sci", fake_registry(["T01", "B01", "V01", "A03.01"]))
+        write(tmp, "good/studentui/LD3/ld3_ids.sci", fake_registry(["T01", "B01", "W01"]))
         write(tmp, "good/studentui/LD2/ld2_note.sci",
               'mprintf("Pirmas žingsnis [T01], paskui [B01].\\n")\n')
         write(tmp, "good/studentui/LD1/ld1_note.sci", "// metodikos žingsnis [E01], žr. [A03.01]\n")
@@ -262,6 +264,7 @@ def self_test():
         # 3) Dublis tame pačiame registre.
         write(tmp, "dup/studentui/LD1/ld1_ids.sci", fake_registry(["T01", "T01"]))
         write(tmp, "dup/studentui/LD2/ld2_ids.sci", fake_registry(["B01"]))
+        write(tmp, "dup/studentui/LD3/ld3_ids.sci", fake_registry(["B01"]))
         dup_code, dup_lines = check(tmp / "dup")
 
         # 4) Literalas registre, bet neįtrauktas į deklaraciją.
@@ -269,6 +272,7 @@ def self_test():
             DECLARED_MARKER + " T01 T02", DECLARED_MARKER + " T01")
         write(tmp, "lit/studentui/LD1/ld1_ids.sci", lit_reg)
         write(tmp, "lit/studentui/LD2/ld2_ids.sci", fake_registry(["B01"]))
+        write(tmp, "lit/studentui/LD3/ld3_ids.sci", fake_registry(["B01"]))
         lit_code, lit_lines = check(tmp / "lit")
 
         # 5) Registro failo nėra → exit 2.

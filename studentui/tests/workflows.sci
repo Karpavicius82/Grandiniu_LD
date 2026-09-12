@@ -214,3 +214,99 @@ function bench_ld2_workflow(n,root,gui)
         delete(LD2.ui.figure);
     end
 endfunction
+
+function bench_ld3_action(callback)
+    global LD3;
+    if LD3.ui.headless then execstr(callback); return; end
+    if isfield(LD3.ui,"dynamic") then
+        for k=1:size(LD3.ui.dynamic,"*")
+            h=LD3.ui.dynamic(k);
+            if h.callback==callback then bench_button(h); return; end
+        end
+    end
+    error("Nėra matomo mygtuko: "+callback);
+endfunction
+
+function bench_ld3_click(id)
+    bench_ld3_action(msprintf("ld3_terminal_click(""%s"")",id));
+endfunction
+
+function bench_ld3_primary()
+    // LD3 mirrors LD2: one primary button per stage with callback ld3_student_primary().
+    global LD3;
+    if LD3.ui.headless then ld3_student_primary(); return; end
+    if isfield(LD3.ui,"studentPrimary") then bench_button(LD3.ui.studentPrimary); return; end
+    bench_ld3_action("ld3_student_primary()");
+endfunction
+
+function bench_ld3_answers(step,values)
+    // Student answer entry goes into the shared [6 8] raw-text store that the
+    // stage check validates; the same store feeds the exported report.
+    global LD3;
+    for k=1:size(values,"*")
+        LD3.answers(step,k)=msprintf("%.12g",values(k));
+    end
+endfunction
+
+function bench_ld3_workflow(n,root,gui)
+    global LD3;
+    if argn(2)<3 then gui=%f; end
+    cfg=ld3_variant_config(n);
+    [valid,why]=ld3_validate_config(cfg);
+    assert_checktrue(valid);
+    LD3=struct("cfg",cfg,"student",student_profile(n,"Automatinė Patikra","TEST","LD3"), ...
+        "ui",struct("headless",~gui));
+    ld3_start();
+    if gui then
+        if isfield(LD3.ui,"figure") then LD3.ui.figure.figure_name="PATIKRA · LD3 · variantas "+string(n);
+        elseif isfield(LD3,"fig") then LD3.fig.figure_name="PATIKRA · LD3 · variantas "+string(n); end
+    end
+    W=["E_P" "K1";"K2" "A_P";"A_N" "R1A";"R1B" "E_N";"V_P" "R1A";"V_N" "R1B"];
+    u=[cfg.U1 cfg.U2 cfg.U3];
+    for step=1:6
+        assert_checkequal(LD3.step,step);
+        select step
+        case 1 then
+            for k=1:size(W,1); bench_ld3_click(W(k,1)); bench_ld3_click(W(k,2)); end
+        case 2 then
+            bench_ld3_answers(step,u(1)/cfg.R*1000);
+            bench_ld3_action("ld3_toggle_power()");
+            bench_ld3_action("ld3_toggle_switch()");
+            ld3_set_voltage(u(1)); bench_ld3_action("ld3_measure()");
+        case 3 then
+            for k=2:3
+                ld3_set_voltage(u(k)); bench_ld3_action("ld3_measure()");
+            end
+        case 4 then
+            // R_k read from the student's own journal rows: R = U/(I in A), I in mA.
+            r=[LD3.journal(1,1)*1000/LD3.journal(1,2) LD3.journal(2,1)*1000/LD3.journal(2,2) LD3.journal(3,1)*1000/LD3.journal(3,2)];
+            bench_ld3_answers(step,[r(1) r(2) r(3) (r(1)+r(2)+r(3))/3]);
+        case 5 then
+            // Slope of the U(I) line through the outer measured points.
+            bench_ld3_answers(step,(LD3.journal(3,1)-LD3.journal(1,1))/((LD3.journal(3,2)-LD3.journal(1,2))/1000));
+        case 6 then
+            bench_ld3_answers(step,[1 1]);
+        end
+        bench_ld3_primary();
+        if ~LD3.done(step) then
+            detail="";
+            if isfield(LD3.ui,"statusMain") then detail=": "+LD3.ui.statusMain.string; end
+            error("LD3 V"+string(n)+" etapas "+string(step)+detail);
+        end
+        if step==3 then
+            assert_checkequal(size(LD3.journal,1),3);
+            for k=1:3
+                assert_checkalmostequal(LD3.journal(k,1),u(k),1e-3,1e-3);
+                assert_checkalmostequal(LD3.journal(k,2),u(k)/cfg.R*1000,1e-3,1e-3);
+            end
+        end
+        if gui then mprintf("PASS LD3 V%02d: etapas %d\n",n,step); end
+    end
+    assert_checktrue(and(LD3.done));
+    assert_checkequal(LD3.student.number,n);
+    if gui then
+        bench_export_report("LD3",root+"tests/results/");
+        if isfield(LD3.ui,"figure") then delete(LD3.ui.figure);
+        elseif isfield(LD3,"fig") then delete(LD3.fig); end
+    end
+endfunction

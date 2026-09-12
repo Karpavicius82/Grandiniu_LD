@@ -51,6 +51,20 @@ def fixture(lab, n, identity):
             "s5": dict(meter="V", pairs=[["SRC_P","NODE_A1"],["SRC_N","NODE_B1"],
                 ["NODE_A2","R3_1"],["R3_2","NODE_B2"],["NODE_A3","R2_1"],["R2_2","VR1_1"],
                 ["VR1_2","NODE_B3"],["M_P","NODE_A4"],["M_N","NODE_B4"]])})
+    elif lab == "LD3":
+        rr = [33, 47, 56, 68, 82, 100, 120, 150][a]
+        u1_, u2_, u3_ = [(3, 6, 9), (4, 8, 12), (2, 5, 8), (5, 10, 12),
+                         (3, 7, 11), (6, 9, 12), (2, 6, 10), (4, 7, 10)][b]
+        report["parameters"] = dict(R=rr, U1=u1_, U2=u2_, U3=u3_)
+        vector(2, [u1_ / rr * 1000], ["mA"])
+        for k, u in [(1, u1_), (2, u2_), (3, u3_)]:
+            observation(f"u{k}", u, "V")
+            observation(f"i{k}", u / rr * 1000, "mA")
+        vector(4, [rr, rr, rr, rr], ["Ohm"] * 4)
+        vector(5, [rr], ["Ohm"])
+        vector(6, [1, 1], ["choice", "choice"])
+        report["evidence"] = dict(wiring={"s1": [["E_P", "K1"], ["K2", "A_P"], ["A_N", "R1A"],
+                                          ["R1B", "E_N"], ["V_P", "R1A"], ["V_N", "R1B"]]})
     else:
         report["parameters"] = dict(E_RC=9,F_RC=frc,R8=r8,C2=4.7e-6,E_RL=9,F_RL=frl,R9=r9,L1=.5,
                                     E_RLC=5,R13=r13,L3=l,C4=c)
@@ -155,7 +169,33 @@ def main(exe):
         # Runtime emits ordinary UTF-8 with a valid BOM for spreadsheet import.
         with (root/"Įvertinimai"/"suvestine.csv").open(encoding="utf-8-sig",newline="") as f:
             rows=list(csv.reader(f,delimiter=";"));assert rows[0][0]=="Failas" and len(rows)==651
+        # LD3 (Omo dėsnis): savarankiškas scenarijus per tą patį ldcheck.
+        ld3=root/"LD3 ataskaitos";ld3.mkdir()
+        for n,name in [(1,"v1"),(17,"v17"),(64,"v64")]:
+            write(ld3/(name+".html"),fixture("LD3",n,name))
+        wrong=fixture("LD3",9,"w9");wrong["answers"][1]["raw"]="999";write(ld3/"blogas_r1.html",wrong)
+        missing=fixture("LD3",25,"m25")
+        missing["observations"]=[o for o in missing["observations"] if o["id"]!="i2"]
+        write(ld3/"truksta_i2.html",missing)
+        (ld3/"siunta.pdf").write_bytes(b'%PDF-1.4')
+        data,_=run(exe,ld3,root/"LD3 rezultatai")
+        assert data["complete"] and len(data["results"])==6,data
+        by={v["file"]:v for v in data["results"]}
+        for name in ("v1.html","v17.html","v64.html"):
+            assert by[name]["status"]=="graded",by[name]
+            assert (by[name]["points"],by[name]["max_points"])==(15,15),by[name]
+        assert by["blogas_r1.html"]["status"]=="graded"
+        assert (by["blogas_r1.html"]["points"],by["blogas_r1.html"]["max_points"])==(14,15)
+        assert next(i for i in by["blogas_r1.html"]["items"] if i["id"]=="s4.q1")["status"]=="incorrect"
+        assert (by["truksta_i2.html"]["points"],by["truksta_i2.html"]["max_points"])==(12,15)
+        statuses={i["id"]:i["status"] for i in by["truksta_i2.html"]["items"]}
+        assert statuses["i2"]=="missing" and statuses["s4.q2"]=="missing_evidence"
+        assert statuses["s4.q4"]=="missing_evidence" and statuses["s4.q1"]=="correct"
+        assert by["siunta.pdf"]["status"]=="review"
+        with (root/"LD3 rezultatai"/"suvestine.csv").open(encoding="utf-8-sig",newline="") as f:
+            assert len(list(csv.reader(f,delimiter=";")))==7
         print(json.dumps(dict(status="PASS",full_reports=650,seconds=round(seconds,3),adversarial_files=17,
-                              deterministic_replay=True,conflicting_ids=True,multiple_attempts=True,utf8_paths=True)))
+                              deterministic_replay=True,conflicting_ids=True,multiple_attempts=True,utf8_paths=True,
+                              ld3_batch=True)))
 
 if __name__=="__main__":main(Path(sys.argv[1]).resolve())
