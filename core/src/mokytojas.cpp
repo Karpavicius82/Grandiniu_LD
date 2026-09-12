@@ -12,15 +12,25 @@
 #ifdef _WIN32
 #define _CRT_SECURE_NO_WARNINGS
 #define NOMINMAX
+#include <winsock2.h>
+#include <ws2tcpip.h>
 #include <windows.h>
+#pragma comment(lib, "ws2_32.lib")
 #else
+#include <arpa/inet.h>
 #include <fcntl.h>
+#include <netinet/in.h>
+#include <sys/socket.h>
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <unistd.h>
 #endif
 #include <algorithm>
+#include <atomic>
 #include <cstdint>
+#include <functional>
+#include <mutex>
+#include <thread>
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
@@ -56,11 +66,11 @@ std::string read_file(const fs::path& p) {
     return std::string((std::istreambuf_iterator<char>(f)), std::istreambuf_iterator<char>());
 }
 
-// Grąžina curl išėjimo kodą; err — stderr tekstas. Argumentai be pačios „curl".
-int run_curl(const std::vector<std::string>& args, const fs::path& errfile) {
+// Grąžina programos išėjimo kodą; err — stderr tekstas. argv_parts[0] — programa.
+int run_prog(const std::vector<std::string>& argv_parts, const fs::path& errfile) {
 #ifdef _WIN32
-    std::string cmdline = "curl";
-    for (const auto& a : args) { cmdline += " \""; cmdline += a; cmdline += "\""; }
+    std::string cmdline;
+    for (const auto& a : argv_parts) { if (!cmdline.empty()) cmdline += ' '; cmdline += '\"'; cmdline += a; cmdline += '\"'; }
     STARTUPINFOW si{}; si.cb = sizeof(si);
     si.dwFlags = STARTF_USESTDHANDLES;
     si.hStdInput = GetStdHandle(STD_INPUT_HANDLE);
@@ -88,10 +98,9 @@ int run_curl(const std::vector<std::string>& args, const fs::path& errfile) {
         ::dup2(errfd, STDERR_FILENO);
         ::close(errfd);
         std::vector<char*> argv;
-        argv.push_back(const_cast<char*>("curl"));
-        for (const auto& a : args) argv.push_back(const_cast<char*>(a.c_str()));
+        for (const auto& a : argv_parts) argv.push_back(const_cast<char*>(a.c_str()));
         argv.push_back(nullptr);
-        ::execvp("curl", argv.data());
+        ::execvp(argv_parts[0].c_str(), argv.data());
         ::_exit(127);
     }
     ::close(errfd);
@@ -99,6 +108,14 @@ int run_curl(const std::vector<std::string>& args, const fs::path& errfile) {
     ::waitpid(pid, &st, 0);
     return WIFEXITED(st) ? WEXITSTATUS(st) : -1;
 #endif
+}
+
+// curl — kaip anksčiau, per bendrą paleidėją.
+int run_curl(const std::vector<std::string>& args, const fs::path& errfile) {
+    std::vector<std::string> full;
+    full.push_back("curl");
+    for (const auto& a : args) full.push_back(a);
+    return run_prog(full, errfile);
 }
 
 long pid_value() {
@@ -518,7 +535,9 @@ struct Source {
     std::string display;
 };
 
-int process(const std::vector<Source>& files, int skipped_other, int skipped_large) {
+int process(const std::vector<Source>& files, int skipped_other, int skipped_large,
+            const std::function<bool(int, int)>& tick = {},
+            const std::atomic<bool>* cancel = nullptr) {
     const fs::path csvp = "IVERTINIMAI.csv";
     std::set<std::string> known;
     int last_nr = 0;
@@ -559,7 +578,12 @@ int process(const std::vector<Source>& files, int skipped_other, int skipped_lar
     std::cout << "\n";
     int k = 0;
     for (const Source& s : files) {
+        if (cancel && cancel->load()) {
+            std::cout << "Sustabdyta po " << k << " is " << total << "\n";
+            break;
+        }
         ++k;
+        if (tick && !tick(k, total)) break;
         std::string hash;
         if (!hash_file(s.path, hash)) {
             std::cout << "[" << k << "/" << total << "] nepavyko perskaityti\n";
@@ -615,7 +639,8 @@ int process(const std::vector<Source>& files, int skipped_other, int skipped_lar
     return 0;
 }
 
-int mokytojas(const std::vector<std::string>& args) {
+int mokytojas_run(const std::vector<std::string>& args, const std::function<bool(int, int)>& tick,
+                  const std::atomic<bool>* cancel) {
     if (args.size() > 1) return 2;
     std::string arg = args.empty() ? std::string(".") : args[0];
     int skipped_other = 0, skipped_large = 0;
@@ -652,7 +677,252 @@ int mokytojas(const std::vector<std::string>& args) {
         for (const fs::path& p : scan_local(root, skipped_other, skipped_large))
             files.push_back({p, fs::relative(p, root).generic_string()});
     }
-    return process(files, skipped_other, skipped_large);
+    return process(files, skipped_other, skipped_large, tick, cancel);
+}
+
+int mokytojas(const std::vector<std::string>& args) { return mokytojas_run(args, {}, nullptr); }
+
+// ------------------------------------------------------------------- UI ----
+// Naujosios kartos sąsaja: vietinis 127.0.0.1 serveris + naršyklės langas.
+// Jokių išorinių bibliotekų — tik C++17 ir platformos socket sluoksnis.
+#ifdef _WIN32
+#define CLOSESOCK ::closesocket
+#else
+#define CLOSESOCK ::close
+#endif
+
+static const char ui_page_html[] = R"HTML(<!doctype html>
+<html lang="lt"><head><meta charset="utf-8">
+<title>MOKYTOJAS — automatinis vertinimas</title>
+<style>
+body{font-family:system-ui,'DejaVu Sans',sans-serif;max-width:980px;margin:24px auto;padding:0 16px;color:#132430;background:#f5f8f9}
+h1{font-size:22px;color:#0a6360}
+input[type=text]{width:70%;padding:10px;font-size:15px;border:1px solid #9db4ba;border-radius:6px}
+button{padding:10px 18px;font-size:15px;border:0;border-radius:6px;background:#0a6360;color:#fff;font-weight:600;cursor:pointer}
+button.antras{background:#8aa4ab}
+button:disabled{background:#b9c8cc;cursor:default}
+#status{margin:14px 0;padding:10px 14px;border-radius:6px;background:#e7efef;min-height:22px}
+#status.klaida{background:#f6e0e0}
+table{border-collapse:collapse;margin-top:14px;background:#fff}
+th,td{border:1px solid #c3d2d6;padding:6px 10px;font-size:14px;text-align:center}
+th{background:#0a6360;color:#fff}
+td:first-child,td:nth-child(2){text-align:left}
+.kelias{font-size:13px;color:#4d6570;margin-top:18px;line-height:1.6}
+</style></head><body>
+<h1>MOKYTOJAS — automatinis laboratorinių vertinimas</h1>
+<p><input id="arg" type="text" placeholder="Google Drive aplanko nuoroda arba vietinis aplankas (tuščia = dabartinis)">
+<button id="go">Įvertinti</button> <button id="stop" class="antras" disabled>Sustabdyti</button></p>
+<div id="status">Paruošta.</div>
+<table id="zurnalas"></table>
+<div class="kelias" id="failai"></div>
+<script>
+const $=id=>document.getElementById(id);
+async function statusas(){
+  try{
+    const r=await fetch('/status');const s=await r.json();
+    const st=$('status');
+    st.className=s.state==='error'?'klaida':'';
+    st.textContent=s.message+(s.total?(' · '+s.done+' / '+s.total+' ataskaitų'):'')+(s.state==='running'?' …':'');
+    $('go').disabled=s.running;$('stop').disabled=!s.running;
+    if(s.state==='done'&&s.total>0)zurnalas();
+  }catch(e){}
+}
+async function zurnalas(){
+  const r=await fetch('/zurnalas');const txt=await r.text();
+  const lines=txt.replace(/^﻿/,'').split(/\r?\n/).filter(x=>x.trim());
+  if(!lines.length)return;
+  const parse=l=>{const f=l.split('";"').map(x=>x.replace(/^"|"$/g,''));return f.length===1?l.split(';'):f};
+  const rows=lines.map(parse);
+  $('zurnalas').innerHTML='<tr>'+rows[0].map(h=>'<th>'+h+'</th>').join('')+'</tr>'+
+    rows.slice(1).map(r=>'<tr>'+r.map(c=>'<td>'+(c||'—')+'</td>').join('')+'</tr>').join('');
+}
+$('go').onclick=async()=>{
+  const arg=encodeURIComponent($('arg').value.trim()||'.');
+  await fetch('/start?arg='+arg);statusas();
+};
+$('stop').onclick=async()=>{await fetch('/stop');statusas();};
+$('failai').innerHTML='Rezultatai rašomi šalia programos: <b>IVERTINIMAI.csv</b> (papildomas istorijos žurnalas), <b>ZURNALAS.csv</b> (studentų × darbų lentelė), <b>atsiliepimai/</b> (detalus kiekvieno įvertinimo paaiškinimas).<br>Lango uždarymas: mygtukas čia arba Ctrl+C terminale.';
+statusas();setInterval(statusas,700);
+</script></body></html>)HTML";
+
+struct UiState {
+    std::atomic<bool> running{false}, cancel{false}, quit{false};
+    std::atomic<int> done{0}, total{0};
+    std::mutex mtx;
+    std::string state = "idle", message = "Paruošta.";
+    void set(const std::string& s, const std::string& m) {
+        std::lock_guard<std::mutex> l(mtx);
+        state = s;
+        message = m;
+    }
+    std::pair<std::string, std::string> get() {
+        std::lock_guard<std::mutex> l(mtx);
+        return {state, message};
+    }
+};
+
+std::string json_escape(const std::string& s) {
+    std::string r;
+    for (unsigned char c : s) {
+        if (c == '"' || c == '\\') { r += '\\'; r += (char)c; }
+        else if (c < 0x20) { char b[8]; std::snprintf(b, sizeof b, "\\u%04x", c); r += b; }
+        else r += (char)c;
+    }
+    return r;
+}
+
+std::string urldecode(const std::string& s) {
+    std::string r;
+    for (std::size_t i = 0; i < s.size(); ++i) {
+        if (s[i] == '%' && i + 2 < s.size()) {
+            auto hex = [](char c) -> int {
+                if (c >= '0' && c <= '9') return c - '0';
+                if (c >= 'a' && c <= 'f') return c - 'a' + 10;
+                if (c >= 'A' && c <= 'F') return c - 'A' + 10;
+                return -1;
+            };
+            int hi = hex(s[i + 1]), lo = hex(s[i + 2]);
+            if (hi >= 0 && lo >= 0) { r += (char)(hi * 16 + lo); i += 2; continue; }
+        }
+        if (s[i] == '+') r += ' ';
+        else r += s[i];
+    }
+    return r;
+}
+
+void http_send(long long c, const std::string& type, const std::string& body, int code = 200) {
+    const char* why = code == 200 ? "OK" : code == 404 ? "Not Found" : code == 409 ? "Conflict" : "Error";
+    std::string head = "HTTP/1.1 " + std::to_string(code) + " " + why +
+                       "\r\nContent-Type: " + type + "; charset=utf-8\r\nContent-Length: " +
+                       std::to_string(body.size()) + "\r\nConnection: close\r\n\r\n";
+    ::send((int)c, head.data(), (int)head.size(), 0);
+    ::send((int)c, body.data(), (int)body.size(), 0);
+}
+
+void open_browser(const std::string& url) {
+    if (std::getenv("MOKYTOJAS_NO_BROWSER")) return;
+    fs::path err = fs::temp_directory_path() / "mokytojas-atidarymas.err";
+#ifdef _WIN32
+    run_prog({"cmd", "/c", "start", "", url}, err);
+#else
+    if (!std::getenv("DISPLAY")) return;
+    run_prog({"xdg-open", url}, err);
+#endif
+}
+
+int ui_run() {
+#ifdef _WIN32
+    WSADATA wsa;
+    if (WSAStartup(MAKEWORD(2, 2), &wsa) != 0) {
+        std::cerr << "Nepavyko inicijuoti tinklo (WSAStartup).\n";
+        return 1;
+    }
+#endif
+    int s = (int)::socket(AF_INET, SOCK_STREAM, 0);
+    if (s < 0) { std::cerr << "Nepavyko atidaryti socketo.\n"; return 1; }
+    int one = 1;
+    ::setsockopt(s, SOL_SOCKET, SO_REUSEADDR, (const char*)&one, sizeof one);
+    sockaddr_in addr{};
+    addr.sin_family = AF_INET;
+    addr.sin_addr.s_addr = htonl(0x7F000001);  // tik vietinis
+    addr.sin_port = 0;                          // laisvas portas
+    if (::bind(s, (sockaddr*)&addr, sizeof addr) != 0 || ::listen(s, 8) != 0) {
+        std::cerr << "Nepavyko prisijungti vietinio serverio.\n";
+        CLOSESOCK(s);
+        return 1;
+    }
+    sockaddr_in bound{};
+    socklen_t blen = sizeof bound;
+    ::getsockname(s, (sockaddr*)&bound, &blen);
+    const int port = ntohs(bound.sin_port);
+    std::cout << "MOKYTOJAS UI: http://127.0.0.1:" << port << std::endl;  // flush — vamzdis blokinis
+    std::cout << "Darbo katalogas: " << fs::current_path().string() << std::endl;
+    open_browser("http://127.0.0.1:" + std::to_string(port));
+
+    UiState st;
+    while (!st.quit.load()) {
+        long long c = (long long)::accept(s, nullptr, nullptr);
+        if (c < 0) continue;
+#ifdef _WIN32
+        DWORD ms = 5000;
+        ::setsockopt((int)c, SOL_SOCKET, SO_RCVTIMEO, (const char*)&ms, sizeof ms);
+#else
+        timeval tv{5, 0};
+        ::setsockopt((int)c, SOL_SOCKET, SO_RCVTIMEO, (const char*)&tv, sizeof tv);
+#endif
+        std::string req;
+        char buf[2048];
+        while (req.find("\r\n\r\n") == std::string::npos && req.size() < 16384) {
+            int n = (int)::recv((int)c, buf, sizeof buf, 0);
+            if (n <= 0) break;
+            req.append(buf, (size_t)n);
+        }
+        std::size_t sp = req.find(' ');
+        std::string path = (sp == std::string::npos) ? "/" : req.substr(sp + 1, req.find(' ', sp + 1) - sp - 1);
+        std::size_t qm = path.find('?');
+        std::string route = path.substr(0, qm);
+        std::string query = (qm == std::string::npos) ? "" : path.substr(qm + 1);
+        std::size_t eq = query.find("arg=");
+        std::string arg = (eq == std::string::npos) ? "" : urldecode(query.substr(eq + 4));
+
+        if (route == "/" || route == "/index.html") {
+            http_send(c, "text/html", std::string(ui_page_html, sizeof ui_page_html - 1));
+        } else if (route == "/status") {
+            auto sm = st.get();
+            std::string j = "{\"state\":\"" + json_escape(sm.first) + "\",\"message\":\"" + json_escape(sm.second) +
+                "\",\"running\":" + (st.running.load() ? "true" : "false") +
+                ",\"done\":" + std::to_string(st.done.load()) +
+                ",\"total\":" + std::to_string(st.total.load()) + "}";
+            http_send(c, "application/json", j);
+        } else if (route == "/start") {
+            if (st.running.load()) { http_send(c, "application/json", "{\"ok\":false,\"error\":\"jau veikia\"}", 409); }
+            else if (arg.empty()) { http_send(c, "application/json", "{\"ok\":false,\"error\":\"nenurodytas kelias\"}", 400); }
+            else {
+                st.cancel = false; st.done = 0; st.total = 0;
+                st.set("running", "Pradedama…");
+                std::thread([&, arg]() {
+                    st.running = true;
+                    try {
+                        int rc = mokytojas_run({arg}, [&](int k, int n) {
+                            st.done = k; st.total = n;
+                            return !st.cancel.load();
+                        }, &st.cancel);
+                        st.set(rc == 0 ? "done" : "error",
+                               rc == 0 ? "Įvertinimas baigtas. Žurnalas ir atsiliepimai paruošti."
+                                       : "Nepavyko baigti (kodas " + std::to_string(rc) + ").");
+                    } catch (const std::exception& e) {
+                        st.set("error", e.what());
+                    }
+                    st.running = false;
+                }).detach();
+                http_send(c, "application/json", "{\"ok\":true}");
+            }
+        } else if (route == "/stop") {
+            st.cancel = true;
+            st.set("running", "Stabdoma…");
+            http_send(c, "application/json", "{\"ok\":true}");
+        } else if (route == "/zurnalas") {
+            if (st.running.load()) { http_send(c, "text/csv", "vertinama...", 503); }
+            else {
+                std::error_code ec;
+                std::string body = read_file(fs::absolute("ZURNALAS.csv", ec));
+                if (body.empty()) body = "\xef\xbb\xbfVardas;Grup\xc4\x97\n";
+                http_send(c, "text/csv", body);
+            }
+        } else if (route == "/quit") {
+            http_send(c, "application/json", "{\"ok\":true}");
+            CLOSESOCK((int)c);
+            break;
+        } else {
+            http_send(c, "text/plain", "nerasta", 404);
+        }
+        CLOSESOCK((int)c);
+    }
+    CLOSESOCK(s);
+#ifdef _WIN32
+    WSACleanup();
+#endif
+    return 0;
 }
 
 }  // namespace
@@ -663,6 +933,7 @@ int wmain(int argc, wchar_t** argv) {
     std::vector<std::string> args;
     for (int k = 1; k < argc; ++k) {
         std::wstring w = argv[k];
+        if (w == L"--ui") return ui_run();
         int n = WideCharToMultiByte(CP_UTF8, 0, w.c_str(), (int)w.size(), nullptr, 0, nullptr, nullptr);
         std::string s((size_t)n, '\0');
         WideCharToMultiByte(CP_UTF8, 0, w.c_str(), (int)w.size(), &s[0], n, nullptr, nullptr);
@@ -675,7 +946,10 @@ int wmain(int argc, wchar_t** argv) {
 int main(int argc, char** argv) {
     if (argc > 2) { std::cerr << "mokytojas [aplankas | Drive nuoroda arba ID]\n"; return 2; }
     std::vector<std::string> args;
-    for (int k = 1; k < argc; ++k) args.push_back(argv[k]);
+    for (int k = 1; k < argc; ++k) {
+        if (std::string(argv[k]) == "--ui") return ui_run();
+        args.push_back(argv[k]);
+    }
     try { return mokytojas(args); }
     catch (const std::exception& e) { std::cerr << e.what() << "\n"; return 1; }
 }
