@@ -1,5 +1,5 @@
 {
-  "time_utc": "2026-09-12T18:10:53.158672+00:00",
+  "time_utc": "2026-09-12T20:11:51.174205+00:00",
   "scilab": "unknown",
   "command": "./PATIKRINTI.sh visi",
   "status": "PASS",
@@ -52,11 +52,11 @@
     "LD2/ld2_wiring.sci": "433b86664876bb8c1c60a44b73587c6e46008717d5055bf6b9d866f4254606a3",
     "LD3/LD3.sce": "52d7a4d9d55cd4006874b6ba3a187b094d9cec1d211232b314c53e816e4df918",
     "LD3/LD3_LOAD.sce": "d768fddf96fd824740786a6b09cbae94529ec5735e753dabe68b49c2ce01895e",
-    "LD3/ld3_callbacks.sci": "d2d71ff546cc68be6df308317054bf2acfb05f6fa1a06ed75c6fff93caaa4594",
-    "LD3/ld3_circuit.sci": "02619001e0dfde09977ab50c3d2fffa8a15916785bd3c64e63d3e465f28773d0",
+    "LD3/ld3_callbacks.sci": "61af3f4ceba8d8d5a07d3954e8f804c7650f9b43e4bbf2d61937776e14be7106",
+    "LD3/ld3_circuit.sci": "0ce3dd0bdb78e67b8444f2c184144738cb2691bc53d3c65ee159fcc7babdb53d",
     "LD3/ld3_config.sci": "8fccca55200af183207023403a605a4ba89b890d8c1e84cc9492426d52135be2",
-    "LD3/ld3_gui.sci": "a84711d523751b44316df12f93ce22b01ec713d7fa1f8869eb1827be756651d5",
-    "LD3/ld3_ids.sci": "b85995bbd8c32a63cb47b8ca2a69282b6cb0e067f1294b07373ce46c108a4334",
+    "LD3/ld3_gui.sci": "57a41fd951f45c8d94138ed39ceb9b6b755f9efe4306adadbdf26de623eef99b",
+    "LD3/ld3_ids.sci": "f75650e2a021cea623cd1aa656da1f49282ac8091774f64559dfa5c199bf57e4",
     "LD3/ld3_student.sci": "77f65297c7b2f3beb70a9d4168495ca81d99bad6fee538c305e1b46bddba04c3",
     "LD3/ld3_utils.sci": "dccea4a1c5740eaf20be44cba573427b31312e25d390736e2dbf2a616464cd54",
     "PALEISTI.sh": "d135f0d78c8aaf76d2440c05331b9a2b9735a0bc0c20fd967e71952b5282411d",
@@ -76,7 +76,7 @@
     "tests/workflows.sci": "59d59af1341781b5133f32cd9c00ffb69305443fecb844a8b43fe1e628b6565a"
   },
   "log_sha256": {
-    "modelis.log": "1690f6a8d62b9367d035471feca6702a110a7c7ac89a6fc3bb0a6f41b6a72fba",
+    "modelis.log": "fc6e6022484a870af8e7ff0431e995f3ae8e2269bc270b2dfb30bb60ceb0bf49",
     "langai.log": "fb50798ccbdd5600df7e435ee487f94986d0a7962d91979dde18014c58adb0a2"
   }
 }

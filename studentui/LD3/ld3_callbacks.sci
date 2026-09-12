@@ -47,7 +47,7 @@ function ld3_toggle_power()
     if LD3.powerOn then
         ld3_set_status("[B01] Maitinimas įJUNGTAS.","ok","Dabar uždarykite jungiklį [B02].");
     else
-        ld3_set_status("[B01] Maitinimas iŠJUNGTAS.","info","[V01] įtampa neveikia.");
+        ld3_set_status("[B01] Maitinimas iŠJUNGTAS.","info","Įtampa nustatoma mygtukais [B10]–[B12].");
     end
 endfunction
 
@@ -58,7 +58,7 @@ function ld3_toggle_switch()
         return;
     end
     LD3.switchOn = ~LD3.switchOn;
-    if LD3.switchOn then ld3_set_status("[B02] Jungiklis UŽDARYTAS.","ok","Nustatykite [V01] įtampą ir matuokite [B03]."); end
+    if LD3.switchOn then ld3_set_status("[B02] Jungiklis UŽDARYTAS.","ok","Nustatykite įtampą [B10]–[B12] ir matuokite [B03]."); end
 endfunction
 
 function ld3_set_voltage(v)
@@ -92,7 +92,7 @@ function ld3_measure()
         if abs(LD3.journal(m,1) - u) < 1e-9 then jeigu = %f; end
     end
     if ~jeigu then
-        ld3_set_status("Šis įtampos taškas jau užfiksuotas.","error","Pakeiskite [V01] į kitą instrukcijos reikšmę.");
+        ld3_set_status("Šis įtampos taškas jau užfiksuotas.","error","Nustatykite kitą reikšmę mygtuku [B11] ar [B12].");
         return;
     end
     if size(LD3.journal, 1) >= 3 then
@@ -132,13 +132,13 @@ function ld3_check_step()
         if ~ld3_close_enough(v, e) then
             ld3_set_status("Teorinė srovė [A02.01] netiksli.","error",msprintf("Tikimasi ≈ %.2f mA (I = U1/R·1000).", e)); return; end
         if size(LD3.journal,1) < 1 then
-            ld3_set_status("Trūksta pirmo matavimo.","error","Nustatykite [V01]=" + string(LD3.cfg.U1) + " V ir spauskite [B03] MATUOTI."); return; end
+            ld3_set_status("Trūksta pirmo matavimo.","error","Spauskite [B10] U1 ir [B03] MATUOTI."); return; end
         LD3.done(2) = %t;
         ld3_set_status("2 etapas baigtas.","ok","[E03] — dar du taškai.");
     case 3 then
         if size(LD3.journal,1) < 3 then
             truksta = 3 - size(LD3.journal,1);
-            ld3_set_status("Trūksta " + string(truksta) + " matavimo taškų.","error","[V01] nustatykite U2/U3 pagal instrukciją ir [B03] MATUOTI."); return; end
+            ld3_set_status("Trūksta " + string(truksta) + " matavimo taškų.","error","Nustatykite [B11] U2 / [B12] U3 ir [B03] MATUOTI."); return; end
         LD3.done(3) = %t;
         ld3_set_status("3 etapas baigtas: trys taškai užfiksuoti.","ok","[E04] — skaičiavimai.");
     case 4 then
@@ -202,8 +202,8 @@ function s = ld3_step_instruction(n)
     cfg = LD3.cfg;
     select n
     case 1 then s = "Sujunkite stendą: [T01]→[T03], [T04]→[T05], [T06]→[T07], [T08]→[T02] (galvos kontūras), o voltmetro zondai [T09]→[T07], [T10]→[T08] lygiagrečiai R1. Maitinimas [B01] dar išjungtas.";
-    case 2 then s = msprintf("Apskaičiuokite teorinę srovę I1 = U1/R·1000 (U1=%d V, R=%d Ω) ir įrašykite [A02.01]. Tada [B01] maitinimas, [B02] jungiklis, [V01]=%d V, [B03] MATUOTI.", cfg.U1, cfg.R, cfg.U1);
-    case 3 then s = msprintf("Nustatykite [V01]=%d V → [B03]; tada [V01]=%d V → [B03]. Užfiksuoti visi 3 taškai.", cfg.U2, cfg.U3);
+    case 2 then s = msprintf("Apskaičiuokite teorinę srovę I1 = U1/R·1000 (U1=%d V, R=%d Ω) ir įrašykite [A02.01]. Tada [B01] maitinimas, [B02] jungiklis, [B10] U1, [B03] MATUOTI.", cfg.U1, cfg.R);
+    case 3 then s = msprintf("Spauskite [B11] U2=%d V → [B03]; tada [B12] U3=%d V → [B03]. Užfiksuoti visi 3 taškai.", cfg.U2, cfg.U3);
     case 4 then s = "Apskaičiuokite ir įrašykite [A04.01]–[A04.03] (R=U/I iš kiekvieno taško) ir vidurkį [A04.04].";
     case 5 then s = "Charakteristikos I(U) taškai rodomi stende. Apskaičiuokite R iš nuolydžio: R=(U3−U1)/((I3−I1)/1000) → [A05.01].";
     case 6 then s = "Atsakykite [A06.01] (ar I(U) tiesinė?) ir [A06.02] (ar R pastovi?) – 1 Taip, 2 Ne. Tada [B08] ataskaita.";
@@ -270,7 +270,7 @@ function ld3_show_stand_map()
     for k = 1:size(bids, "*")
         txt($+1) = "  [" + bids(k) + "] " + blabels(k);
     end
-    txt($+1) = ""; txt($+1) = "ETAPAI: [E01]–[E06]; LAUKELIAI: [A02.01], [A04.01]–[A04.04], [A05.01], [A06.01]–[A06.02]; [V01] slankiklis, [V02] rodmuo.";
+    txt($+1) = ""; txt($+1) = "ETAPAI: [E01]–[E06]; LAUKELIAI: [A02.01], [A04.01]–[A04.04], [A05.01], [A06.01]–[A06.02]; įtampos mygtukai [B10]–[B12], [V02] rodmuo.";
     ld3_text_window("STENDO ŽEMĖLAPIS", txt);
 endfunction
 

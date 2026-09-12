@@ -46,7 +46,7 @@ function [u, i, ok, msg] = ld3_measure_values()
         return;
     end
     if LD3.voltage <= 0 then
-        msg = "Įtampa 0 V: nustatykite [V01] slankiklį reikšmei iš instrukcijos.";
+        msg = "Įtampa 0 V: nustatykite ją mygtuku [B10] U1, [B11] U2 ar [B12] U3.";
         return;
     end
     [wok, wwhy] = ld3_wiring_valid(LD3.wires);

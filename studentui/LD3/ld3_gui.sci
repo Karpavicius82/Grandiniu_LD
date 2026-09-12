@@ -121,15 +121,15 @@ function ld3_wire_path(x1, y1, x2, y2, color, orient)
         ld3_board_segment(x1, y1, x1, 0.42, color);
         ld3_board_segment(x1, 0.42, x2, 0.42, color);
         ld3_board_segment(x2, 0.42, x2, y2, color);
-    case "VHV@29" then
-        ld3_board_segment(x1, y1, x1, 0.29, color);
-        ld3_board_segment(x1, 0.29, x2, 0.29, color);
-        ld3_board_segment(x2, 0.29, x2, y2, color);
-    case "VHV@33" then
-        // Grąžinamasis laidas: horizontalė y=33% — apačioje, žemiau V dėžės.
-        ld3_board_segment(x1, y1, x1, 0.33, color);
-        ld3_board_segment(x1, 0.33, x2, 0.33, color);
-        ld3_board_segment(x2, 0.33, x2, y2, color);
+    case "VHV@28" then
+        ld3_board_segment(x1, y1, x1, 0.28, color);
+        ld3_board_segment(x1, 0.28, x2, 0.28, color);
+        ld3_board_segment(x2, 0.28, x2, y2, color);
+    case "VHV@32" then
+        // Grąžinamasis laidas: horizontalė y=32% — aiškiai žemiau V dėžės (≥11 px).
+        ld3_board_segment(x1, y1, x1, 0.32, color);
+        ld3_board_segment(x1, 0.32, x2, 0.32, color);
+        ld3_board_segment(x2, 0.32, x2, y2, color);
     case "VHV_LOW" then
         // Žemutinis maršrutas: horizontalė arti apatinio taško (apeina dėžutes).
         ym = min(y1, y2) + 0.005;
@@ -231,6 +231,10 @@ endfunction
 function ld3_render_wires()
     global LD3;
     if ~isfield(LD3, "ui") then return; end
+    if isfield(LD3, "fig") then
+        if ~is_handle_valid(LD3.fig) then return; end
+    end
+    if ~isfield(LD3.ui, "circuitFrame") | ~is_handle_valid(LD3.ui.circuitFrame) then return; end
     if isfield(LD3.ui, "headless") then if LD3.ui.headless then return; end end
     // Terminalai + laidai per piešiamąjį sluoksnį; elementų dėžutės lieka.
     nkeep = 0;
@@ -251,8 +255,8 @@ function ld3_render_wires()
     // Pirmiausia laidai (po mygtukais – kaip schemoje), tada terminalai.
     orient = struct();
     orient("E_P|K1") = "H";     orient("K2|A_P") = "H";
-    orient("A_N|R1A") = "VHV@42";  orient("R1B|E_N") = "VHV@33";
-    orient("V_P|R1A") = "VHV@36";  orient("V_N|R1B") = "VHV@29";
+    orient("A_N|R1A") = "VHV@42";  orient("R1B|E_N") = "VHV@32";
+    orient("V_P|R1A") = "VHV@36";  orient("V_N|R1B") = "VHV@28";
     for m = 1:size(LD3.wires, 1)
         p1 = ld3_terminal_xy(LD3.wires(m, 1));
         p2 = ld3_terminal_xy(LD3.wires(m, 2));
@@ -290,6 +294,9 @@ endfunction
 function ld3_render_stage()
     global LD3;
     if ~isfield(LD3, "ui") then return; end
+    if isfield(LD3, "fig") then
+        if ~is_handle_valid(LD3.fig) then return; end
+    end
     if isfield(LD3.ui, "headless") then if LD3.ui.headless then return; end end
     if isfield(LD3.ui, "answerEdits") then
         for k = 1:size(LD3.ui.answerEdits, "*")
@@ -311,9 +318,6 @@ function ld3_render_stage()
     end
     if isfield(LD3.ui, "voltLabel") & is_handle_valid(LD3.ui.voltLabel) then
         LD3.ui.voltLabel.string = msprintf("%d V", LD3.voltage);
-    end
-    if isfield(LD3.ui, "voltSlider") & is_handle_valid(LD3.ui.voltSlider) then
-        LD3.ui.voltSlider.value = LD3.voltage;
     end
     if isfield(LD3.ui, "progress") & is_handle_valid(LD3.ui.progress) then
         nd = size(find(LD3.done), "*");
@@ -382,15 +386,17 @@ function ld3_build_gui()
     ld3_board_box(lb.V/100, "V", "VOLT.", [0.95 0.97 0.99]);
     ld3_board_text([0.03 0.78 0.30 0.03], "Omo dėsnio stendas: I = U / R", 10, %t, "left");
 
-    // Valdymo juosta lentos apačioje: [V01] slankiklis + [V02] rodmuo + mygtukai.
-    LD3.ui.voltSlider = uicontrol(f, "style", "slider", "units", "normalized", ...
-        "position", [0.032 0.150 0.145 0.026], "min", 0, "max", 12, "value", 0, ...
-        "tag", "V01", "tooltipstring", "[V01] Šaltinio įtampos nustatymas (0–12 V)", ...
-        "callback", "ld3_slider_changed()");
+    // Valdymo juosta: varianto U reikšmių mygtukai [B10]–[B12] + [V02] rodmuo.
     LD3.ui.voltLabel = uicontrol(f, "style", "text", "units", "normalized", ...
-        "position", [0.182 0.148 0.052 0.030], "string", "0 V", "tag", "V02", ...
+        "position", [0.032 0.148 0.052 0.030], "string", "0 V", "tag", "V02", ...
         "tooltipstring", "[V02] Dabartinė šaltinio įtampa", "fontsize", 11, ...
         "fontname", "DejaVu Sans", "backgroundcolor", [1 1 1]);
+    hu1 = ld3_button(f, [0.090 0.148 0.062 0.030], msprintf("U1=%dV", LD3.cfg.U1), ...
+        "ld3_set_voltage(LD3.cfg.U1)", 8);
+    hu2 = ld3_button(f, [0.156 0.148 0.062 0.030], msprintf("U2=%dV", LD3.cfg.U2), ...
+        "ld3_set_voltage(LD3.cfg.U2)", 8);
+    hu3 = ld3_button(f, [0.222 0.148 0.062 0.030], msprintf("U3=%dV", LD3.cfg.U3), ...
+        "ld3_set_voltage(LD3.cfg.U3)", 8);
     LD3.ui.journalList = uicontrol(f, "style", "listbox", "units", "normalized", ...
         "position", [0.030 0.195 0.150 0.075], "string", "Matavimai:", ...
         "fontname", "DejaVu Sans", "fontunits", "pixels", "fontsize", 9);
@@ -431,7 +437,7 @@ function ld3_build_gui()
 
     // Mygtukai į dinamį sąrašą — workflow'ai ieško pagal callback (LD2 raštas).
     LD3.ui.dynamic($+1) = LD3.ui.studentPrimary;
-    for h = [hb1 hb2 hb3 hb4 hb5 hb6 hc1 hc2 hc3]
+    for h = [hb1 hb2 hb3 hb4 hb5 hb6 hc1 hc2 hc3 hu1 hu2 hu3]
         LD3.ui.dynamic($+1) = h;
     end
 
@@ -454,9 +460,3 @@ function ld3_build_gui()
     ld3_render_stage();
 endfunction
 
-function ld3_slider_changed()
-    global LD3;
-    if isfield(LD3, "ui") & isfield(LD3.ui, "voltSlider") & is_handle_valid(LD3.ui.voltSlider) then
-        ld3_set_voltage(LD3.ui.voltSlider.value);
-    end
-endfunction
