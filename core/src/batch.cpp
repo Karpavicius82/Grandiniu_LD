@@ -9,6 +9,7 @@
 #include <sstream>
 #include <stdexcept>
 #ifdef _WIN32
+#define NOMINMAX
 #include <windows.h>
 #else
 #include <fcntl.h>
@@ -26,6 +27,7 @@ void atomic_write(const fs::path& path,const std::string& data,bool replace) {
     fs::path temp=path;temp+=unique_suffix();
     try {
 #ifdef _WIN32
+#define NOMINMAX
         HANDLE h=CreateFileW(temp.c_str(),GENERIC_WRITE,0,nullptr,CREATE_NEW,FILE_ATTRIBUTE_NORMAL,nullptr);
         if(h==INVALID_HANDLE_VALUE) throw std::runtime_error("output_open");
         DWORD written=0;bool ok=WriteFile(h,data.data(),static_cast<DWORD>(data.size()),&written,nullptr)!=0;
