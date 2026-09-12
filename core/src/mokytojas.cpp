@@ -880,8 +880,8 @@ int ui_run() {
             else {
                 st.cancel = false; st.done = 0; st.total = 0;
                 st.set("running", "Pradedama…");
+                st.running = true;  // sinchroniškai — pirmoji /status užklausa turi matyti
                 std::thread([&, arg]() {
-                    st.running = true;
                     try {
                         int rc = mokytojas_run({arg}, [&](int k, int n) {
                             st.done = k; st.total = n;

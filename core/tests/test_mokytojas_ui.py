@@ -64,7 +64,7 @@ def main(exe):
             for _ in range(120):  # iki 30 s
                 code, body = get(base, "/status")
                 s = json.loads(body)
-                if not s["running"]:
+                if not s["running"] and s["state"] != "running":
                     break
                 time.sleep(0.25)
             assert s["state"] == "done" and s["total"] == 2, s
@@ -84,7 +84,7 @@ def main(exe):
             for _ in range(40):
                 code, body = get(base, "/status")
                 s = json.loads(body)
-                if not s["running"]:
+                if not s["running"] and s["state"] != "running":
                     break
                 time.sleep(0.25)
             assert s["state"] == "error", s
