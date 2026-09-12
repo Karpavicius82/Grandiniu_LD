@@ -117,8 +117,14 @@ function ld3_wire_path(x1, y1, x2, y2, color, orient)
         ld3_board_segment(x1, y1, x1, 0.36, color);
         ld3_board_segment(x1, 0.36, x2, 0.36, color);
         ld3_board_segment(x2, 0.36, x2, y2, color);
-    case "V" then
-        ld3_board_segment(x1, y1, x2, y2, color);
+    case "VHV@42" then
+        ld3_board_segment(x1, y1, x1, 0.42, color);
+        ld3_board_segment(x1, 0.42, x2, 0.42, color);
+        ld3_board_segment(x2, 0.42, x2, y2, color);
+    case "VHV@29" then
+        ld3_board_segment(x1, y1, x1, 0.29, color);
+        ld3_board_segment(x1, 0.29, x2, 0.29, color);
+        ld3_board_segment(x2, 0.29, x2, y2, color);
     case "VHV@33" then
         // Grąžinamasis laidas: horizontalė y=33% — apačioje, žemiau V dėžės.
         ld3_board_segment(x1, y1, x1, 0.33, color);
@@ -168,23 +174,18 @@ function [term_xy, boxes] = ld3_layout()
     wE = 10; wK = 8; wA = 11;     // viršutinės dėžių apimtys %
     G = (100 - 2*m - wE - wK - wA) / 2;   // vienodi tarpai tarp dėžių
     xE = m; xK = xE + wE + G; xA = xK + wK + G;   // kairieji kraštai
-    f = 0.30;                     // terminalo vieta tarpe (30 % nuo dėžės)
-    yT = 66; dPair = 5;           // eilės aukštis ir poros išsiskirstymas
+    d = 5.5;                      // VIENODAS gnybto atsitraukimas nuo savo dėžutės
+    yT = 67.5;                    // viršutinės eilės vidurys (dėžučių y61..74)
     term_xy = struct();
-    term_xy.E_P = [xE + wE + (1-f)*G, yT + dPair];
-    term_xy.E_N = [xE + wE + (1-f)*G, yT - dPair];
-    term_xy.K1 = [xK - (1-f)*G, yT];
-    term_xy.K2 = [xK + wK + f*G, yT];
-    term_xy.A_P = [xA - f*G, yT];
-    term_xy.A_N = [xA + wA + 2.6, yT];
+    term_xy.E_N = [xE - d, yT];        term_xy.E_P = [xE + wE + d, yT];
+    term_xy.K1 = [xK - d, yT];         term_xy.K2 = [xK + wK + d, yT];
+    term_xy.A_P = [xA - d, yT];        term_xy.A_N = [xA + wA + d, yT];
     // Apatinė grupė: V kairiau, R1 dešiniau, CENTRUOTA (vidurys 50 %).
     wV = 11; wR = 14; gIn = 12;
     grW = wV + gIn + wR;
     xV = 50 - grW/2; xR = xV + wV + gIn;
-    term_xy.V_N = [xV - 5.9, 41];
-    term_xy.V_P = [xV + wV + 5.9, 41];
-    term_xy.R1B = [xR - 5.9, 27];
-    term_xy.R1A = [xR + wR + 5.6, 27];
+    term_xy.V_N = [xV - d, 40];        term_xy.V_P = [xV + wV + d, 40];
+    term_xy.R1B = [xR - d, 18];        term_xy.R1A = [xR + wR + d, 18];
     boxes = struct();
     boxes.E = [xE 61 wE 13]; boxes.K = [xK 61 wK 13]; boxes.A = [xA 61 wA 13];
     boxes.V = [xV 34 wV 12]; boxes.R1 = [xR 12 wR 12];
@@ -249,9 +250,9 @@ function ld3_render_wires()
     LD3.term.handles = list(); LD3.term.handleIds = emptystr(0, 1);
     // Pirmiausia laidai (po mygtukais – kaip schemoje), tada terminalai.
     orient = struct();
-    orient("E_P|K1") = "HVH";   orient("K2|A_P") = "H";
-    orient("A_N|R1A") = "VHV";  orient("R1B|E_N") = "VHV@33";
-    orient("V_P|R1A") = "VHV@36";  orient("V_N|R1B") = "V";
+    orient("E_P|K1") = "H";     orient("K2|A_P") = "H";
+    orient("A_N|R1A") = "VHV@42";  orient("R1B|E_N") = "VHV@33";
+    orient("V_P|R1A") = "VHV@36";  orient("V_N|R1B") = "VHV@29";
     for m = 1:size(LD3.wires, 1)
         p1 = ld3_terminal_xy(LD3.wires(m, 1));
         p2 = ld3_terminal_xy(LD3.wires(m, 2));
