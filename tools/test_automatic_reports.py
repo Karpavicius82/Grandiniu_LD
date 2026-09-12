@@ -20,7 +20,8 @@ with tempfile.TemporaryDirectory(prefix='LD ataskaitos Žąsė ') as temp:
     env=os.environ.copy();env['LD_DATA_DIR']=temp
     if a.core:env['LD_CORE_LIBRARY']=str(a.core.resolve())
     start=time.monotonic()
-    result=subprocess.run([a.scilab,'-nwni','-nb','-f',str(runtime/'tests/AUTOMATINIS.sce')],
+    headless=[] if os.name=='nt' else ['-nwni']  # Scilex.exe is already windowless; -nwni unsupported there
+    result=subprocess.run([a.scilab,*headless,'-nb','-f',str(runtime/'tests/AUTOMATINIS.sce')],
                           env=env,stdout=subprocess.PIPE,stderr=subprocess.STDOUT,timeout=180)
     log=result.stdout.decode('utf-8',errors='replace')
     assert result.returncode==0 and 'AUTOMATIC_PASS:' in log,log
