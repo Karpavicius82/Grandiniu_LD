@@ -95,6 +95,34 @@ def main(exe):
         # 4) Data formatas
         assert len(r[4][1]) == 16 and r[4][1][4] == "-" and r[4][1][10] == " ", r[4][1]
 
+        # 4b) ZURNALAS matrica: studentai eilutėse, LD stulpeliais
+        zpath = work / "ZURNALAS.csv"
+        assert zpath.is_file(), "ZURNALAS.csv turi būti sukurta"
+        zr = rows(zpath)
+        assert zr[0][:4] == ["Vardas", "Grupė", "LD1", "LD2"] and zr[0][-1] == "LD13", zr[0]
+        assert len(zr) == 4, zr  # antraštė + 3 studentai (mok-a, mok-b, mok-c; d be identiteto)
+        za = {r[0]: r for r in zr[1:]}
+        a_row = za["Žąsė Ąžuolas mok-a"]
+        assert a_row[2] == "10.0" and a_row[3] == "", a_row  # LD1 įvertinta, LD2 tuščia
+        b_row = za["Žąsė Ąžuolas mok-b"]
+        assert b_row[2] == "" and float(b_row[3]) > 0, b_row  # LD2 yra, LD1 dar ne
+
+        # 4c) geriausias bandymas: tas pats studentas+LD du kartus — langelyje 10.0
+        first_try = fixture("LD1", 2, "mok-d1")   # TOBULAS pateikiamas pirmas
+        first_try["student"]["name"] = "Žąsė Įžuolas mok-b"
+        write(src / "f1.html", first_try)
+        second_try = fixture("LD1", 2, "mok-d2")   # prastesnis — vėliau
+        second_try["student"]["name"] = "Žąsė Įžuolas mok-b"
+        second_try["answers"][0]["raw"] = "1"
+        write(src / "f2.html", second_try)
+        p = run(exe, src, cwd=work)
+        assert p.returncode == 0, (p.stdout, p.stderr)
+        zr = rows(zpath)
+        zb = {r[0]: r for r in zr[1:]}
+        both = zb["Žąsė Įžuolas mok-b"]
+        assert both[2] == "10.0", both  # geriausias iš dviejų bandymų
+        assert len(rows(csv_path)) == 7, "žurnalas turi visus 6 pateikimus + antraštę"
+
         # 5) be rakto Drive nuoroda → exit 1 su aiškiu pranešimu
         p = run(exe, "https://drive.google.com/drive/folders/AbCdEfGhIjK123456789", cwd=work)
         assert p.returncode == 1, (p.returncode, p.stdout, p.stderr)
@@ -106,7 +134,7 @@ def main(exe):
 
     print(json.dumps({"status": "PASS", "tool": "mokytojas",
                       "checks": ["csv_append", "sha256_dedup", "klaidu_ivedimas",
-                                 "atsiliepimai", "drive_be_rakto", "usage"]}))
+                                 "atsiliepimai", "zurnalas_matrica", "geriausias_bandymas", "drive_be_rakto", "usage"]}))
     return 0
 
 

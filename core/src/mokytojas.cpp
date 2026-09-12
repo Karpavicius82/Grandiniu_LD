@@ -476,6 +476,42 @@ void write_feedback(int nr, const std::string& display, const ld::Json& v) {
     f << o.str();
 }
 
+// ------------------------------------------------------------- žurnalas ----
+// Matrica „studentai × laboratoriniai" (Vardas;Grupė;LD1..LD13). Statoma iš
+// IVERTINIMAI.csv žurnalo kiekvieną paleidimą iš naujo: langelyje — geriausio
+// to studento ir darbo bandymo įvertinimas (didžiausi balai). Pats žurnalas
+// lieka tik papildomas, todėl duomenys niekada nepradingsta.
+void rebuild_zurnalas(const fs::path& journal) {
+    auto rows = read_csv_rows(journal);
+    struct Key {
+        std::string name, group;
+        bool operator<(const Key& o) const { return name != o.name ? name < o.name : group < o.group; }
+    };
+    std::map<Key, std::map<std::string, std::pair<int, std::string>>> best;
+    for (size_t k = 1; k < rows.size(); ++k) {
+        const auto& r = rows[k];
+        if (r.size() != HEADER.size()) continue;
+        if (r[2].empty() || r[4].empty() || r[6] == "NEVERTINTA") continue;
+        int points = 0;
+        try { points = std::stoi(r[7]); } catch (...) { continue; }
+        auto& slot = best[{r[2], r[3]}][r[4]];
+        if (slot.first < points) slot = {points, r[6]};
+    }
+    std::ofstream f("ZURNALAS.csv", std::ios::binary | std::ios::trunc);
+    f << "\xef\xbb\xbf";
+    f << csv("Vardas") << ';' << csv("Grupė");
+    for (int ld = 1; ld <= 13; ++ld) f << ';' << csv("LD" + std::to_string(ld));
+    f << "\r\n";
+    for (const auto& entry : best) {
+        f << csv(entry.first.name) << ';' << csv(entry.first.group);
+        for (int ld = 1; ld <= 13; ++ld) {
+            auto it = entry.second.find("LD" + std::to_string(ld));
+            f << ';' << (it == entry.second.end() ? csv(std::string()) : csv(it->second.second));
+        }
+        f << "\r\n";
+    }
+}
+
 // -------------------------------------------------------------- pagrindinė --
 struct Source {
     fs::path path;
@@ -570,10 +606,12 @@ int process(const std::vector<Source>& files, int skipped_other, int skipped_lar
         known.insert(hash);
     }
     app.flush();
+    rebuild_zurnalas(csvp);
     std::cout << "Rezultatas: nauji irasai " << (graded + failed) << " (ivertinta " << graded
               << ", neivertinta " << failed << "), jau buvo ivertinti " << dup << "\n";
     std::error_code ec;
     std::cout << "CSV: " << fs::absolute(csvp, ec).string() << "\n";
+    std::cout << "Zurnalas: " << fs::absolute("ZURNALAS.csv", ec).string() << "\n";
     return 0;
 }
 
