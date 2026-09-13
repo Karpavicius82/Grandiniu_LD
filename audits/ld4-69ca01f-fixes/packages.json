@@ -1,0 +1,18 @@
+[
+  {
+    "platform": "Linux",
+    "source_commit": "42a8c729e35eb922f79c45fe8ffbe3d0a943493c",
+    "file": "Grandiniu_LD-Linux.zip",
+    "bytes": 594990,
+    "sha256": "dc284ea661587041a5c31e38e113ec1c8e3d063b29cc26b946729c790a6ad7c3",
+    "runtime_files_verified": 64
+  },
+  {
+    "platform": "Windows",
+    "source_commit": "d65a6cc0e092587bd8396d9ca53efae0c00e68a2",
+    "file": "Grandiniu_LD-Windows.zip",
+    "bytes": 958151,
+    "sha256": "d970236f3cb39bfd12158911503cfc35a611ba8f3cf204c6cd83008859547aec",
+    "runtime_files_verified": 64
+  }
+]

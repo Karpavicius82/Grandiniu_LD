@@ -1,20 +1,29 @@
 {
   "time_utc": "2026-09-13T17:18:01.674739+00:00",
   "status": "PASS",
-  "command": "LD4 targeted GUI Windows/Linux + native CTest + 257 actual Scilab reports per OS",
-  "coverage": {
-    "LD4_GUI_variants": [
-      1,
-      17,
-      64
-    ],
-    "LD4_GUI_stages_per_variant": 7,
-    "LD4_geometry_cases_per_OS": 42,
-    "LD4_geometry_errors": 0,
-    "actual_reports_per_OS": 257,
-    "operating_system_mouse_events": false
+  "ld4_gui_variants": [
+    1,
+    17,
+    64
+  ],
+  "ld4_geometry_cases_per_os": 42,
+  "geometry_errors": 0,
+  "actual_exported_reports_per_os": 257,
+  "cpp_tests": 6,
+  "ci": {
+    "linux": {
+      "run": 34770173295,
+      "job": 103758209191,
+      "conclusion": "success",
+      "source_commit": "42a8c729e35eb922f79c45fe8ffbe3d0a943493c"
+    },
+    "windows": {
+      "run": 34770911844,
+      "conclusion": "success",
+      "source_commit": "d65a6cc0e092587bd8396d9ca53efae0c00e68a2"
+    }
   },
-  "source_sha256": {
+  "runtime_sha256": {
     "DESTYTOJUI.sce": "6518ec1acc2679736b3bd2b334381aded90c03e6f313559fde5ca1df46af1aa4",
     "GUI_PATIKRA.sce": "8659d0548825312ef251a6e03adfd361915823be78e4e51bae206f72543f8d8a",
     "LD1/LD1.sce": "369863c411bca178ef30347fe4b4ae90a4ba00904abacff9b8b41a81b3eec611",
@@ -80,26 +89,8 @@
     "tests/HEADLESS.sce": "e7caf3831cd4f52544bfc1869b1b27ab91bad2d8c5eb77c5f7da4cf4b0d9ec5a",
     "tests/workflows.sci": "2f7c5ef282890cb02b988a8b776f969fe4bf5fa1b2ea5154b0c4f41807e3b0ab"
   },
-  "ci": {
-    "linux": {
-      "run": 34770173295,
-      "job": 103758209191,
-      "conclusion": "success",
-      "source_commit": "42a8c729e35eb922f79c45fe8ffbe3d0a943493c"
-    },
-    "windows": {
-      "run": 34770911844,
-      "conclusion": "success",
-      "source_commit": "d65a6cc0e092587bd8396d9ca53efae0c00e68a2"
-    }
-  },
-  "previous_full_gui": {
-    "source_commit": "69ca01f4247456c71c5c0976b84a832d1892558f",
-    "time_utc": "2026-09-13T16:37:16.329352+00:00",
-    "command": "./PATIKRINTI.sh visi",
-    "log_sha256": {
-      "modelis.log": "65e45531f69c202ae1877e8ac993d9b79a2db9e93432577a7d533cb403e9152b",
-      "langai.log": "3d0c82424431e3735558d677d5d96885e49d7fb4de878b8f7d97f5282573f1f7"
-    }
-  }
+  "limits": [
+    "No physical Windows 125-200 percent DPI check",
+    "Native control callbacks; OS mouse input is not automated"
+  ]
 }
