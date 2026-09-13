@@ -22,12 +22,14 @@ env = dict(os.environ, LD4_TEST_RUNTIME=runtime.as_posix(), LD4_TEST_OUT=out.as_
 if a.core: env['LD_CORE_LIBRARY'] = str(a.core.resolve())
 exe = a.scilab.resolve()
 if os.name == 'nt':
-    exe = exe.parent / 'WScilex.exe'
+    exe = exe.parent / 'WScilex-cli.exe'
     assert exe.is_file(), f'Missing graphical Scilab executable: {exe}'
-args = [str(exe), '-nw', '-nb', '-f', str(repo / 'tools/test_ld4.sce')]
-result = subprocess.run(args, env=env, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, timeout=240)
-(out / 'scilab.log').write_bytes(result.stdout)
-verdict = (out / 'verdict.log').read_text(encoding='utf-8') if (out / 'verdict.log').exists() else result.stdout.decode('utf-8', errors='replace')
+# Windows uses separate STD/NW/NWNI binaries, without -nw/-nwni flags.
+mode = [] if os.name == 'nt' else ['-nw']
+args = [str(exe), *mode, '-nb', '-f', str(repo / 'tools/test_ld4.sce')]
+with (out / 'scilab.log').open('wb') as log:
+    result = subprocess.run(args, env=env, stdout=log, stderr=subprocess.STDOUT, timeout=240)
+verdict = (out / 'verdict.log').read_text(encoding='utf-8') if (out / 'verdict.log').exists() else (out / 'scilab.log').read_text(encoding='utf-8', errors='replace')
 assert result.returncode == 0 and 'LD4_PASS:' in verdict, verdict
 print(verdict.strip())
 result = subprocess.run([str(a.checker.resolve()), str(out / 'geometry.tsv')], capture_output=True, text=True)
