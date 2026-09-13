@@ -152,7 +152,7 @@ endfunction
 
 function ld1_track_board_handle(h)
     global LD1;
-    LD1.ui.boardHandles($+1)=h;
+    for item=matrix(h,1,-1); LD1.ui.boardHandles($+1)=item; end
 endfunction
 
 function h = ld1_board_text(pos,txt,fs,bold,align,bg,fg)
@@ -163,7 +163,7 @@ function h = ld1_board_text(pos,txt,fs,bold,align,bg,fg)
     if argn(2)<6 then bg=[1 1 1]; end
     if argn(2)<7 then fg=[0.08 0.10 0.13]; end
     h=uicontrol(LD1.ui.circuitFrame,"style","text","units","normalized", ..
-        "position",pos,"string",txt,"fontsize",fs, ..
+        "position",pos,"string",txt,"fontunits","pixels","fontsize",fs, ..
         "horizontalalignment",align,"verticalalignment","middle", ..
         "backgroundcolor",bg,"foregroundcolor",fg);
     if bold then h.fontweight="bold"; end
@@ -189,17 +189,8 @@ endfunction
 function h = ld1_board_segment(x1,y1,x2,y2,color)
     // Plonas stačiakampis naudojamas kaip laido atkarpa.
     global LD1;
-    t=0.006;
-    if abs(y2-y1) < 0.001 then
-        x=min(x1,x2); w=max(abs(x2-x1),0.002);
-        pos=[x y1-t/2 w t];
-    else
-        y=min(y1,y2); hh=max(abs(y2-y1),0.002);
-        pos=[x1-t/2 y t hh];
-    end
-    h=uicontrol(LD1.ui.circuitFrame,"style","text","units","normalized", ..
-        "position",pos,"string","","backgroundcolor",color);
-    ld1_track_board_handle(h);
+    h=student_wire(LD1.ui.circuitFrame,[x1 y1],[x2 y2],color);
+    if h<>[] then ld1_track_board_handle(h); end
 endfunction
 
 function ld1_draw_wire(p1,p2,color)
@@ -255,8 +246,7 @@ function ld1_create_terminal(id)
     if isnan(xy(1)) then return; end
     x=xy(1)/100; y=xy(2)/100;
     // v1.7: mažesni kontaktai, kad stende liktų daugiau erdvės ir mažėtų kolizijos.
-    w=0.042; h=0.050;
-    if id=="M_N" then w=0.060; end
+    wh=[36 40]./student_size(LD1.ui.circuitFrame); w=wh(1); h=wh(2);
     pos=[x-w/2 y-h/2 w h];
     cb="ld1_terminal_click("""+id+""")";
 
@@ -276,20 +266,13 @@ function ld1_create_terminal(id)
         tname=ld1_terminal_name(id);
         tcode=ld1_terminal_code(id);
     end
-    ht=uicontrol(LD1.ui.circuitFrame,"style","pushbutton","units","normalized", ..
-        "position",pos,"string",ld1_terminal_button_text(id), ..
-        "fontsize",9,"fontweight","bold","backgroundcolor",bg, ..
-        "foregroundcolor",fg,"margins",[0 0 0 0],"tooltipstring",tname, ..
-        "tag",tcode,"callback",cb);
+    ht=student_terminal(LD1.ui.circuitFrame,[x y],ld1_terminal_button_text(id),tcode,cb,tname,bg);
+    ht.foregroundcolor=fg;
     LD1.term.handles($+1)=ht;
     LD1.term.handleIds($+1,1)=id;
     ld1_track_board_handle(ht);
     // T-žymos tekstas šalia gnybto – per ld1_board_text vamzdyną, kad
     // būtų valomas kartu su lenta. Mažas šriftas, kad neužstingtų kiti.
-    if tcode<>"" then
-        ld1_board_text([x-0.023 y-h/2-0.027 0.046 0.023], ..
-            "["+tcode+"]",8,%f,"center",[1 1 1],[0.10 0.30 0.50]);
-    end
 endfunction
 
 function ld1_draw_connection_count()
@@ -393,6 +376,16 @@ endfunction
 function ld1_redraw_panel_classic()
     global LD1;
     ld1_clear_board_controls();
+    ports=[]; sz=student_size(LD1.ui.circuitFrame);
+    for id=matrix(LD1.term.active,1,-1)
+        wh=[36 40];
+        if ~ld1_terminal_should_show(id) then
+            wh=[0.014 0.020].*sz; if id=="M_N" then wh(1)=0.020*sz(1); end
+        end
+        ports($+1,:)=[ld1_get_xy(id)/100 wh];
+    end
+    LD1.ui.circuitFrame.user_data=struct("ports",ports);
+    student_begin_wires(LD1.ui.circuitFrame);
 
     // Studentų laidai braižomi pirmi, kad komponentai ir gnybtai liktų virš jų.
     pal=[0.12 0.40 0.78; ..
@@ -417,6 +410,7 @@ function ld1_redraw_panel_classic()
         ld1_draw_parallel_board();
     end
 
+    ld1_draw_component_leads();
     // Gnybtai kuriami paskutiniai: jie visada aiškiai matomi ir paspaudžiami.
     for k=1:size(LD1.term.active,"*")
         if ld1_terminal_should_show(LD1.term.active(k)) then
@@ -425,6 +419,7 @@ function ld1_redraw_panel_classic()
             ld1_create_locked_terminal(LD1.term.active(k));
         end
     end
+    h=student_end_wires(LD1.ui.circuitFrame); if h<>[] then ld1_track_board_handle(h); end
 endfunction
 
 function ld1_build_panel(kind)

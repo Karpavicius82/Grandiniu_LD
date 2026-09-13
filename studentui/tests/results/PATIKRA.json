@@ -1,7 +1,7 @@
 {
-  "time_utc": "2026-09-12T20:11:51.174205+00:00",
-  "scilab": "unknown",
-  "command": "./PATIKRINTI.sh visi",
+  "time_utc": "2026-09-13T13:20:19.555384+00:00",
+  "scilab": "\"scilab-2026.1.0\" linux",
+  "command": "./PATIKRINTI.sh; papildomai C++ geometrija ir tools/test_entrypoints.sce",
   "status": "PASS",
   "coverage": {
     "LD1_model_variants": 64,
@@ -17,7 +17,18 @@
     "native_controls_callbacks": true,
     "operating_system_mouse_events": false,
     "LD3_model_variants": 64,
-    "LD3_GUI_stages_per_variant": 6
+    "LD3_GUI_stages_per_variant": 6,
+    "ergonomics": {
+      "scenarios": 228,
+      "errors": 0,
+      "min_contact_gap_px": 8.016,
+      "cpp_checker": "core/tests/layout_check.cpp"
+    },
+    "entrypoints": [
+      "LD1 cancel/accept",
+      "LD2 cancel/accept",
+      "LD3 cancel/accept"
+    ]
   },
   "source_sha256": {
     "DESTYTOJUI.sce": "6518ec1acc2679736b3bd2b334381aded90c03e6f313559fde5ca1df46af1aa4",
@@ -27,9 +38,9 @@
     "LD1/ld1_callbacks.sci": "502ad0e8d2b58a2db59c90d82e121d034bb42fd514e6072bc58cac4622e8cbc2",
     "LD1/ld1_circuit.sci": "d68ee07b81b21b720df2a2113cd38076b786c8a6b9b0fe70a6ddf5809a80a325",
     "LD1/ld1_config.sci": "65e8fc837a29ebff41dff64f3e091aed36b6d5dfa7346d222e746a46bb185855",
-    "LD1/ld1_gui.sci": "b50c7f0f6ea8cca0d6305dfd2a400e5fd8b0be1c89ed45554209f86fc2ca0e4b",
+    "LD1/ld1_gui.sci": "9354f5ac05f08b433ad839e811eb1828d484e9d30a20fdd9bcc57df3e3960cba",
     "LD1/ld1_ids.sci": "1e3a92fe5aca0a7644cde58784f224c98cdce3736238b3c10ba4cccdd8129ae4",
-    "LD1/ld1_student.sci": "69cc19186955a3439ed7ab2a7b9a4f38a8f40a406361f62981365b89844a5868",
+    "LD1/ld1_student.sci": "6b198b1c0977e88115d9dde1f95b7e64476e2767da9683a0e862b0a2ee86dc6e",
     "LD1/ld1_utils.sci": "129dc2acc1f230c7012f831dddaef1657af0d3f1c7f1681ef2f076d3c9dac620",
     "LD2/LD2.sce": "b0e34e873ae9e12a1ddeb2e117fcbd49947ebae2d47fdfa39d6f98ff71765798",
     "LD2/LD2_GUI_TEST.sce": "56597c99ab27b2ee167336a6a3d851deb23e01a7fc24c77f9f4056ff8e0471a9",
@@ -38,7 +49,7 @@
     "LD2/LD2_SELFTEST.sce": "27bf9690b28b3ec3a7a58ed1294780ee5cd01a2562cfe9b53783147071e3000f",
     "LD2/ld2_callbacks.sci": "dd69994bf3c9809768a84226cd02e37b98c76ac42fe9d5a3ff7e7b92900139ed",
     "LD2/ld2_config.sci": "19309153ea1c66588da7bcec8b9cd991e29b5f7284278808ca1f76d8f13a0273",
-    "LD2/ld2_gui.sci": "6e38ef5142da24a59cfceeac8a03a2765a2e89c03d708559ebe54ee8b0814637",
+    "LD2/ld2_gui.sci": "dd3aac35b9e0f99557b3363ffc0e43009450ebfc532b856deb24dcfa5d73b5b3",
     "LD2/ld2_ids.sci": "2fcade1a4777b427c6cf47b201f42e06ad42ed841a2164b716990356d66caea8",
     "LD2/ld2_method.sci": "758578630a6edde2d2fa1096405fa3a601568924e97d2dfa809375a4c3afeae6",
     "LD2/ld2_model.sci": "a42279c8a7994f6ee59794d0527d3aafb1b631609319d547e2b89fffd250fae2",
@@ -46,18 +57,18 @@
     "LD2/ld2_plots.sci": "9ed735cb369d68860c8d8984e15d8935be12b3c670ab9bab233f45272b8ddda5",
     "LD2/ld2_selftest.sci": "07df1ce2cabd6aedc98108550c916533de0463482068abd750dd6a292b3d5297",
     "LD2/ld2_storage.sci": "acb2dd48748d2c8c39b2c3ad8181922d55b77134405d17b7111053c064eaaa0b",
-    "LD2/ld2_student.sci": "4aa58a79b249340e25d0a0754c9e1d3e526b04e942f45035b08ce0b961c4eae6",
+    "LD2/ld2_student.sci": "a4fdfb6893aa26d951a45a0e549c47a3e0f514c393522a6a2d8884251ae71436",
     "LD2/ld2_utils.sci": "f4bf3c3a5252a983789a1c5d865fa6caeb8785af088f3ba9a4fec2f35f8f71ac",
     "LD2/ld2_variants.sci": "bb83e4c3e41e7c5cef485c10dd9928869b0ed5056c6ff6985a80cb8694e8dfbc",
     "LD2/ld2_wiring.sci": "433b86664876bb8c1c60a44b73587c6e46008717d5055bf6b9d866f4254606a3",
-    "LD3/LD3.sce": "52d7a4d9d55cd4006874b6ba3a187b094d9cec1d211232b314c53e816e4df918",
+    "LD3/LD3.sce": "054a79ae6e35b785bc110713d1694e5743bfa0902559c4f5c6a4bf811e0da054",
     "LD3/LD3_LOAD.sce": "d768fddf96fd824740786a6b09cbae94529ec5735e753dabe68b49c2ce01895e",
-    "LD3/ld3_callbacks.sci": "61af3f4ceba8d8d5a07d3954e8f804c7650f9b43e4bbf2d61937776e14be7106",
+    "LD3/ld3_callbacks.sci": "67e638c1637314a24ce3bd14c3f8532b2e1505a42d0ba956ba0eec331891b6d6",
     "LD3/ld3_circuit.sci": "0ce3dd0bdb78e67b8444f2c184144738cb2691bc53d3c65ee159fcc7babdb53d",
     "LD3/ld3_config.sci": "8fccca55200af183207023403a605a4ba89b890d8c1e84cc9492426d52135be2",
-    "LD3/ld3_gui.sci": "57a41fd951f45c8d94138ed39ceb9b6b755f9efe4306adadbdf26de623eef99b",
+    "LD3/ld3_gui.sci": "221e496a78b2ca39f542b6f0848dab2e0e24f8aeecdb97b99269476c106473b1",
     "LD3/ld3_ids.sci": "f75650e2a021cea623cd1aa656da1f49282ac8091774f64559dfa5c199bf57e4",
-    "LD3/ld3_student.sci": "77f65297c7b2f3beb70a9d4168495ca81d99bad6fee538c305e1b46bddba04c3",
+    "LD3/ld3_student.sci": "5eff0aff0a7a1ee60865e541154cc1c23fd14338edce3b5062d6aeb4554b4d20",
     "LD3/ld3_utils.sci": "dccea4a1c5740eaf20be44cba573427b31312e25d390736e2dbf2a616464cd54",
     "PALEISTI.sh": "d135f0d78c8aaf76d2440c05331b9a2b9735a0bc0c20fd967e71952b5282411d",
     "PATIKRINTI.sh": "a2d596ad6c9a5df00d2b7082373ebeb8929836c4f977668515871cec33a470b5",
@@ -70,10 +81,10 @@
     "bench_session.sci": "358c4ba5afb1a5ad6e9dc0a111f5357afa64d7903c6ab1f11ed6d0ed202aa3df",
     "bench_teacher.sci": "8de6d5b3de9924f8f0e301c893d7d3f82c0dd74e158534487d6aebbc0cd6f3c0",
     "student_profile.sci": "922143ce18a4bed2ce406c03f04f8b5eeaa713bfedb4ad0244e20e68d10549bf",
-    "student_style.sci": "5c026e03505c13ae6786cc97e50071777a7f2ff688e27d711fdc7996b1fb7472",
+    "student_style.sci": "1d5a3bd10bf3533add3bd6c8fbeac967e773bf15a2eab3c2a6911254970b54c0",
     "tests/AUTOMATINIS.sce": "55aed6e8fcbd45e0a87c3bb0e4a5e57b78b200bbfee5b1fe26f526929572604e",
     "tests/HEADLESS.sce": "a83daebec37072116e353b056aaa6850bf6e5aa498bb6e6e29a313cdf5bf4200",
-    "tests/workflows.sci": "59d59af1341781b5133f32cd9c00ffb69305443fecb844a8b43fe1e628b6565a"
+    "tests/workflows.sci": "389a3928f7700322d4110a3dd6f11a64cce43b694d4dc2a449670495b263388a"
   },
   "log_sha256": {
     "modelis.log": "fc6e6022484a870af8e7ff0431e995f3ae8e2269bc270b2dfb30bb60ceb0bf49",

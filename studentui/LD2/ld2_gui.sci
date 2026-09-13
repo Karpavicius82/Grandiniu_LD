@@ -107,7 +107,7 @@ endfunction
 
 function ld2_track(h)
     global LD2;
-    LD2.ui.dynamic = [LD2.ui.dynamic h];
+    LD2.ui.dynamic = [matrix(LD2.ui.dynamic,1,-1) matrix(h,1,-1)];
 endfunction
 
 function ld2_clear_dynamic()
@@ -814,6 +814,20 @@ function [x,y]=ld2_terminal_xy(phase,id)
         else x=0.01; y=0.01;
         end
     end
+    // Return the legacy anchor (center - [0.014 0.019]); every caller uses
+    // the same center. RLC has enough space for two distinct 36 px contacts
+    // between adjacent components, rather than overlapping click targets.
+    if phase=="RC" | phase=="RL" then
+        if id=="GEN_H" | id=="GEN_L" then x=0.2155-0.014; end
+        if id=="AM_H" then x=0.268-0.014; end
+    else
+        ids=["GEN_H" "GEN_L" "AM_H" "AM_L" "C4_1" "C4_2" "L3_1" "L3_2" "R13_1" "R13_2" ...
+             "C4_M1" "C4_M2" "L3_M1" "L3_M2" "R13_M1" "R13_M2"];
+        xx=[0.160 0.160 0.213 0.338 0.391 0.515 0.568 0.692 0.745 0.869 0.430 0.490 0.607 0.667 0.784 0.844];
+        k=find(ids==id);
+        if k<>[] then x=xx(k)-0.014; end
+        if id=="LC_M1" | id=="LC_M2" then y=0.417-0.019; end
+    end
 endfunction
 
 function ld2_draw_terminal(parent,id,label,xy,active,c)
@@ -884,7 +898,7 @@ function ld2_draw_connection(parent,phase,a,b)
         ld2_wire_segment(parent,x1,lane,x2,lane,col);
         ld2_wire_segment(parent,x2,lane,x2,y2,col);
     elseif (a=="GEN_L" | b=="GEN_L") then
-        lane=0.380;
+        lane=0.370;
         ld2_wire_segment(parent,x1,y1,x1,lane,col);
         ld2_wire_segment(parent,x1,lane,x2,lane,col);
         ld2_wire_segment(parent,x2,lane,x2,y2,col);
@@ -901,15 +915,8 @@ function ld2_draw_connection(parent,phase,a,b)
 endfunction
 
 function ld2_wire_segment(parent,x1,y1,x2,y2,col)
-    t=0.003;
-    if abs(x2-x1)>=abs(y2-y1) then
-        x=min([x1 x2]); w=max([abs(x2-x1) t]);
-        y=(y1+y2)/2-t/2; h=t;
-    else
-        x=(x1+x2)/2-t/2; w=t;
-        y=min([y1 y2]); h=max([abs(y2-y1) t]);
-    end
-    ld2_text(parent,[x y w h],"",1,%f,"left",col,col);
+    h=student_wire(parent,[x1 y1],[x2 y2],col);
+    if h<>[] then ld2_track(h); end
 endfunction
 
 function ld2_render_stand_tools(parent)

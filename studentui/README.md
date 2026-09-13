@@ -1,13 +1,18 @@
 # Laboratorinių darbų stendai studentui
 
-Abu darbai naudoja tą pačią sąsają: kairėje grandinė ir prietaisai, dešinėje
-vieno etapo užduotis ir atsakymai. Atsiskaitymo režime **Įrašyti ir toliau**
+LD1, LD2 ir LD3 naudoja tą patį išdėstymą: kairėje grandinė ir prietaisai, dešinėje
+vieno etapo užduotis ir atsakymai. LD1 ir LD2 atsiskaitymo režime **Įrašyti ir toliau**
 išsaugo jūsų atsakymus. Mokymosi režime **Patikrinti** parodo klaidas.
 Papildomi veiksmai ir režimo pasirinkimas yra skiltyje **Pagalba**.
 
+LD3 užduotis tikrinama mygtuku **TIKRINTI**. Įtampą parinkite U1 / U2 / U3,
+maitinimą ir jungiklį valdykite stendo dešinėje. Papildomi veiksmai – viršutiniame
+**Pagalba** meniu; apačioje galima grįžti į ankstesnį etapą arba atverti kontaktų žemėlapį.
+Laido tarpas sankirtoje reiškia, kad laidai elektriškai nesujungti.
+
 Pabaigoje spauskite **Išsaugoti ataskaitą**. Sukurtą vieną HTML failą iš
 naudotojo aplanko `Grandiniu_LD_darbai` persiųskite dėstytojui. Nebaigtą
-ataskaitą taip pat galima išsaugoti per Pagalbą. Juodraščiai saugomi automatiškai
+ataskaitą taip pat galima išsaugoti per Pagalbą. LD1 ir LD2 juodraščiai saugomi automatiškai
 įrašant atsakymus ir pereinant į kitą etapą; juos atverkite per Pagalbą.
 
 Dėstytojui: vykdykite `DESTYTOJUI.sce` ir pasirinkite aplanką su ataskaitomis.
@@ -19,7 +24,7 @@ Reikia Scilab 2026.1.0 ir jūsų OS atitinkančio paketo su `bin/ldcore.dll`
 (Windows) arba `bin/ldcore.so` (Linux). Kompiliatorius studentui nereikalingas.
 
 Linux: `./PALEISTI.sh`. Scilab aplinkoje: vykdykite `STENDAS.sce` ir pasirinkite darbą.
-Atskirai galima vykdyti `LD1/LD1.sce` arba `LD2/LD2.sce`.
+Atskirai galima vykdyti `LD1/LD1.sce`, `LD2/LD2.sce` arba `LD3/LD3.sce`.
 Paleidiklis ieško įdiegto Scilab; prireikus nurodykite `SCILAB_BIN=/visas/kelias/bin/scilab`.
 
 Prieš pradedant studentas įveda **eilės numerį sąraše (1–64), vardą ir pavardę,

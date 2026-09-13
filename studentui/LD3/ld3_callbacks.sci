@@ -6,7 +6,7 @@ function ld3_terminal_click(id)
     global LD3;
     if LD3.demoMode then ld3_set_status("Pavyzdyje laidai jau sujungti.","info","Grįžkite paspaudę [B07]."); return; end
     if LD3.step ~= 1 & ~LD3.done(1) then
-        ld3_set_status("Pirmiausia užbaikite 1 etapo sujungimą.","error","Etapą atveria [E01] mygtukas.");
+        ld3_set_status("Pirmiausia užbaikite 1 etapo sujungimą.","error","Mygtuku ← Atgal grįžkite į 1 etapą.");
         return;
     end
     if LD3.pending == "" then
@@ -33,7 +33,7 @@ function ld3_terminal_click(id)
         ld3_set_status("Laidas pridėtas (" + string(size(LD3.wires,1)) + "/6).","ok","");
         if size(LD3.wires, 1) >= 6 then
             [wok, wwhy] = ld3_wiring_valid(LD3.wires);
-            if wok then ld3_set_status("Sujungimas teisingas! Galima tikrinti 1 etapą.","ok","Spauskite [B03] apatinį TIKRINTI mygtuką."); end
+            if wok then ld3_set_status("Sujungimas teisingas! Galima tikrinti 1 etapą.","ok","Spauskite apatinį TIKRINTI mygtuką."); end
         end
     end
     if isfield(LD3, "ui") then
@@ -49,6 +49,7 @@ function ld3_toggle_power()
     else
         ld3_set_status("[B01] Maitinimas iŠJUNGTAS.","info","Įtampa nustatoma mygtukais [B10]–[B12].");
     end
+    ld3_render_wires();
 endfunction
 
 function ld3_toggle_switch()
@@ -59,6 +60,7 @@ function ld3_toggle_switch()
     end
     LD3.switchOn = ~LD3.switchOn;
     if LD3.switchOn then ld3_set_status("[B02] Jungiklis UŽDARYTAS.","ok","Nustatykite įtampą [B10]–[B12] ir matuokite [B03]."); end
+    ld3_render_wires();
 endfunction
 
 function ld3_set_voltage(v)
@@ -75,6 +77,7 @@ function ld3_set_voltage(v)
         if isfield(LD3.ui, "voltSlider") & is_handle_valid(LD3.ui.voltSlider) then
             LD3.ui.voltSlider.value = LD3.voltage;
         end
+        ld3_render_wires();
     end
 endfunction
 
@@ -83,7 +86,7 @@ function ld3_measure()
     [u, i, ok, msg] = ld3_measure_values();
     if ~ok then ld3_set_status(msg, "error", ""); return; end
     if LD3.step ~= 2 & LD3.step ~= 3 then
-        ld3_set_status("Matavimai atliekami 2 ir 3 etapuose.","info","Etapus keičia [E01]–[E06] mygtukai.");
+        ld3_set_status("Matavimai atliekami 2 ir 3 etapuose.","info","Etapą rodo skaičius viršuje; grįžkite mygtuku ← Atgal.");
         return;
     end
     jeigu = %t;
@@ -104,7 +107,7 @@ function ld3_measure()
     ld3_set_status(msprintf("Užfiksuota: U = %g V, I = %.2f mA (%d/3 taškai).", u, i, size(LD3.journal,1)), "ok", ...
         msprintf("Rodmuo matomas [V02] lange ir matavimų sąraše."));
     if isfield(LD3, "ui") then
-        if ~isfield(LD3.ui, "headless") | ~LD3.ui.headless then ld3_render_journal(); end
+        if ~isfield(LD3.ui, "headless") | ~LD3.ui.headless then ld3_render_journal(); ld3_render_wires(); end
     end
 endfunction
 
@@ -122,7 +125,7 @@ function ld3_check_step()
     select n
     case 1 then
         [wok, wwhy] = ld3_wiring_valid(LD3.wires);
-        if ~wok then ld3_set_status(wwhy, "error", "Seką rodo [B04] KAIP SUJUNGTI."); return; end
+        if ~wok then ld3_set_status(wwhy, "error", "Seką rasite: Pagalba → [B04] Kaip sujungti."); return; end
         LD3.done(1) = %t;
         ld3_set_status("1 etapas baigtas: stendas sujungtas teisingai.","ok","[E02] atveria teorinę prognozę.");
     case 2 then
@@ -162,7 +165,7 @@ function ld3_check_step()
         LD3.done(5) = %t;
         ld3_set_status("5 etapas baigtas.","ok","[E06] — išvados.");
     case 6 then
-        if LD3.answers(6,1) ~= "1" then ld3_set_status("[A06.01]: atsakykite 1 (Taip) arba 2 (Ne).","error","Žr. grafiką [V02] srityje."); return; end
+        if LD3.answers(6,1) ~= "1" then ld3_set_status("[A06.01]: atsakykite 1 (Taip) arba 2 (Ne).","error","Palyginkite tris matavimų taškus [V02] sąraše."); return; end
         if LD3.answers(6,2) ~= "1" then ld3_set_status("[A06.02]: atsakykite 1 (Taip) arba 2 (Ne).","error","Palyginkite [A04.01]–[A04.03]."); return; end
         LD3.done(6) = %t;
         ld3_set_status("6 etapas baigtas: darbas atliktas!","ok","[B08] ATASKAITA DĖSTYTOJUI sukuria HTML ataskaitą.");
@@ -191,7 +194,7 @@ function ld3_set_step(n)
         if ~isfield(LD3.ui, "headless") | ~LD3.ui.headless then
             ld3_render_stage();
             if isfield(LD3.ui, "instructionLine") & is_handle_valid(LD3.ui.instructionLine(1)) then
-                LD3.ui.instructionLine(1).string = ld3_step_instruction(n);
+                LD3.ui.instructionLine(1).string = student_wrap(ld3_step_instruction(n),38);
             end
         end
     end
@@ -206,7 +209,7 @@ function s = ld3_step_instruction(n)
     case 3 then s = msprintf("Spauskite [B11] U2=%d V → [B03]; tada [B12] U3=%d V → [B03]. Užfiksuoti visi 3 taškai.", cfg.U2, cfg.U3);
     case 4 then s = "Apskaičiuokite ir įrašykite [A04.01]–[A04.03] (R=U/I iš kiekvieno taško) ir vidurkį [A04.04].";
     case 5 then s = "Charakteristikos I(U) taškai rodomi stende. Apskaičiuokite R iš nuolydžio: R=(U3−U1)/((I3−I1)/1000) → [A05.01].";
-    case 6 then s = "Atsakykite [A06.01] (ar I(U) tiesinė?) ir [A06.02] (ar R pastovi?) – 1 Taip, 2 Ne. Tada [B08] ataskaita.";
+    case 6 then s = "Atsakykite [A06.01] (ar I(U) tiesinė?) ir [A06.02] (ar R pastovi?) – 1 Taip, 2 Ne. Tada Pagalba → [B08] Ataskaita.";
     else s = "";
     end
 endfunction
@@ -220,12 +223,19 @@ function ld3_save_answers()
     if isfield(LD3.ui, "answerEdits") then
         for k = 1:size(LD3.ui.answerEdits, "*")
             h = LD3.ui.answerEdits(k);
-            if is_handle_valid(h) then
+            if is_handle_valid(h) & h.visible=="on" then
                 [st, sl] = ld3_answer_slot(k);
+                if h.string<>LD3.answers(st,sl) then LD3.done(st)=%f; end
                 LD3.answers(st, sl) = h.string;
             end
         end
     end
+endfunction
+
+function ld3_answers_changed()
+    global LD3;
+    if LD3.demoMode then return; end
+    ld3_save_answers(); ld3_student_sync();
 endfunction
 
 function [st, sl] = ld3_answer_slot(k)
@@ -253,7 +263,7 @@ function ld3_show_wiring_guide()
            "5) [T09] (voltmetras +) su [T07];";
            "6) [T10] (voltmetras −) su [T08].";
            "";
-           "Klaidą taiso [B06] ATKURTI arba naujas laidas po [B09]."];
+           "Klaidą taiso Pagalba → [B06] Atkurti stendą."];
     ld3_text_window("KAIP SUJUNGTI", txt);
 endfunction
 

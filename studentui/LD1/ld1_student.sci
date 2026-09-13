@@ -211,6 +211,7 @@ endfunction
 function ld1_student_source(pos)
     global LD1;
     bg=[0.94 0.97 0.97]; fr=student_frame(LD1.ui.circuitFrame,pos,bg); ld1_track_board_handle(fr);
+    fr.tag="component:SRC";
     student_text(fr,[0.09 0.70 0.82 0.20],"ŠALTINIS",13,%t,bg);
     LD1.ui.sourceDisplay=student_text(fr,[0.09 0.43 0.82 0.22],"10 V DC",20,%t,bg);
     caption="Įjungti"; if LD1.powerOn then caption="Išjungti"; end
@@ -223,6 +224,7 @@ endfunction
 function ld1_student_resistor(pos,name,value,variable)
     global LD1;
     bg=[0.97 0.97 0.95]; fr=student_frame(LD1.ui.circuitFrame,pos,bg); ld1_track_board_handle(fr);
+    fr.tag="component:"+name;
     student_text(fr,[0.09 0.57 0.82 0.30],name,17,%t,bg);
     h=student_text(fr,[0.09 0.16 0.82 0.30],string(value)+" Ω",16,%f,bg);
     if variable then
@@ -238,6 +240,7 @@ endfunction
 function ld1_student_meter(pos)
     global LD1;
     bg=[0.93 0.96 0.96]; fr=student_frame(LD1.ui.circuitFrame,pos,bg); ld1_track_board_handle(fr);
+    fr.tag="component:M";
     name="AMPERMETRAS"; if LD1.meterMode=="V" then name="VOLTMETRAS"; end
     student_text(fr,[0.07 0.74 0.86 0.20],name,12,%t,bg);
     reading="— "+LD1.meterMode;
@@ -246,6 +249,8 @@ function ld1_student_meter(pos)
     LD1.ui.meterDisplay.horizontalalignment="center";
     LD1.ui.measure=student_button(fr,[0.07 0.08 0.86 0.25],"Matuoti","ld1_measure()",%t);
     ld1_register_button(LD1.ui.measure,"ld1_measure()");
+    LD1.ui.measure.string="<html><center>[B06] Matuoti</center></html>";
+    LD1.ui.measure.fontsize=12;
     if LD1.step==1 | LD1.step==2 | LD1.step==5 | LD1.demoMode then LD1.ui.measure.visible="off"; end
 endfunction
 
@@ -262,19 +267,19 @@ function ld1_draw_parallel_board()
     global LD1;
     ld1_board_text([0.04 0.92 0.9 0.045],"Lygiagrečioji grandinė",17,%t);
     ld1_board_segment(0.30,0.83,0.92,0.83,[0.41 0.49 0.51]);
-    ld1_board_segment(0.30,0.15,0.92,0.15,[0.41 0.49 0.51]);
-    ld1_board_text([0.27 0.845 0.08 0.04],"A",16,%t);
-    ld1_board_text([0.27 0.09 0.08 0.04],"B",16,%t);
+    ld1_board_segment(0.30,0.112,0.92,0.112,[0.41 0.49 0.51]);
+    ld1_board_text([0.94 0.845 0.04 0.04],"A",16,%t);
+    ld1_board_text([0.94 0.09 0.04 0.04],"B",16,%t);
     ld1_student_source([0.035 0.37 0.18 0.25]);
     ld1_student_resistor([0.43 0.41 0.15 0.19],"R3",LD1.cfg.R3,%f);
-    ld1_student_resistor([0.65 0.57 0.17 0.12],"R2",LD1.cfg.R2,%f);
-    ld1_student_resistor([0.65 0.27 0.17 0.18],"VR1",LD1.VR1,%t);
-    if LD1.step==8 then ld1_student_meter([0.27 0.48 0.145 0.26]);
+    ld1_student_resistor([0.65 0.58 0.17 0.12],"R2",LD1.cfg.R2,%f);
+    ld1_student_resistor([0.65 0.24 0.17 0.17],"VR1",LD1.VR1,%t);
+    if LD1.step==8 then ld1_student_meter([0.035 0.70 0.205 0.19]);
     else ld1_student_meter([0.84 0.36 0.145 0.26]); end
 endfunction
 
 function ld1_set_parallel_meter_layout(forCurrent)
-    if forCurrent then ld1_set_xy("M_P",25,62); ld1_set_xy("M_N",42,62);
+    if forCurrent then ld1_set_xy("M_P",26.5,75); ld1_set_xy("M_N",26.5,85.5);
     else ld1_set_xy("M_P",91.0,67); ld1_set_xy("M_N",91.0,31); end
 endfunction
 
@@ -284,28 +289,52 @@ function ld1_build_panel(kind)
     LD1.term.xy=%nan*ones(size(LD1.term.ids,"*"),2);
     if kind=="series" then
         LD1.term.active=["SRC_P";"SRC_N";"R1_1";"R1_2";"VR1_1";"VR1_2";"M_P";"M_N"];
-        ld1_set_xy("SRC_P",24,60); ld1_set_xy("SRC_N",24,43);
-        ld1_set_xy("R1_1",38,75); ld1_set_xy("R1_2",62,75);
-        ld1_set_xy("VR1_1",83.5,68); ld1_set_xy("VR1_2",83.5,40);
+        ld1_set_xy("SRC_P",24.5,60); ld1_set_xy("SRC_N",24.5,43);
+        ld1_set_xy("R1_1",37.5,75); ld1_set_xy("R1_2",62.5,75);
+        ld1_set_xy("VR1_1",83.5,69); ld1_set_xy("VR1_2",83.5,39);
         ld1_set_xy("M_P",70,27); ld1_set_xy("M_N",30,27);
     else
         LD1.term.active=LD1.term.ids(find(LD1.term.ids<>"R1_1" & LD1.term.ids<>"R1_2"));
-        ld1_set_xy("SRC_P",23,62); ld1_set_xy("SRC_N",23,37);
+        ld1_set_xy("SRC_P",24.5,62); ld1_set_xy("SRC_N",24.5,37);
         xs=[32 50.5 73.5 91];
         for k=1:4
             ld1_set_xy("NODE_A"+string(k),xs(k),83);
-            ld1_set_xy("NODE_B"+string(k),xs(k),15);
+            ld1_set_xy("NODE_B"+string(k),xs(k),11.2);
         end
-        ld1_set_xy("R3_1",50.5,64); ld1_set_xy("R3_2",50.5,37);
-        ld1_set_xy("R2_1",73.5,73); ld1_set_xy("R2_2",73.5,54);
-        ld1_set_xy("VR1_1",73.5,49); ld1_set_xy("VR1_2",73.5,23);
+        ld1_set_xy("R3_1",50.5,64); ld1_set_xy("R3_2",50.5,36);
+        ld1_set_xy("R2_1",73.5,74); ld1_set_xy("R2_2",73.5,54);
+        ld1_set_xy("VR1_1",73.5,45.2); ld1_set_xy("VR1_2",73.5,20);
         ld1_set_parallel_meter_layout(LD1.step==8);
     end
     ld1_redraw_panel();
 endfunction
 
+function ld1_draw_component_leads()
+    global LD1;
+    owners=struct();
+    for k=1:length(LD1.ui.boardHandles)
+        h=LD1.ui.boardHandles(k);
+        if h.style=="frame" then
+            if part(h.tag,1:min(10,length(h.tag)))=="component:" then owners(part(h.tag,11:length(h.tag)))=h.position; end
+        end
+    end
+    for id=matrix(LD1.term.active,1,-1)
+        if part(id,1:4)=="NODE" then continue; end
+        parts=tokens(id,"_"); owner=parts(1);
+        if ~isfield(owners,owner) then continue; end
+        r=owners(owner); xy=ld1_get_xy(id)/100;
+        edge=[max(r(1),min(r(1)+r(3),xy(1))) max(r(2),min(r(2)+r(4),xy(2)))];
+        mid=[xy(1) edge(2)];
+        h=student_wire(LD1.ui.circuitFrame,xy,mid,[0.41 0.49 0.51],"lead:"+owner);
+        if h<>[] then ld1_track_board_handle(h); end
+        h=student_wire(LD1.ui.circuitFrame,mid,edge,[0.41 0.49 0.51],"lead:"+owner);
+        if h<>[] then ld1_track_board_handle(h); end
+    end
+endfunction
+
 function ld1_redraw_panel()
     global LD1;
+    drawing=LD1.fig.immediate_drawing; LD1.fig.immediate_drawing="off";
     ld1_redraw_panel_classic();
     if LD1.step==1 | LD1.step==5 | LD1.step==8 then
         h=student_button(LD1.ui.circuitFrame,[0.04 0.025 0.24 0.05],"Atšaukti laidą","ld1_remove_last_wire()");
@@ -317,4 +346,5 @@ function ld1_redraw_panel()
         ld1_board_text([0.34 0.025 0.62 0.05],tip,13,%f);
     end
     ld1_student_sync();
+    LD1.fig.immediate_drawing=drawing;
 endfunction

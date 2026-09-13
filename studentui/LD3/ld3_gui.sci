@@ -1,462 +1,211 @@
-// ============================================================================
-// LD3 grafinė sąsaja — LD1 vizualinė kalba: 1280×800 lenta, antraštė,
-// navigacijos juosta, dėžutės su reikšmėmis, gnybtai su [Txx] žymomis,
-// laidai trijų segmentų keliais (board_segment), boardHandles valymas.
-// ============================================================================
-
-function [ok, code, label, hint] = ld3_button_lookup(cb)
-    ok = %f; code = ""; label = ""; hint = "";
+// Shared Scilab UI; numerical calculation and grading remain in the C++ core.
+function h=ld3_button(p,pos,label,cb,fs,bg)
+    if argn(2)<5 then fs=13; end
+    if argn(2)<6 then bg=[0.94 0.96 0.96]; end
+    code=""; hint="";
     try
-        [code, label, hint] = ld3_button_info(cb);
-        ok = %t;
+        [code,registered,hint]=ld3_button_info(cb);
     catch
+        code="";
+    end
+    if code<>"" then label="["+code+"] "+label; end
+    h=student_button(p,pos,"<html><center>"+label+"</center></html>",cb);
+    h.tag=code; h.tooltipstring=hint; h.fontsize=fs; h.backgroundcolor=bg;
+    if sum(bg)<1.5 then h.foregroundcolor=[1 1 1]; end
+endfunction
+
+function [term_xy,boxes]=ld3_layout()
+    // Contacts are 36 x 40 client pixels. Short leads join each to its owner.
+    // R and V share the same horizontal extent: both probes are vertical.
+    boxes=struct("E",[9 61 16 19],"K",[42 61 14 19],"A",[73 61 17 19], ...
+        "R1",[51 36 18 14],"V",[51 13 18 16]);
+    term_xy=struct("E_N",[6.5 70.5],"E_P",[27.5 70.5], ...
+        "K1",[39.5 70.5],"K2",[58.5 70.5],"A_P",[70.5 70.5],"A_N",[92.5 70.5], ...
+        "R1B",[48.5 43],"R1A",[71.5 43],"V_N",[48.5 21],"V_P",[71.5 21]);
+endfunction
+
+function xy=ld3_terminal_xy(id)
+    [tt,bb]=ld3_layout(); xy=tt(id)/100;
+endfunction
+
+function txt=ld3_terminal_button_text(id)
+    select id
+    case "E_P" then txt="+"; case "E_N" then txt="−";
+    case "K1" then txt="1"; case "K2" then txt="2";
+    case "A_P" then txt="+"; case "A_N" then txt="−";
+    case "R1A" then txt="a"; case "R1B" then txt="b";
+    case "V_P" then txt="+"; case "V_N" then txt="−";
     end
 endfunction
 
-function h = ld3_button(parent, pos, str, cb, fs, bg)
-    if argn(2) < 5 then fs = 10; end
-    if argn(2) < 6 then bg = [0.93 0.93 0.93]; end
-    [ok, code, label, hint] = ld3_button_lookup(cb);
-    if ok then str = "[" + code + "] " + str; else code = ""; hint = ""; end
-    h = uicontrol(parent, "style", "pushbutton", "units", "normalized", ...
-        "position", pos, "string", str, "tag", code, "tooltipstring", hint, ...
-        "fontname", "DejaVu Sans", "fontunits", "pixels", ...
-        "fontsize", fs, "fontweight", "bold", "callback", cb, "backgroundcolor", bg);
-endfunction
-
-function h = ld3_stage_button(parent, pos, n, fs)
-    if argn(2) < 4 then fs = 9; end
-    code = ld3_stage_code(n);
-    h = uicontrol(parent, "style", "pushbutton", "units", "normalized", ...
-        "position", pos, "string", "[" + code + "]", "tag", code, ...
-        "tooltipstring", "[" + code + "] Atidaryti " + string(n) + " etapą", ...
-        "fontname", "DejaVu Sans", "fontunits", "pixels", ...
-        "fontsize", fs, "fontweight", "bold", "callback", "ld3_jump_step(" + string(n) + ")");
-endfunction
-
-// ------------------------------------------------- lentos pagelbininkai -----
 function ld3_track_board(h)
     global LD3;
-    LD3.ui.boardHandles($+1) = h;
+    if h<>[] then
+        for item=matrix(h,1,-1); LD3.ui.boardHandles($+1)=item; end
+    end
 endfunction
 
 function ld3_clear_board()
-    // Išvalo piešiamą lentos turinį (ne pačius valdiklių rėmus).
     global LD3;
-    if isfield(LD3.ui, "boardHandles") then
-        for k = 1:length(LD3.ui.boardHandles)
-            try
-                if is_handle_valid(LD3.ui.boardHandles(k)) then delete(LD3.ui.boardHandles(k)); end
-            catch
-            end
-        end
+    for k=1:length(LD3.ui.boardHandles)
+        h=LD3.ui.boardHandles(k);
+        if is_handle_valid(h) then delete(h); end
     end
-    LD3.ui.boardHandles = list();
+    LD3.ui.boardHandles=list(); LD3.term.handles=list(); LD3.term.handleIds=emptystr(0,1);
+    // Only the permanent controls survive. No stale terminal handles accumulate.
+    LD3.ui.dynamic=LD3.ui.controls;
 endfunction
 
-function h = ld3_board_text(pos, txt, fs, bold, align, bg, fg)
+function ld3_polyline(points,col)
     global LD3;
-    if argn(2) < 3 then fs = 12; end
-    if argn(2) < 4 then bold = %f; end
-    if argn(2) < 5 then align = "left"; end
-    if argn(2) < 6 then bg = [1 1 1]; end
-    if argn(2) < 7 then fg = [0.08 0.10 0.13]; end
-    h = uicontrol(LD3.ui.circuitFrame, "style", "text", "units", "normalized", ...
-        "position", pos, "string", txt, "fontsize", fs, ...
-        "fontname", "DejaVu Sans", ...
-        "horizontalalignment", align, "verticalalignment", "middle", ...
-        "backgroundcolor", bg, "foregroundcolor", fg);
-    if bold then h.fontweight = "bold"; end
-    ld3_track_board(h);
-endfunction
-
-function h = ld3_board_box(pos, title, subtitle, bg)
-    global LD3;
-    if argn(2) < 4 then bg = [0.95 0.97 0.99]; end
-    h = uicontrol(LD3.ui.circuitFrame, "style", "frame", "units", "normalized", ...
-        "position", pos, "backgroundcolor", bg, "relief", "groove");
-    tx = uicontrol(h, "style", "text", "units", "normalized", ...
-        "position", [0.05 0.54 0.90 0.34], "string", title, ...
-        "fontsize", 12, "fontweight", "bold", "horizontalalignment", "center", ...
-        "fontname", "DejaVu Sans", ...
-        "backgroundcolor", bg, "foregroundcolor", [0.08 0.12 0.18]);
-    st = uicontrol(h, "style", "text", "units", "normalized", ...
-        "position", [0.05 0.13 0.90 0.29], "string", subtitle, ...
-        "fontsize", 10, "horizontalalignment", "center", ...
-        "fontname", "DejaVu Sans", ...
-        "backgroundcolor", bg, "foregroundcolor", [0.16 0.20 0.25]);
-    ld3_track_board(h);
-endfunction
-
-function h = ld3_board_segment(x1, y1, x2, y2, color)
-    // Plonas stačiakampis kaip laido atkarpa (kaip LD1).
-    global LD3;
-    t = 0.011;
-    if abs(y2 - y1) < 0.001 then
-        x = min(x1, x2); w = max(abs(x2 - x1), 0.002);
-        pos = [x y1 - t/2 w t];
-    else
-        y = min(y1, y2); hh = max(abs(y2 - y1), 0.002);
-        pos = [x1 - t/2 y t hh];
-    end
-    h = uicontrol(LD3.ui.circuitFrame, "style", "text", "units", "normalized", ...
-        "position", pos, "string", "", "backgroundcolor", color);
-    ld3_track_board(h);
-endfunction
-
-function ld3_wire_path(x1, y1, x2, y2, color, orient)
-    // Kelias pagal orientaciją: "HVH", "VHV" arba "H" (tiesus).
-    if argn(2) < 6 then orient = "HVH"; end
-    if abs(y2 - y1) < 0.001 then orient = "H"; end
-    if abs(x2 - x1) < 0.001 then orient = "V"; end
-    select orient
-    case "H" then ld3_board_segment(x1, y1, x2, y2, color);
-    case "V" then ld3_board_segment(x1, y1, x2, y2, color);
-    case "VHV@36" then
-        // Zondo laidas: horizontalė y=36% virš R1, žemiau V poros.
-        ld3_board_segment(x1, y1, x1, 0.36, color);
-        ld3_board_segment(x1, 0.36, x2, 0.36, color);
-        ld3_board_segment(x2, 0.36, x2, y2, color);
-    case "VHV@42" then
-        ld3_board_segment(x1, y1, x1, 0.42, color);
-        ld3_board_segment(x1, 0.42, x2, 0.42, color);
-        ld3_board_segment(x2, 0.42, x2, y2, color);
-    case "VHV@28" then
-        ld3_board_segment(x1, y1, x1, 0.28, color);
-        ld3_board_segment(x1, 0.28, x2, 0.28, color);
-        ld3_board_segment(x2, 0.28, x2, y2, color);
-    case "VHV@32" then
-        // Grąžinamasis laidas: horizontalė y=32% — aiškiai žemiau V dėžės (≥11 px).
-        ld3_board_segment(x1, y1, x1, 0.32, color);
-        ld3_board_segment(x1, 0.32, x2, 0.32, color);
-        ld3_board_segment(x2, 0.32, x2, y2, color);
-    case "VHV_LOW" then
-        // Žemutinis maršrutas: horizontalė arti apatinio taško (apeina dėžutes).
-        ym = min(y1, y2) + 0.005;
-        ld3_board_segment(x1, y1, x1, ym, color);
-        ld3_board_segment(x1, ym, x2, ym, color);
-        ld3_board_segment(x2, ym, x2, y2, color);
-    case "VHV" then
-        ym = (y1 + y2) / 2;
-        ld3_board_segment(x1, y1, x1, ym, color);
-        ld3_board_segment(x1, ym, x2, ym, color);
-        ld3_board_segment(x2, ym, x2, y2, color);
-    else  // HVH
-        xm = (x1 + x2) / 2;
-        ld3_board_segment(x1, y1, xm, y1, color);
-        ld3_board_segment(xm, y1, xm, y2, color);
-        ld3_board_segment(xm, y2, x2, y2, color);
-    end
-endfunction
-
-// Gnybto simbolis ant mygtuko (kaip LD1 +/-/1/2…).
-function txt = ld3_terminal_button_text(id)
-    select id
-    case "E_P" then txt = "+";
-    case "E_N" then txt = "-";
-    case "K1" then txt = "1";
-    case "K2" then txt = "2";
-    case "A_P" then txt = "+";
-    case "A_N" then txt = "-";
-    case "R1A" then txt = "a";
-    case "R1B" then txt = "b";
-    case "V_P" then txt = "+";
-    case "V_N" then txt = "-";
-    else txt = "•";
-    end
-endfunction
-
-// Lentos išdėstymas — algoritmu, ne ranka: viršutinė eilė E-K-A su VIENODOMIS
-// paraštėmis ir VIENODAIS tarpais (terminalai ties 30 % / 70 % tarpo); apatinė
-// grupė V-R1 CENTRUOTA pagal lentos vidurį; visos poros simetriškos.
-function [term_xy, boxes] = ld3_layout()
-    m = 13;                       // paraštė = 100 px (13 % × 768 px)
-    wE = 10; wK = 8; wA = 11;     // viršutinės dėžių apimtys %
-    G = (100 - 2*m - wE - wK - wA) / 2;   // vienodi tarpai tarp dėžių
-    xE = m; xK = xE + wE + G; xA = xK + wK + G;   // kairieji kraštai
-    d = 5.5;                      // VIENODAS gnybto atsitraukimas nuo savo dėžutės
-    yT = 67.5;                    // viršutinės eilės vidurys (dėžučių y61..74)
-    term_xy = struct();
-    term_xy.E_N = [xE - d, yT];        term_xy.E_P = [xE + wE + d, yT];
-    term_xy.K1 = [xK - d, yT];         term_xy.K2 = [xK + wK + d, yT];
-    term_xy.A_P = [xA - d, yT];        term_xy.A_N = [xA + wA + d, yT];
-    // Apatinė grupė: V kairiau, R1 dešiniau, CENTRUOTA (vidurys 50 %).
-    wV = 11; wR = 14; gIn = 12;
-    grW = wV + gIn + wR;
-    xV = 50 - grW/2; xR = xV + wV + gIn;
-    term_xy.V_N = [xV - d, 40];        term_xy.V_P = [xV + wV + d, 40];
-    term_xy.R1B = [xR - d, 18];        term_xy.R1A = [xR + wR + d, 18];
-    boxes = struct();
-    boxes.E = [xE 61 wE 13]; boxes.K = [xK 61 wK 13]; boxes.A = [xA 61 wA 13];
-    boxes.V = [xV 34 wV 12]; boxes.R1 = [xR 12 wR 12];
-endfunction
-
-function xy = ld3_terminal_xy(id)
-    [all, boxes] = ld3_layout();
-    xy = all(id) / 100;
-endfunction
-
-function ld3_draw_terminal(id)
-    global LD3;
-    xy = ld3_terminal_xy(id); x = xy(1); y = xy(2);
-    w = 0.042; h = 0.050;  // kaip LD1 v1.7 kompaktiški kontaktai
-    pos = [x - w/2 y - h/2 w h];
-    cb = "ld3_terminal_click(""" + id + """)";
-    if LD3.pending == id then
-        bg = [1.00 0.82 0.28]; fg = [0.08 0.08 0.08];
-    else
-        bg = [0.08 0.39 0.37]; fg = [1 1 1];
-    end
-    tcode = ld3_terminal_code(id);
-    ht = uicontrol(LD3.ui.circuitFrame, "style", "pushbutton", "units", "normalized", ...
-        "position", pos, "string", ld3_terminal_button_text(id), ...
-        "fontsize", 9, "fontweight", "bold", "backgroundcolor", bg, ...
-        "foregroundcolor", fg, "margins", [0 0 0 0], ...
-        "tooltipstring", "[" + tcode + "] " + ld3_terminal_name(id), ...
-        "tag", tcode, "callback", cb);
-    LD3.term.handles($+1) = ht;
-    LD3.term.handleIds($+1, 1) = id;
-    LD3.ui.dynamic($+1) = ht;
-    ld3_track_board(ht);
-    // [Txx] žyma (4.2% pločio, kad nelįstų ant kaimynų); E_N — virš mygtuko.
-    if id == "E_N" then
-        ld3_board_text([x - 0.021 y + h/2 + 0.004 0.042 0.023], ...
-            "[" + tcode + "]", 8, %f, "center", [1 1 1], [0.10 0.30 0.50]);
-    else
-        ld3_board_text([x - 0.021 y - h/2 - 0.027 0.042 0.023], ...
-            "[" + tcode + "]", 8, %f, "center", [1 1 1], [0.10 0.30 0.50]);
+    for k=1:size(points,1)-1
+        ld3_track_board(student_wire(LD3.ui.circuitFrame,points(k,:),points(k+1,:),col));
     end
 endfunction
 
 function ld3_render_wires()
     global LD3;
-    if ~isfield(LD3, "ui") then return; end
-    if isfield(LD3, "fig") then
-        if ~is_handle_valid(LD3.fig) then return; end
-    end
-    if ~isfield(LD3.ui, "circuitFrame") | ~is_handle_valid(LD3.ui.circuitFrame) then return; end
-    if isfield(LD3.ui, "headless") then if LD3.ui.headless then return; end end
-    // Terminalai + laidai per piešiamąjį sluoksnį; elementų dėžutės lieka.
-    nkeep = 0;
-    keep = list();
-    if isfield(LD3.ui, "boardHandles") then
-        for k = 1:length(LD3.ui.boardHandles)
-            h = LD3.ui.boardHandles(k);
-            if is_handle_valid(h) then
-                if h.type == "uicontrol" & (h.style == "frame" | (h.style == "text" & h.tag == "")) then
-                    // dėžutės (frame) ir etikečių tekstai lieka tik ne tarp gnybtų — paprasčiau: laikom frame
-                end
-                if h.style == "frame" then keep($+1) = h; nkeep = nkeep + 1; end
-            end
+    if ~isfield(LD3,"ui") then return; end
+    if isfield(LD3.ui,"headless") then if LD3.ui.headless then return; end; end
+    if ~isfield(LD3.ui,"circuitFrame") then return; end
+    if ~is_handle_valid(LD3.ui.circuitFrame) then return; end
+    drawing=LD3.fig.immediate_drawing; LD3.fig.immediate_drawing="off";
+    ld3_clear_board(); p=LD3.ui.circuitFrame;
+    ports=[];
+    for id=matrix(ld3_terminal_ids(),1,-1); ports($+1,:)=[ld3_terminal_xy(id) 36 40]; end
+    p.user_data=struct("ports",ports);
+    student_begin_wires(p);
+    for k=1:size(LD3.wires,1)
+        a=LD3.wires(k,1); b=LD3.wires(k,2); p1=ld3_terminal_xy(a); p2=ld3_terminal_xy(b);
+        col=[0.22 0.40 0.42];
+        if or([a b]=="V_P") | or([a b]=="V_N") then col=[0.52 0.25 0.48]; end
+        // Canonical routing is independent of which endpoint is clicked first.
+        if (a=="A_N" & b=="R1A") | (b=="A_N" & a=="R1A") then
+            pts=[p1;p1(1) 0.54;p2(1) 0.54;p2];
+        elseif (a=="E_N" & b=="R1B") | (b=="E_N" & a=="R1B") then
+            if a=="E_N" then pts=[p1;p1(1) p2(2);p2]; else pts=[p1;p2(1) p1(2);p2]; end
+        elseif abs(p1(1)-p2(1))<1e-9 | abs(p1(2)-p2(2))<1e-9 then pts=[p1;p2];
+        else
+            // Invalid student wiring stays visible and is rejected by the core.
+            xm=(p1(1)+p2(1))/2; pts=[p1;xm p1(2);xm p2(2);p2];
         end
+        ld3_polyline(pts,col);
     end
-    LD3.ui.boardHandles = keep;
-    LD3.term.handles = list(); LD3.term.handleIds = emptystr(0, 1);
-    // Pirmiausia laidai (po mygtukais – kaip schemoje), tada terminalai.
-    orient = struct();
-    orient("E_P|K1") = "H";     orient("K2|A_P") = "H";
-    orient("A_N|R1A") = "VHV@42";  orient("R1B|E_N") = "VHV@32";
-    orient("V_P|R1A") = "VHV@36";  orient("V_N|R1B") = "VHV@28";
-    for m = 1:size(LD3.wires, 1)
-        p1 = ld3_terminal_xy(LD3.wires(m, 1));
-        p2 = ld3_terminal_xy(LD3.wires(m, 2));
-        key = LD3.wires(m, 1) + "|" + LD3.wires(m, 2);
-        o = "HVH";
-        if isfield(orient, key) then o = orient(key); end
-        ld3_wire_path(p1(1), p1(2), p2(1), p2(2), [0.20 0.30 0.50], o);
-        // Skieto taškas abiejose laido galuose.
-        for g = 1:2
-            if g == 1 then pp = p1; else pp = p2; end
-            h = uicontrol(LD3.ui.circuitFrame, "style", "text", "units", "normalized", ...
-                "position", [pp(1) - 0.006 pp(2) - 0.005 0.012 0.010], ...
-                "string", "", "backgroundcolor", [0.20 0.30 0.50]);
-            ld3_track_board(h);
+    [tt,bb]=ld3_layout(); ids=["E" "K" "A" "R1" "V"];
+    names=["ŠALTINIS" "JUNGIKLIS" "AMPERMETRAS" "R1" "VOLTMETRAS"];
+    switchText="Atviras"; if LD3.switchOn then switchText="Uždarytas"; end
+    powerText="Išjungtas"; if LD3.powerOn then powerText=msprintf("%d V",LD3.voltage); end
+    ampText="— mA"; if ~isnan(LD3.lastMeasurement) then ampText=msprintf("%.2f mA",LD3.lastMeasurement); end
+    vals=[powerText switchText ampText msprintf("%d Ω",LD3.cfg.R) msprintf("%d V",LD3.voltage)];
+    pairs=["E_N" "E_P";"K1" "K2";"A_P" "A_N";"R1B" "R1A";"V_N" "V_P"];
+    for k=1:5
+        r=bb(ids(k))/100; bg=[0.94 0.97 0.97];
+        for j=1:2
+            xy=tt(pairs(k,j))/100; edge=[r(1) xy(2)]; if j==2 then edge(1)=r(1)+r(3); end
+            ld3_track_board(student_wire(p,xy,edge,[0.41 0.49 0.51],"lead:"+ids(k)));
         end
+        fr=student_frame(p,r,bg); fr.tag="component:"+ids(k); ld3_track_board(fr);
+        h=student_text(fr,[0.06 0.66 0.88 0.24],names(k),12,%t,bg); h.horizontalalignment="center";
+        h=student_text(fr,[0.06 0.15 0.88 0.36],vals(k),16,%t,bg); h.horizontalalignment="center";
     end
-    tids = ld3_terminal_ids();
-    for k = 1:size(tids, "*")
-        ld3_draw_terminal(tids(k));
+    tids=ld3_terminal_ids();
+    for id=matrix(tids,1,-1)
+        bg=[0.08 0.39 0.37]; if id==LD3.pending then bg=[0.60 0.39 0.06]; end
+        cb="ld3_terminal_click("""+id+""")";
+        h=student_terminal(p,ld3_terminal_xy(id),ld3_terminal_button_text(id),ld3_terminal_code(id),cb,ld3_terminal_name(id),bg);
+        if LD3.demoMode | LD3.step<>1 then h.enable="off"; end
+        LD3.term.handles($+1)=h; LD3.term.handleIds($+1,1)=id; LD3.ui.dynamic($+1)=h; ld3_track_board(h);
     end
+    ld3_track_board(student_end_wires(p));
+    LD3.fig.immediate_drawing=drawing;
 endfunction
 
 function ld3_render_journal()
     global LD3;
-    if ~isfield(LD3, "ui") | ~isfield(LD3.ui, "journalList") then return; end
-    if isfield(LD3.ui, "headless") then if LD3.ui.headless then return; end end
-    if ~is_handle_valid(LD3.ui.journalList) then return; end
-    rows = "Matavimai:";
-    for m = 1:size(LD3.journal, 1)
-        rows($+1) = msprintf("U=%g V · I=%.2f mA", LD3.journal(m,1), LD3.journal(m,2));
+    if ~isfield(LD3,"ui") then return; end
+    if ~isfield(LD3.ui,"journalList") then return; end
+    rows="U, V         I, mA";
+    for m=1:size(LD3.journal,1)
+        rows($+1)=msprintf("%g              %.2f",LD3.journal(m,1),LD3.journal(m,2));
     end
-    LD3.ui.journalList.string = rows;
+    LD3.ui.journalList.string=rows;
 endfunction
 
 function ld3_render_stage()
     global LD3;
-    if ~isfield(LD3, "ui") then return; end
-    if isfield(LD3, "fig") then
-        if ~is_handle_valid(LD3.fig) then return; end
-    end
-    if isfield(LD3.ui, "headless") then if LD3.ui.headless then return; end end
-    if isfield(LD3.ui, "answerEdits") then
-        for k = 1:size(LD3.ui.answerEdits, "*")
-            h = LD3.ui.answerEdits(k);
-            if is_handle_valid(h) then
-                [st, sl] = ld3_answer_slot(k);
-                h.string = LD3.answers(st, sl);
-            end
+    if ~isfield(LD3,"ui") then return; end
+    if isfield(LD3.ui,"headless") then if LD3.ui.headless then return; end; end
+    if ~isfield(LD3.ui,"answerEdits") then return; end
+    row=0;
+    for k=1:8
+        [st,sl]=ld3_answer_slot(k); h=LD3.ui.answerEdits(k); lab=LD3.ui.answerLabels(k);
+        h.visible="off"; lab.visible="off";
+        if st==LD3.step then
+            yy=0.55-row*0.10; row=row+1;
+            lab.position=[0.07 yy 0.53 0.075]; h.position=[0.63 yy 0.30 0.075];
+            h.string=LD3.answers(st,sl); h.visible="on"; lab.visible="on";
         end
     end
-    for n = 1:6
-        h = findobj("tag", ld3_stage_code(n));
-        if h <> [] then
-            if LD3.done(n) then h.backgroundcolor = [0.55 0.80 0.55];
-            elseif LD3.skipped(n) then h.backgroundcolor = [0.95 0.85 0.45];
-            elseif n == LD3.step then h.backgroundcolor = [0.55 0.70 0.90];
-            else h.backgroundcolor = [0.85 0.85 0.85]; end
-        end
-    end
-    if isfield(LD3.ui, "voltLabel") & is_handle_valid(LD3.ui.voltLabel) then
-        LD3.ui.voltLabel.string = msprintf("%d V", LD3.voltage);
-    end
-    if isfield(LD3.ui, "progress") & is_handle_valid(LD3.ui.progress) then
-        nd = size(find(LD3.done), "*");
-        LD3.ui.progress.string = msprintf("%d / %d", nd, 6);
-    end
-    ld3_render_wires();
-    ld3_render_journal();
+    LD3.ui.instructionLine(1).string=student_wrap(ld3_step_instruction(LD3.step),38);
+    LD3.ui.progress.string=string(LD3.step)+" / 6 etapas";
+    LD3.ui.identity.string=student_caption(LD3.student);
+    ld3_render_wires(); ld3_render_journal(); ld3_student_sync();
 endfunction
 
-// ----------------------------------------------------------- langas ---------
 function ld3_build_gui()
     global LD3;
-    f = figure("default_axes", "off", "dockable", "off", "menubar", "none", ...
-        "toolbar", "none", "visible", "off", "axes_size", [1280 800]);
-    f.infobar_visible = "off";
-    f.figure_position = [75 75];
-    f.figure_name = "LD3 · Omo dėsnio veikimas realioje elektros grandinėje";
-    f.resize = "on";
-    LD3.fig = f;
-    ld3_was_headless = %f;
-    if isfield(LD3, "ui") then
-        if isfield(LD3.ui, "headless") then ld3_was_headless = LD3.ui.headless; end
+    f=figure("default_axes","off","dockable","off","menubar","none","toolbar","none","visible","off");
+    f.axes_size=[1280 800]; f.figure_position=[35 35]; f.infobar_visible="off";
+    f.figure_name="LD3 · Omo dėsnio stendas"; f.background=color(246,248,249); LD3.fig=f;
+    LD3.ui=struct("headless",%f,"boardHandles",list(),"dynamic",[],"controls",[]);
+    LD3.term=struct("handles",list(),"handleIds",emptystr(0,1));
+    student_text(f,[0.03 0.925 0.65 0.05],"LD3  /  Omo dėsnis",22,%t,[0.965 0.973 0.977]);
+    LD3.ui.progress=student_text(f,[0.705 0.93 0.15 0.044],"",14,%f,[0.965 0.973 0.977]);
+    LD3.ui.identity=student_text(f,[0.03 0.895 0.94 0.025],"",12,%f,[0.965 0.973 0.977]);
+    student_button(f,[0.87 0.93 0.105 0.044],"Pagalba","ld3_show_actions()");
+    p=student_frame(f,[0.025 0.12 0.655 0.77]); LD3.ui.circuitFrame=p;
+    right=student_frame(f,[0.70 0.12 0.275 0.77]); LD3.ui.right=right;
+    student_text(p,[0.04 0.87 0.92 0.065],"Omo dėsnio stendas · I = U / R",19,%t);
+    // Two unobstructed control rows. Measurement journal stays next to the circuit.
+    LD3.ui.journalList=uicontrol(p,"style","listbox","units","normalized","position",[0.04 0.13 0.28 0.25], ...
+        "string","Matavimai","fontname","DejaVu Sans","fontunits","pixels","fontsize",14,"tag","V02");
+    controls=[];
+    for k=1:3
+        vv=LD3.cfg("U"+string(k)); cb="ld3_set_voltage(LD3.cfg.U"+string(k)+")";
+        controls($+1)=ld3_button(p,[0.04+(k-1)*0.20 0.025 0.18 0.060],"U"+string(k)+" = "+string(vv)+" V",cb);
     end
-    LD3.ui = struct();
-    LD3.ui.headless = ld3_was_headless;
-    LD3.ui.boardHandles = list();
-    LD3.ui.dynamic = [];
-
-    // Antraštė (kaip LD1).
-    uicontrol(f, "style", "text", "units", "normalized", ...
-        "position", [0.018 0.938 0.964 0.049], ...
-        "string", "LD3 · OMO DĖSNIO VEIKIMAS REALIOJE ELEKTROS GRANDINĖJE", ...
-        "fontsize", 19, "fontweight", "bold", "horizontalalignment", "center", ...
-        "fontname", "DejaVu Sans", ...
-        "backgroundcolor", [0.15 0.27 0.42], "foregroundcolor", [1 1 1]);
-
-    // Navigacijos juosta: progreso tekstas + [E01]–[E06] (kaip LD1).
-    nav = uicontrol(f, "style", "frame", "units", "normalized", ...
-        "position", [0.018 0.891 0.964 0.039], "backgroundcolor", [0.87 0.91 0.96], "relief", "flat");
-    LD3.ui.progress = uicontrol(nav, "style", "text", "units", "normalized", ...
-        "position", [0.01 0.10 0.08 0.80], "string", "0 / 6", ...
-        "fontsize", 10, "fontweight", "bold", "horizontalalignment", "left", ...
-        "fontname", "DejaVu Sans", ...
-        "backgroundcolor", [0.87 0.91 0.96], "foregroundcolor", [0.12 0.22 0.34]);
-    for k = 1:6
-        xx = 0.155 + (k - 1) * 0.050;
-        ld3_stage_button(nav, [xx 0.12 0.043 0.76], k, 9);
+    controls($+1)=ld3_button(p,[0.755 0.35 0.21 0.06],"Maitinimas","ld3_toggle_power()",12);
+    controls($+1)=ld3_button(p,[0.755 0.25 0.21 0.06],"Jungiklis","ld3_toggle_switch()",12);
+    controls($+1)=ld3_button(p,[0.755 0.15 0.21 0.06],"Matuoti","ld3_measure()",13,[0.08 0.39 0.37]);
+    LD3.ui.instructionLine(1)=student_text(right,[0.07 0.64 0.86 0.31],"",14,%f);
+    LD3.ui.instructionLine(1).verticalalignment="top";
+    labels=["[A02.01] I1 teorinė, mA";"[A04.01] R1, Ω";"[A04.02] R2, Ω";"[A04.03] R3, Ω"; ...
+        "[A04.04] Rvid, Ω";"[A05.01] R iš nuolydžio, Ω";"[A06.01] Tiesinė? 1 Taip / 2 Ne";"[A06.02] R pastovi? 1 Taip / 2 Ne"];
+    LD3.ui.answerEdits=[]; LD3.ui.answerLabels=[];
+    for k=1:8
+        LD3.ui.answerLabels($+1)=student_text(right,[0.07 0.5 0.53 0.075],student_wrap(labels(k),22),14,%f);
+        [st,sl]=ld3_answer_slot(k);
+        h=uicontrol(right,"style","edit","units","normalized","position",[0.63 0.5 0.30 0.075], ...
+            "string","","fontunits","pixels","fontsize",14,"fontname","DejaVu Sans", ...
+            "tag",ld3_answer_code(st,sl),"callback","ld3_answers_changed()","backgroundcolor",[0.94 0.96 0.96]);
+        LD3.ui.answerEdits($+1)=h;
     end
-    uicontrol(nav, "style", "text", "units", "normalized", ...
-        "position", [0.50 0.10 0.48 0.80], ...
-        "string", "Bankas LD3-64-A-2026 · ataskaita: [B08]", ...
-        "fontsize", 9, "horizontalalignment", "right", ...
-        "fontname", "DejaVu Sans", "backgroundcolor", [0.87 0.91 0.96], ...
-        "foregroundcolor", [0.12 0.22 0.34]);
-
-    // Kairė: stendo lenta (kaip LD1 circuitFrame).
-    LD3.ui.circuitFrame = uicontrol(f, "style", "frame", "units", "normalized", ...
-        "position", [0.018 0.105 0.600 0.770], "backgroundcolor", [1 1 1], "relief", "groove");
-
-    // Elementų dėžutės su reikšmėmis (rezistorius rodo varžą — kaip LD1 R1/VR1).
-    [lt_xy, lb] = ld3_layout();
-    ld3_board_box(lb.E/100, "E", "0–12 V", [0.98 0.96 0.88]);
-    ld3_board_box(lb.K/100, "K", "JUNGLIS", [0.95 0.97 0.99]);
-    ld3_board_box(lb.A/100, "A", "mA", [0.95 0.97 0.99]);
-    ld3_board_box(lb.R1/100, "R1", msprintf("%d Ω", LD3.cfg.R), [0.98 0.96 0.88]);
-    ld3_board_box(lb.V/100, "V", "VOLT.", [0.95 0.97 0.99]);
-    ld3_board_text([0.03 0.78 0.30 0.03], "Omo dėsnio stendas: I = U / R", 10, %t, "left");
-
-    // Valdymo juosta: varianto U reikšmių mygtukai [B10]–[B12] + [V02] rodmuo.
-    LD3.ui.voltLabel = uicontrol(f, "style", "text", "units", "normalized", ...
-        "position", [0.032 0.148 0.052 0.030], "string", "0 V", "tag", "V02", ...
-        "tooltipstring", "[V02] Dabartinė šaltinio įtampa", "fontsize", 11, ...
-        "fontname", "DejaVu Sans", "backgroundcolor", [1 1 1]);
-    hu1 = ld3_button(f, [0.090 0.148 0.062 0.030], msprintf("U1=%dV", LD3.cfg.U1), ...
-        "ld3_set_voltage(LD3.cfg.U1)", 8);
-    hu2 = ld3_button(f, [0.156 0.148 0.062 0.030], msprintf("U2=%dV", LD3.cfg.U2), ...
-        "ld3_set_voltage(LD3.cfg.U2)", 8);
-    hu3 = ld3_button(f, [0.222 0.148 0.062 0.030], msprintf("U3=%dV", LD3.cfg.U3), ...
-        "ld3_set_voltage(LD3.cfg.U3)", 8);
-    LD3.ui.journalList = uicontrol(f, "style", "listbox", "units", "normalized", ...
-        "position", [0.030 0.195 0.150 0.075], "string", "Matavimai:", ...
-        "fontname", "DejaVu Sans", "fontunits", "pixels", "fontsize", 9);
-    hc1 = ld3_button(f, [0.240 0.148 0.095 0.030], "Maitinimas", "ld3_toggle_power()", 8);
-    hc2 = ld3_button(f, [0.340 0.148 0.080 0.030], "Junglis", "ld3_toggle_switch()", 8);
-    hc3 = ld3_button(f, [0.425 0.148 0.085 0.030], "MATUOTI", "ld3_measure()", 8, [0.08 0.39 0.37]);
-
-    // Dešinė: instrukcijos ir atsakymai (kaip LD1 dešinioji sritis).
-    panel = uicontrol(f, "style", "frame", "units", "normalized", ...
-        "position", [0.635 0.105 0.345 0.770], "backgroundcolor", [1 1 1], "relief", "groove");
-    LD3.ui.instructionLine(1) = uicontrol(f, "style", "text", "units", "normalized", ...
-        "position", [0.650 0.715 0.315 0.145], "string", ld3_step_instruction(LD3.step), ...
-        "fontname", "DejaVu Sans", "fontunits", "pixels", "fontsize", 10, ...
-        "horizontalalignment", "left", "verticalalignment", "top", "backgroundcolor", [1 1 1]);
-    etiketes = ["[A02.01] I1 teorinė, mA"; "[A04.01] R1, Ω"; "[A04.02] R2, Ω"; ...
-                "[A04.03] R3, Ω"; "[A04.04] Rvid, Ω"; "[A05.01] R (nuolydis), Ω"; ...
-                "[A06.01] Tiesinė? (1/2)"; "[A06.02] R pastovi? (1/2)"];
-    LD3.ui.answerEdits = [];
-    for k = 1:8
-        uicontrol(f, "style", "text", "units", "normalized", ...
-            "position", [0.650 0.645 - (k - 1) * 0.044 0.185 0.038], "string", etiketes(k), ...
-            "fontname", "DejaVu Sans", "fontunits", "pixels", "fontsize", 9, ...
-            "backgroundcolor", [1 1 1], "horizontalalignment", "left");
-        h = uicontrol(f, "style", "edit", "units", "normalized", ...
-            "position", [0.840 0.645 - (k - 1) * 0.044 0.125 0.038], "string", "", ...
-            "fontname", "DejaVu Sans", "fontunits", "pixels", "fontsize", 10, ...
-            "horizontalalignment", "right", "backgroundcolor", [0.97 0.98 0.98]);
-        LD3.ui.answerEdits($+1) = h;
-    end
-    LD3.ui.studentPrimary = ld3_button(f, [0.650 0.125 0.315 0.055], "TIKRINTI / TOLIAU", ...
-        "ld3_student_primary()", 13, [0.08 0.39 0.37]);
-    hb1 = ld3_button(f, [0.650 0.190 0.150 0.040], "Kaip sujungti", "ld3_show_wiring_guide()", 8);
-    hb2 = ld3_button(f, [0.815 0.190 0.150 0.040], "Žemėlapis", "ld3_show_stand_map()", 8);
-    hb3 = ld3_button(f, [0.650 0.240 0.150 0.040], "Pavyzdys", "ld3_toggle_solution()", 8);
-    hb4 = ld3_button(f, [0.815 0.240 0.150 0.040], "Ataskaita", "bench_export_current(""LD3"")", 8);
-    hb5 = ld3_button(f, [0.815 0.290 0.150 0.040], "Iš naujo", "ld3_restart()", 8);
-    hb6 = ld3_button(f, [0.650 0.290 0.150 0.040], "Atkurti stendą", "ld3_restore_stage()", 8);
-
-    // Mygtukai į dinamį sąrašą — workflow'ai ieško pagal callback (LD2 raštas).
-    LD3.ui.dynamic($+1) = LD3.ui.studentPrimary;
-    for h = [hb1 hb2 hb3 hb4 hb5 hb6 hc1 hc2 hc3 hu1 hu2 hu3]
-        LD3.ui.dynamic($+1) = h;
-    end
-
-    // Būsenos juosta (kaip LD1 apačia).
-    uicontrol(f, "style", "frame", "units", "normalized", "position", [0.018 0.012 0.964 0.080], ...
-              "backgroundcolor", [0.90 0.95 0.95], "relief", "groove");
-    LD3.ui.statusMain = uicontrol(f, "style", "text", "units", "normalized", ...
-        "position", [0.028 0.052 0.945 0.034], "string", "Paruošta.", ...
-        "fontsize", 12, "fontweight", "bold", "fontname", "DejaVu Sans", ...
-        "backgroundcolor", [0.90 0.95 0.95], "horizontalalignment", "left");
-    LD3.ui.statusFix = uicontrol(f, "style", "text", "units", "normalized", ...
-        "position", [0.028 0.018 0.945 0.034], "string", "", ...
-        "fontsize", 10, "fontname", "DejaVu Sans", ...
-        "backgroundcolor", [0.90 0.95 0.95], "horizontalalignment", "left");
-
-    // Terminalai + laidai (piešiamasis sluoksnis).
-    LD3.term = struct("handleIds", ld3_terminal_ids(), "handles", list());
-    ld3_render_wires();
-    f.visible = "on";
-    ld3_render_stage();
+    LD3.ui.studentPrimary=ld3_button(right,[0.07 0.085 0.86 0.075],"Tikrinti","ld3_student_primary()",15,[0.08 0.39 0.37]);
+    controls($+1)=LD3.ui.studentPrimary;
+    controls($+1)=ld3_button(right,[0.07 0.015 0.37 0.045],"← Atgal","ld3_jump_step(LD3.step-1)",12);
+    controls($+1)=ld3_button(right,[0.48 0.015 0.45 0.045],"Žemėlapis","ld3_show_stand_map()",12);
+    LD3.ui.controls=controls; LD3.ui.dynamic=controls;
+    LD3.ui.statusMain=student_text(f,[0.025 0.055 0.95 0.035],"",13,%t,[0.94 0.96 0.96]);
+    LD3.ui.statusFix=student_text(f,[0.025 0.020 0.95 0.035],"",12,%f,[0.94 0.96 0.96]);
+    f.visible="on"; ld3_render_stage();
 endfunction
 
+function ld3_show_actions()
+    choice=messagebox("Pagalba ir darbo veiksmai","LD3","info", ...
+        ["[B04] Kaip sujungti" "[B05] Žemėlapis" "[B07] Pavyzdys" "[B08] Ataskaita" "[B06] Atkurti stendą" "[B09] Iš naujo" "Grįžti"],"modal");
+    select choice
+    case 1 then ld3_show_wiring_guide(); case 2 then ld3_show_stand_map();
+    case 3 then ld3_toggle_solution(); case 4 then bench_export_current("LD3");
+    case 5 then ld3_restore_stage(); case 6 then ld3_restart();
+    end
+endfunction

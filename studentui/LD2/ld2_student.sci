@@ -92,12 +92,14 @@ function ld2_render_step()
     global LD2;
     if isfield(LD2.ui,"suppress_render") then if LD2.ui.suppress_render then return; end; end
     if isfield(LD2.ui,"headless") then if LD2.ui.headless then return; end; end
+    drawing=LD2.ui.figure.immediate_drawing; LD2.ui.figure.immediate_drawing="off";
     ld2_save_answers(); ld2_clear_dynamic();
     ld2_render_instructions(); ld2_render_answers(); ld2_render_action_row();
     ld2_render_stand(); ld2_render_controls(); ld2_update_nav_colors();
     LD2.ui.studentProgress.string=string(LD2.state.step)+" / 12 etapas";
     if LD2.example_active then LD2.ui.studentProgress.string="Pavyzdys · "+string(LD2.state.step); end
     if isfield(LD2.state,"student") then LD2.ui.studentIdentity.string=student_caption(LD2.state.student); end
+    LD2.ui.figure.immediate_drawing=drawing;
 endfunction
 
 function ld2_render_instructions()
@@ -347,44 +349,62 @@ function ld2_component_box(parent,pos,main,sub,bg)
     bg=[0.96 0.97 0.96]; phase=ld2_phase_for_step(LD2.state.step); step=LD2.state.step;
     if main=="GENERATORIUS" then
         pos(4)=0.24; pos(2)=0.40;
+        if phase=="RLC" then pos(3)=0.11; end
         fr=ld2_frame(parent,pos,[0.94 0.97 0.97]);
+        fr.tag="component:GEN";
         ld2_text(fr,[0.07 0.77 0.86 0.16],"ŠALTINIS",12,%t,"left",[0.94 0.97 0.97],[0.13 0.19 0.23]);
         txt=strsubst(sub," • ",ascii(10));
         ld2_text(fr,[0.07 0.31 0.86 0.40],txt,14,%t,"left",[0.94 0.97 0.97],[0.13 0.19 0.23]);
         label="Įjungti"; if LD2.state.power then label="Išjungti"; end
         h=ld2_button_reg(fr,[0.07 0.06 0.86 0.22],label,"ld2_power_toggle()",%f,%t,12); ld2_track(h);
+        h.string="<html><center>[B09]<br>"+label+"</center></html>";
         if step==2 | step==3 | step==5 | step==6 | step==8 then h.enable="off"; end
     elseif main=="A~" then
         pos(2)=0.535; pos(4)=0.19;
+        if phase=="RLC" then pos(1)=0.238; pos(3)=0.075;
+        else pos(1)=0.293; pos(3)=0.089; end
         [tx,ty]=ld2_terminal_xy(phase,"AM_H");
         ld2_wire_segment(parent,tx+0.014,ty+0.019,pos(1),ty+0.019,[0.41 0.49 0.51]);
         [tx,ty]=ld2_terminal_xy(phase,"AM_L");
         ld2_wire_segment(parent,pos(1)+pos(3),ty+0.019,tx+0.014,ty+0.019,[0.41 0.49 0.51]);
         fr=ld2_frame(parent,pos,[0.93 0.96 0.96]);
+        fr.tag="component:AM";
         ld2_text(fr,[0.06 0.77 0.88 0.16],"A~",15,%t,"center",[0.93 0.96 0.96],[0.13 0.19 0.23]);
         ld2_text(fr,[0.04 0.41 0.92 0.25],ld2_amp_display_text(),12,%t,"center",[0.93 0.96 0.96],[0.13 0.19 0.23]);
         if step==4 | step==7 | step>=9 then
             h=ld2_button_reg(fr,[0.06 0.06 0.88 0.24],"Matuoti I","ld2_measure_current()",%t,%f,12); ld2_track(h);
+            h.string="<html><center>[B14] I</center></html>";
         end
     elseif main=="V~ VOLTMETRAS" then
         if ~(step==4 | step==7 | step>=9) then return; end
-        pos=[0.41 0.115 0.28 0.17];
+        pos=[0.41 0.10 0.28 0.16];
         fr=ld2_frame(parent,pos,[0.93 0.96 0.96]);
+        fr.tag="component:VM";
         ld2_text(fr,[0.07 0.77 0.86 0.19],"VOLTMETRAS · V~",12,%t,"left",[0.93 0.96 0.96],[0.13 0.19 0.23]);
         ld2_text(fr,[0.07 0.41 0.86 0.28],ld2_volt_display_text(),19,%t,"center",[0.93 0.96 0.96],[0.13 0.19 0.23]);
-        h=ld2_button_reg(fr,[0.07 0.07 0.86 0.25],"Matuoti U","ld2_measure_voltage()",%t,%t,12); ld2_track(h);
+        h=ld2_button_reg(fr,[0.07 0.06 0.86 0.29],"Matuoti U","ld2_measure_voltage()",%t,%t,12); ld2_track(h);
     else
         eq=strindex(main," = ");
         if size(eq,"*")>0 then
             id=part(main,1:eq(1)-1);
+            if phase=="RLC" then
+                select id
+                case "C4" then pos(1)=0.415;
+                case "L3" then pos(1)=0.592;
+                case "R13" then pos(1)=0.769;
+                end
+                pos(3)=0.075;
+            else pos(1)=pos(1)+0.012; pos(3)=pos(3)-0.022; end
             [tx,ty]=ld2_terminal_xy(phase,id+"_1");
             ld2_wire_segment(parent,tx+0.014,ty+0.019,pos(1),ty+0.019,[0.41 0.49 0.51]);
             [tx,ty]=ld2_terminal_xy(phase,id+"_2");
             ld2_wire_segment(parent,pos(1)+pos(3),ty+0.019,tx+0.014,ty+0.019,[0.41 0.49 0.51]);
         end
         fr=ld2_frame(parent,pos,bg);
+        fr.tag="component:"+id;
         txt=strsubst(main," = ",ascii(10));
-        ld2_text(fr,[0.07 0.10 0.86 0.80],txt,16,%t,"center",bg,[0.13 0.19 0.23]);
+        if phase=="RLC" then txt=strsubst(txt," ",ascii(10)); end
+        ld2_text(fr,[0.07 0.10 0.86 0.80],txt,14,%t,"center",bg,[0.13 0.19 0.23]);
     end
 endfunction
 
@@ -392,30 +412,42 @@ function ld2_draw_terminal(parent,id,label,xy,active,c)
     global LD2;
     used=ld2_terminal_used(c,id); isactive=ld2_in_string_list(id,active);
     if ~used & ~isactive then return; end
-    selected=(LD2.state.selected_terminal==id);
-    if used then
-        ld2_text(parent,[xy(1)+0.009 xy(2)+0.012 0.010 0.014],"",1,%f,"center",[0.41 0.49 0.51],[0.41 0.49 0.51]);
-        return;
+    parts=tokens(id,"_"); owner=parts(1);
+    if id=="LC_M1" then owner="C4"; end
+    if id=="LC_M2" then owner="L3"; end
+    for fr=parent.children'
+        if fr.style=="frame" & fr.tag=="component:"+owner then
+            r=fr.position; center=xy+[0.014 0.019];
+            edge=[max(r(1),min(r(1)+r(3),center(1))) max(r(2),min(r(2)+r(4),center(2)))];
+            mid=[center(1) edge(2)];
+            hh=student_wire(parent,center,mid,[0.41 0.49 0.51],"lead:"+owner); if hh<>[] then ld2_track(hh); end
+            hh=student_wire(parent,mid,edge,[0.41 0.49 0.51],"lead:"+owner); if hh<>[] then ld2_track(hh); end
+        end
     end
+    selected=(LD2.state.selected_terminal==id);
     bg=[0.08 0.39 0.37]; if selected then bg=[0.85 0.59 0.16]; end
     if label=="COM" then label="C"; end
-    h=uicontrol(parent,"style","pushbutton","units","normalized", ...
-        "position",[xy(1)-0.006 xy(2)-0.006 0.040 0.050], ...
-        "string","<html>"+label+"</html>","fontsize",9,"fontweight","bold", ...
-        "margins",[0 0 0 0],"backgroundcolor",bg,"foregroundcolor",[1 1 1], ...
-        "tooltipstring",ld2_terminal_name(id), ...
-        "callback",msprintf("ld2_terminal_click(""%s"")",id));
-    if LD2.example_active then h.enable="off"; end
+    h=student_terminal(parent,xy+[0.014 0.019],label,ld2_terminal_code(id), ...
+        msprintf("ld2_terminal_click(""%s"")",id),ld2_terminal_name(id),bg);
+    if LD2.example_active | used then h.enable="off"; end
     ld2_track(h);
 endfunction
 
 function ld2_draw_phase_stand(parent,phase,step)
     global LD2;
     c=ld2_get_phase_connections(phase); active=ld2_active_terminals(step);
+    ports=[];
+    for id=matrix(ld2_terminal_ids(),1,-1)
+        if ld2_terminal_used(c,id) | ld2_in_string_list(id,active) then
+            [tx,ty]=ld2_terminal_xy(phase,id); ports($+1,:)=[tx+0.014 ty+0.019 36 40];
+        end
+    end
+    parent.user_data=struct("ports",ports);
+    student_begin_wires(parent);
     ld2_text(parent,[0.04 0.87 0.9 0.065],phase+" grandinė",19,%t,"left",[1 1 1],[0.13 0.19 0.23]);
     if step==2 | step==5 | step==8 then tip="Laidas: spauskite du gnybtus.";
     elseif step==3 | step==6 then tip="Parametrai pateikti prie komponentų.";
-    else tip="Voltmetro zondus junkite prie matuojamo elemento M lizdų."; end
+    else tip="Zondus junkite prie elemento M lizdų. Laidų tarpas sankirtoje: nesujungta."; end
     ld2_text(parent,[0.04 0.79 0.92 0.065],student_wrap(tip,72),14,%f,"left",[1 1 1],[0.38 0.45 0.48]);
     for k=1:size(c,1); ld2_draw_connection(parent,phase,c(k,1),c(k,2)); end
     if phase=="RC" then
@@ -425,6 +457,7 @@ function ld2_draw_phase_stand(parent,phase,step)
         ld2_draw_chain_common(parent,phase,msprintf("R9 = %.0f Ω",LD2.cfg.R9), ...
             msprintf("L1 = %.2f H",LD2.cfg.L1),"R9","L1",active,c);
     else ld2_draw_rlc_chain(parent,active,c); end
+    h=student_end_wires(parent); if h<>[] then ld2_track(h); end
 endfunction
 
 function ld2_draw_overview(parent)

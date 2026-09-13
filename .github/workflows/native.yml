@@ -47,6 +47,21 @@ jobs:
           "SCILAB_BIN=$target\bin\Scilex.exe" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
       - name: Scilab to C++ to HTML to folder grading
         run: python tools/test_automatic_reports.py --scilab "${{ env.SCILAB_BIN }}" --runtime studentui
+      - name: Actual Linux bench geometry
+        if: runner.os == 'Linux'
+        shell: bash
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y xvfb x11-utils python3-gi gir1.2-gtk-3.0
+          xvfb-run --auto-servernum --server-args="-screen 0 1920x1080x24" python tools/test_ergonomics.py --scilab "$SCILAB_BIN" --output "$RUNNER_TEMP/ld-ergonomics"
+      - uses: actions/upload-artifact@v4
+        if: always() && runner.os == 'Linux'
+        with:
+          name: LD-geometry-Linux
+          path: |
+            ${{ runner.temp }}/ld-ergonomics/*.log
+            ${{ runner.temp }}/ld-ergonomics/*.tsv
+            ${{ runner.temp }}/ld-ergonomics/*.png
       - name: Portable student and teacher package
         run: python tools/package_native.py --platform "${{ runner.os }}"
       - uses: actions/upload-artifact@v4

@@ -6,6 +6,8 @@ Interaktyvūs elektros grandinių laboratoriniai darbai: Scilab sąsaja, bendras
 
 Windows / Linux paketai su C++ branduoliu kuriami [GitHub Actions](https://github.com/Karpavicius82/Grandiniu_LD/actions/workflows/native.yml). Šaltinių kopijai pirmiausia reikia surinkti branduolį pagal `core/README.md`.
 
+[Stendų ergonomikos auditas](audits/ergonomics-2026-09-13/README.md): LD1–LD3 kontaktų koordinatės, 36 × 40 px paspaudimo zonos, bent 8 px tarpai, laidų sankirtos, langų vaizdai ir C++ patikra. Linux CI tikrina tikrus Scilab langus.
+
 ## Studentui
 
 Linux aplinkoje paleiskite:
@@ -37,7 +39,7 @@ procese ir uždaromi pasibaigus patikrai.
 
 - Visi 64 LD1 variantai tikrinami skaitiniu grandinės sprendikliu.
 - Visi 64 LD2 variantai atlieka visus 12 etapų (768 etapų).
-- Su 1, 17 ir 64 variantais visi LD1 ir LD2 etapai atliekami per tikrų
+- Su 1, 17 ir 64 variantais visi LD1, LD2 ir LD3 etapai atliekami per tikrų
   langų valdiklių funkcijas; tikrinamas ir duomenų išlaikymas, eksportas bei sesijos atkūrimas.
 
 Patikra praėjo su **Scilab 2026.1.0 Linux**. Žurnalai ir tikrintų failų hash:
@@ -46,7 +48,7 @@ sąsajai dar netikrintas.
 
 ## Turinys
 
-- `studentui/` – vienintelis aktyvus šaltinis: bendra studento sąsaja, LD1 ir LD2
+- `studentui/` – vienintelis aktyvus šaltinis: bendra studento sąsaja, LD1–LD3
   variantai, elementų numerių registrai (T/B/E/F/V/H/W/D/A kodai) ir automatinė patikra.
 - `audits/` – LD2 nepriklausomo kryžminio audito medžiaga, naudota prieš v2.0.
 - `dist/` – paruoštas savarankiškas studento versijos ZIP paketas.

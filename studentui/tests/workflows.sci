@@ -240,11 +240,20 @@ function bench_ld3_primary()
 endfunction
 
 function bench_ld3_answers(step,values)
-    // Student answer entry goes into the shared [6 8] raw-text store that the
-    // stage check validates; the same store feeds the exported report.
+    // GUI checks must type into visible fields, not bypass the edit callbacks.
     global LD3;
     for k=1:size(values,"*")
-        LD3.answers(step,k)=msprintf("%.12g",values(k));
+        if LD3.ui.headless then
+            LD3.answers(step,k)=msprintf("%.12g",values(k));
+        else
+            for j=1:8
+                [st,sl]=ld3_answer_slot(j);
+                if st==step & sl==k then
+                    h=LD3.ui.answerEdits(j); assert_checkequal(h.visible,"on");
+                    h.string=msprintf("%.12g",values(k)); execstr(h.callback);
+                end
+            end
+        end
     end
 endfunction
 
@@ -273,6 +282,14 @@ function bench_ld3_workflow(n,root,gui)
             bench_ld3_action("ld3_toggle_power()");
             bench_ld3_action("ld3_toggle_switch()");
             ld3_set_voltage(u(1)); bench_ld3_action("ld3_measure()");
+            if gui then
+                // Clicking Check must also collect a draft without Enter or
+                // an explicit edit callback, and retain a rejected raw answer.
+                LD3.ui.answerEdits(1).string="0";
+                bench_ld3_primary(); assert_checkfalse(LD3.done(2));
+                assert_checkequal(LD3.answers(2,1),"0");
+                LD3.ui.answerEdits(1).string=msprintf("%.12g",u(1)/cfg.R*1000);
+            end
         case 3 then
             for k=2:3
                 ld3_set_voltage(u(k)); bench_ld3_action("ld3_measure()");
