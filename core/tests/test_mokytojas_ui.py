@@ -22,6 +22,18 @@ def get(base, path, timeout=5):
         return e.code, e.read().decode("utf-8", "replace")
 
 
+def wait_finished(base, timeout=30):
+    deadline = time.monotonic() + timeout
+    while time.monotonic() < deadline:
+        code, body = get(base, "/status")
+        status = json.loads(body)
+        assert code == 200, (code, body)
+        if not status["running"] and status["state"] != "running":
+            return status
+        time.sleep(0.05)
+    raise AssertionError(f"Vertinimas nebaigtas per {timeout} s: {status}")
+
+
 def main(exe):
     with tempfile.TemporaryDirectory() as td:
         work = Path(td)
@@ -41,7 +53,9 @@ def main(exe):
         try:
             # portas iš pirmos stdout eilutės
             line = proc.stdout.readline()
-            assert "MOKYTOJAS UI: http://127.0.0.1:" in line, line
+            if "MOKYTOJAS UI: http://127.0.0.1:" not in line:
+                proc.wait(timeout=5)
+                raise AssertionError((line, proc.returncode, proc.stderr.read()))
             port = int(line.strip().rsplit(":", 1)[1])
             base = f"http://127.0.0.1:{port}"
 
@@ -61,17 +75,16 @@ def main(exe):
             # 4) paleidimas su tikrom ataskaitom
             code, body = get(base, "/start?arg=" + urllib.request.quote(str(src)))
             assert code == 200 and json.loads(body)["ok"], (code, body)
-            for _ in range(120):  # iki 30 s
-                code, body = get(base, "/status")
-                s = json.loads(body)
-                if not s["running"] and s["state"] != "running":
-                    break
-                time.sleep(0.25)
+            s = wait_finished(base)
             assert s["state"] == "done" and s["total"] == 2, s
 
             # 5) pakartotinis paleidimas iškart po pabaigos — vėl ok (dedup viduje)
             code, body = get(base, "/start?arg=" + urllib.request.quote(str(src)))
-            assert code == 200, (code, body)
+            assert code == 200 and json.loads(body)["ok"], (code, body)
+            # /start acknowledges a background job. /zurnalas correctly returns
+            # 503 until that job finishes; do not race the writer in this test.
+            s = wait_finished(base)
+            assert s["state"] == "done", s
 
             # 6) žurnalas matricoje
             code, csv = get(base, "/zurnalas")
@@ -81,15 +94,18 @@ def main(exe):
 
             # 7) klaidos kelias: neegzistuojantis kelias
             code, body = get(base, "/start?arg=" + urllib.request.quote(str(work / "nieko")))
-            for _ in range(40):
-                code, body = get(base, "/status")
-                s = json.loads(body)
-                if not s["running"] and s["state"] != "running":
-                    break
-                time.sleep(0.25)
+            assert code == 200 and json.loads(body)["ok"], (code, body)
+            s = wait_finished(base)
             assert s["state"] == "error", s
 
-            # 8) uždarymas per /quit — procesas baigiasi švariai
+            # 8) Quit immediately after starting a larger batch. The worker must
+            # be cancelled/joined before its shared state leaves scope.
+            pending = work / "nebaigti"
+            pending.mkdir()
+            for k in range(100):
+                write(pending / f"{k:03d}.html", fixture("LD1", k % 64 + 1, f"quit-{k}"))
+            code, body = get(base, "/start?arg=" + urllib.request.quote(str(pending)))
+            assert code == 200 and json.loads(body)["ok"], (code, body)
             code, body = get(base, "/quit")
             assert code == 200, (code, body)
             rc = proc.wait(timeout=10)
@@ -97,6 +113,7 @@ def main(exe):
         finally:
             if proc.poll() is None:
                 proc.kill()
+            proc.wait(timeout=10)
     print(json.dumps({"status": "PASS", "tool": "mokytojas_ui",
                       "checks": ["puslapis", "statusas", "startas", "eigis", "zurnalas",
                                  "klaidos_kelias", "404", "uzdarymas"]}))

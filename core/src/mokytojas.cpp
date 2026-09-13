@@ -840,6 +840,7 @@ int ui_run() {
     open_browser("http://127.0.0.1:" + std::to_string(port));
 
     UiState st;
+    std::thread worker;
     while (!st.quit.load()) {
         long long c = (long long)::accept(s, nullptr, nullptr);
         if (c < 0) continue;
@@ -878,10 +879,11 @@ int ui_run() {
             if (st.running.load()) { http_send(c, "application/json", "{\"ok\":false,\"error\":\"jau veikia\"}", 409); }
             else if (arg.empty()) { http_send(c, "application/json", "{\"ok\":false,\"error\":\"nenurodytas kelias\"}", 400); }
             else {
+                if (worker.joinable()) worker.join();
                 st.cancel = false; st.done = 0; st.total = 0;
                 st.set("running", "Pradedama…");
                 st.running = true;  // sinchroniškai — pirmoji /status užklausa turi matyti
-                std::thread([&, arg]() {
+                worker = std::thread([&, arg]() {
                     try {
                         int rc = mokytojas_run({arg}, [&](int k, int n) {
                             st.done = k; st.total = n;
@@ -894,7 +896,7 @@ int ui_run() {
                         st.set("error", e.what());
                     }
                     st.running = false;
-                }).detach();
+                });
                 http_send(c, "application/json", "{\"ok\":true}");
             }
         } else if (route == "/stop") {
@@ -910,6 +912,7 @@ int ui_run() {
                 http_send(c, "text/csv", body);
             }
         } else if (route == "/quit") {
+            st.cancel = true;
             http_send(c, "application/json", "{\"ok\":true}");
             CLOSESOCK((int)c);
             break;
@@ -918,6 +921,10 @@ int ui_run() {
         }
         CLOSESOCK((int)c);
     }
+    // The worker captures st by reference. It must stop before st is destroyed;
+    // detached execution here could access freed memory when the window closes.
+    st.cancel = true;
+    if (worker.joinable()) worker.join();
     CLOSESOCK(s);
 #ifdef _WIN32
     WSACleanup();
