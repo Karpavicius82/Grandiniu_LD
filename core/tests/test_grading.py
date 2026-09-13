@@ -75,7 +75,7 @@ def fixture(lab, n, identity):
         u1_, u2_, u3_ = [(3, 6, 9), (4, 8, 12), (2, 5, 8), (5, 10, 12),
                          (3, 7, 11), (6, 9, 12), (2, 6, 10), (4, 7, 10)][b]
         report["parameters"] = dict(R1nom=n1_, R2nom=n2_, R1=r1a_, R2=r2a_, U1=u1_, U2=u2_, U3=u3_)
-        vector(2, [u1_ / r1a_ * 1000], ["mA"])
+        vector(2, [u1_ / n1_ * 1000], ["mA"])
         for tag, rr in [(1, r1a_), (2, r2a_)]:
             for k, u in [(1, u1_), (2, u2_), (3, u3_)]:
                 observation(f"r{tag}u{k}", u, "V")
@@ -89,7 +89,7 @@ def fixture(lab, n, identity):
         vector(7, [1, 1], ["choice", "choice"])
         series = [["E_P", "K1"], ["K2", "A_P"], ["A_N", "R1A"], ["R1B", "R2A"],
                   ["R2B", "E_N"], ["V_P", "R1A"], ["V_N", "R2B"]]
-        report["evidence"] = dict(wiring={"s1": {"pairs": series, "meter": "DC"},
+        report["evidence"] = dict(wiring={"s1": {"pairs": [["E_P","K1"],["K2","A_P"],["A_N","R1A"],["R1B","E_N"],["V_P","R1A"],["V_N","R1B"]], "meter": "DC"},
                                           "s6": {"pairs": series, "meter": "DC"}})
     else:
         report["parameters"] = dict(E_RC=9,F_RC=frc,R8=r8,C2=4.7e-6,E_RL=9,F_RL=frl,R9=r9,L1=.5,
@@ -220,6 +220,27 @@ def main(exe):
         assert by["siunta.pdf"]["status"]=="review"
         with (root/"LD3 rezultatai"/"suvestine.csv").open(encoding="utf-8-sig",newline="") as f:
             assert len(list(csv.reader(f,delimiter=";")))==7
+        # LD4: all variants, genuine stage evidence, nominal prediction and limits.
+        ld4=root/"LD4 ataskaitos";ld4.mkdir()
+        for n in range(1,65):write(ld4/f"v{n:02d}.html",fixture("LD4",n,f"v{n}"))
+        cases={}
+        for name in ["empty", "missing_s6", "wrong_s1", "boundary", "outside", "actual_as_theory"]:
+            r=fixture("LD4",1,name)
+            if name=="empty":
+                r["answers"]=[];r["observations"]=[]
+                for stage in ["s1","s6"]:r["evidence"]["wiring"][stage]["pairs"]=[]
+                cases[name]=0
+            elif name=="missing_s6":r["evidence"]["wiring"]["s6"]["pairs"]=[];cases[name]=26
+            elif name=="wrong_s1":r["evidence"]["wiring"]["s1"]=r["evidence"]["wiring"]["s6"];cases[name]=26
+            else:
+                r["answers"][0]["raw"]={"boundary":"30.3","outside":"30.45","actual_as_theory":"31.25"}[name]
+                cases[name]=27 if name=="boundary" else 26
+            write(ld4/(name+".html"),r)
+        data,_=run(exe,ld4,root/"LD4 rezultatai")
+        for r in data["results"]:
+            assert r["status"]=="graded",r
+            assert r["points"]==cases.get(Path(r["file"]).stem,27),r
+            assert r["max_points"]==27,r
         print(json.dumps(dict(status="PASS",full_reports=650,seconds=round(seconds,3),adversarial_files=17,
                               deterministic_replay=True,conflicting_ids=True,multiple_attempts=True,utf8_paths=True,
                               ld3_batch=True)))

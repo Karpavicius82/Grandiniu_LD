@@ -7,7 +7,7 @@ function a=bench_observation(id,value,unit)
 endfunction
 
 function r=bench_report_data(lab)
-    global LD1 LD2 LD3;
+    global LD1 LD2 LD3 LD4;
     answers=list(); observations=list(); evidence=struct(); params=struct();
     mode="learning";practice=%f;
     if lab=="LD1" then
@@ -58,6 +58,7 @@ function r=bench_report_data(lab)
         evidence.wiring=struct("s1",struct("pairs",bench_pairs(LD3.wires),"meter","DC"));
         note="";
     elseif lab=="LD4" then
+        if LD4.demoMode then error("Grįžkite iš pavyzdžio į savo darbą prieš išsaugodami ataskaitą."); end
         st=LD4.student; cfg=LD4.cfg;
         if isfield(LD4,"assessment") then if LD4.assessment then mode="assessment"; end; end
         if isfield(LD4,"practice_used") then practice=LD4.practice_used; end
@@ -79,8 +80,12 @@ function r=bench_report_data(lab)
         end
         params=struct("R1nom",cfg.R1nom,"R2nom",cfg.R2nom,"R1",cfg.R1,"R2",cfg.R2, ...
                       "U1",cfg.U1,"U2",cfg.U2,"U3",cfg.U3);
-        evidence.wiring=struct("s1",struct("pairs",bench_pairs(LD4.wires),"meter","DC"), ...
-                               "s6",struct("pairs",bench_pairs(ld4_canonical_wires("S")),"meter","DC"));
+        evidence.wiring=struct();
+        for step=[1 6]
+            w=emptystr(0,2);
+            if isfield(LD4,"report_wires") then w=LD4.report_wires(step); end
+            evidence.wiring("s"+string(step))=struct("pairs",bench_pairs(w),"meter","DC");
+        end
         note="";
     else
         if LD2.example_active then error("Grįžkite iš pavyzdžio į savo darbą prieš išsaugodami ataskaitą."); end
@@ -149,19 +154,23 @@ function path=bench_export_report(lab,folder)
     bench_write_new(path,doc);
 endfunction
 
-function bench_export_current(lab)
-    global LD1 LD2 LD3;
+function path=bench_export_current(lab)
+    global LD1 LD2 LD3 LD4;
+    path="";
     try
         if lab=="LD1" then ld1_save_step_inputs();
         elseif lab=="LD3" then ld3_save_answers();
+        elseif lab=="LD4" then ld4_save_answers();
         else ld2_save_answers(); end
         path=bench_export_report(lab);
         if lab=="LD1" then ld1_set_status("Ataskaita išsaugota: "+path,"ok","Persiųskite šį HTML failą dėstytojui.");
         elseif lab=="LD3" then ld3_set_status("Ataskaita išsaugota: "+path,"ok","Persiųskite šį HTML failą dėstytojui.");
+        elseif lab=="LD4" then ld4_set_status("Ataskaita išsaugota: "+path,"ok","Persiųskite šį HTML failą dėstytojui.");
         else ld2_set_status("Ataskaita išsaugota: "+path+". Persiųskite šį HTML failą dėstytojui.","ok"); end
     catch
         if lab=="LD1" then ld1_set_status(strcat(lasterror()," "),"error","");
         elseif lab=="LD3" then ld3_set_status(strcat(lasterror()," "),"error","");
+        elseif lab=="LD4" then ld4_set_status(strcat(lasterror()," "),"error","");
         else ld2_set_status(strcat(lasterror()," "),"error"); end
     end
 endfunction

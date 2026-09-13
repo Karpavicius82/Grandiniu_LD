@@ -313,6 +313,7 @@ bool ld4_wiring(const Json& pairs,int mode,bool& valid) {
         for(int k=0;k<n;++k) canonical.insert({std::min(std::string(set[k][0]),std::string(set[k][1])),
                                                std::max(std::string(set[k][0]),std::string(set[k][1]))});
         for(auto& w:pairs) {
+            if(!w.is_array() || w.size()!=2) {valid=false;return false;}
             const auto a=text(w.at(0)),b2=text(w.at(1));
             if(a.empty()||b2.empty()) {valid=false;return false;}
             if(!unique.insert({std::min(a,b2),std::max(a,b2)}).second) return false;  // dublis
@@ -325,7 +326,7 @@ void grade_ld4(Grader& g,const Json& r,const Bank& b) {
     const double uu[3]={b.u1,b.u2,b.u3};
     const double i1m[3]={b.u1/b.r1a*1000,b.u2/b.r1a*1000,b.u3/b.r1a*1000};
     const double i2m[3]={b.u1/b.r2a*1000,b.u2/b.r2a*1000,b.u3/b.r2a*1000};
-    g.answer("s2.q1","2 etapas (teorinė prognozė): srovė I1 = U1 / R1",i1m[0],"mA","I1 = U1 / R1; mA = V / Ω × 1000.",.01,1e-9);
+    g.answer("s2.q1","2 etapas (teorinė prognozė): srovė I1 = U1 / R1nom",b.u1/b.r1n*1000,"mA","I1 = U1 / R1nom; mA = V / Ω × 1000.",.01,1e-9);
     double r1u[3],r1i[3],r2u[3],r2i[3];
     for(int k=0;k<3;++k) {
         auto s=std::to_string(k+1);
@@ -351,16 +352,13 @@ void grade_ld4(Grader& g,const Json& r,const Bank& b) {
     g.answer("s7.q1","7 etapas (išvada): ar abiejų rezistorių I(U) tiesinės",1,"choice","1 – Taip, 2 – Ne.",0,0);
     g.answer("s7.q2","7 etapas (išvada): ar δ telpa ±5 % tolerancijos ribose",1,"choice","1 – Taip, 2 – Ne.",0,0);
     const auto& w=r.at("evidence").at("wiring");
-    bool okA=true,okB=true,okC=true,ok6=true;
-    bool w1a=ld4_wiring(w.at("s1").at("pairs"),1,okA);
-    bool w1b=ld4_wiring(w.at("s1").at("pairs"),2,okB);
-    bool w1c=ld4_wiring(w.at("s1").at("pairs"),3,okC);
+    bool ok1=true,ok6=true;
+    bool w1=ld4_wiring(w.at("s1").at("pairs"),1,ok1);
     bool w6=ld4_wiring(w.at("s6").at("pairs"),3,ok6);
-    bool ok1=okA&&okB&&okC;
-    g.add("s1.wiring","1 etapas (tiesinių rezistorių stendas): sujungimas — matavimo grandinė su R1 (arba R2)",w1a||w1b||w1c,
-          ok1?"Patikrinkite seką: šaltinis → jungiklis → ampermetras → rezistorius → šaltinis; voltmetras lygiagrečiai rezistoriui.":"Sujungimo įrodymo duomenys sugadinti.",ok1?"":"missing_evidence");
+    g.add("s1.wiring","1 etapas: faktiškai sujungta R1 matavimo grandinė",w1,
+          "Trūksta teisingo R1 grandinės sujungimo įrodymo.",ok1?"":"missing_evidence");
     g.add("s6.wiring","6 etapas (nuoseklus): R1 ir R2 eilėje — laidu R1B → R2A, zondai [T11]→[T07], [T12]→[T10]",w6,
-          ok6?"Nuosekliam jungimui sujunkite R1B su R2A; grąžinamasis iš R2B į šaltinį; zondai ant R1 galų.":"Sujungimo įrodymo duomenys sugadinti.",ok6?"":"missing_evidence");
+          ok6?"Nuosekliam jungimui sujunkite R1B su R2A; grąžinamasis iš R2B į šaltinį; zondai ant viso R1+R2 junginio galų.":"Sujungimo įrodymo duomenys sugadinti.",ok6?"":"missing_evidence");
 }
 void grade_ld3(Grader& g,const Json& r,const Bank& b) {
     parameters(r,{{"R",b.r},{"U1",b.u1},{"U2",b.u2},{"U3",b.u3}});

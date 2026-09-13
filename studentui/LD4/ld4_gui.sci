@@ -15,14 +15,18 @@ function h=ld4_button(p,pos,label,cb,fs,bg)
 endfunction
 
 function [term_xy,boxes]=ld4_layout()
-    // Contacts are 36 x 40 client pixels. Short leads join each to its owner.
-    // R and V share the same horizontal extent: both probes are vertical.
-    boxes=struct("E",[4 61 15 19],"K",[33 61 13 19],"A",[62 61 16 19], ...
-        "R1",[10 36 15 14],"R2",[63 36 15 14],"V",[37 11 16 16]);
-    term_xy=struct("E_N",[1.8 70.5],"E_P",[21.5 70.5], ...
-        "K1",[31 70.5],"K2",[48.5 70.5],"A_P",[59.5 70.5],"A_N",[81.5 70.5], ...
-        "R1B",[7.5 43],"R1A",[27.5 43],"R2B",[60.5 43],"R2A",[80.5 43], ...
-        "V_N",[34.5 19],"V_P",[55.5 19]);
+    global LD4;
+    // All terminals sit outside their own component, with 36 x 40 px targets.
+    boxes=struct("E",[7 63 15 16],"K",[38.5 65 12 14],"A",[66 63 14 16], ...
+        "R1",[18 39 19 14],"R2",[54 39 19 14],"V",[35 12 21 16]);
+    term_xy=struct("E_N",[4.5 72],"E_P",[24.5 72], ...
+        "K1",[35.5 72],"K2",[53.5 72],"A_P",[63.5 72],"A_N",[83 72], ...
+        "R1A",[15 46],"R1B",[40 46],"R2A",[51 46],"R2B",[76 46], ...
+        "V_P",[32 20],"V_N",[59 20]);
+    // The voltmeter follows the measured resistor, keeping the probe leads clear.
+    m=ld4_wire_mode();
+    if m==1 then boxes.V=[18 12 19 16]; term_xy.V_P=[15 20]; term_xy.V_N=[40 20];
+    elseif m==2 then boxes.V=[54 12 19 16]; term_xy.V_P=[51 20]; term_xy.V_N=[76 20]; end
 endfunction
 
 function xy=ld4_terminal_xy(id)
@@ -83,9 +87,13 @@ function ld4_render_wires()
         if or([a b]=="V_P") | or([a b]=="V_N") then col=[0.52 0.25 0.48]; end
         // Canonical routing is independent of which endpoint is clicked first.
         if (a=="A_N" & b=="R1A") | (b=="A_N" & a=="R1A") | (a=="A_N" & b=="R2A") | (b=="A_N" & a=="R2A") then
-            pts=[p1;p1(1) 0.54;p2(1) 0.54;p2];
+            pts=[p1;p1(1) 0.57;p2(1) 0.57;p2];
         elseif (a=="E_N" & b=="R1B") | (b=="E_N" & a=="R1B") | (a=="E_N" & b=="R2B") | (b=="E_N" & a=="R2B") then
-            if a=="E_N" then pts=[p1;p1(1) p2(2);p2]; else pts=[p1;p2(1) p1(2);p2]; end
+            // Return rail is below both resistors. Probe crossings use gaps.
+            pts=[p1;p1(1) 0.34;p2(1) 0.34;p2];
+        elseif or([a b]=="V_P") | or([a b]=="V_N") then
+            if a=="V_P" | a=="V_N" then pts=[p1;p2(1) p1(2);p2];
+            else pts=[p1;p1(1) p2(2);p2]; end
         elseif (a=="R1B" & b=="R2A") | (b=="R1B" & a=="R2A") then
             pts=[p1;p2];  // nuoseklus tiltas tarp gretimų rezistorių — tiesus
         elseif abs(p1(1)-p2(1))<1e-9 | abs(p1(2)-p2(2))<1e-9 then pts=[p1;p2];
@@ -99,10 +107,12 @@ function ld4_render_wires()
     names=["ŠALTINIS" "JUNGIKLIS" "AMPERMETRAS" "R1" "R2" "VOLTMETRAS"];
     switchText="Atviras"; if LD4.switchOn then switchText="Uždarytas"; end
     powerText="Išjungtas"; if LD4.powerOn then powerText=msprintf("%d V",LD4.voltage); end
-    ampText="— mA"; if ~isnan(LD4.lastMeasurement) then ampText=msprintf("%.2f mA",LD4.lastMeasurement); end
+    [u,i,valid,reason]=ld4_measure_values();
+    ampText="— mA"; voltText="— V";
+    if valid then ampText=msprintf("%.3f mA",i); voltText=msprintf("%g V",u); end
     vals=[powerText switchText ampText msprintf("%d Ω ±5%%",LD4.cfg.R1nom) ...
-          msprintf("%d Ω ±5%%",LD4.cfg.R2nom) msprintf("%d V",LD4.voltage)];
-    pairs=["E_N" "E_P";"K1" "K2";"A_P" "A_N";"R1B" "R1A";"R2B" "R2A";"V_N" "V_P"];
+          msprintf("%d Ω ±5%%",LD4.cfg.R2nom) voltText];
+    pairs=["E_N" "E_P";"K1" "K2";"A_P" "A_N";"R1A" "R1B";"R2A" "R2B";"V_P" "V_N"];
     for k=1:6
         r=bb(ids(k))/100; bg=[0.94 0.97 0.97];
         for j=1:2
@@ -112,6 +122,7 @@ function ld4_render_wires()
         fr=student_frame(p,r,bg); fr.tag="component:"+ids(k); ld4_track_board(fr);
         h=student_text(fr,[0.06 0.66 0.88 0.24],names(k),12,%t,bg); h.horizontalalignment="center";
         h=student_text(fr,[0.06 0.15 0.88 0.36],vals(k),16,%t,bg); h.horizontalalignment="center";
+        h.tag="reading:"+ids(k);
     end
     tids=ld4_terminal_ids();
     for id=matrix(tids,1,-1)
@@ -122,6 +133,7 @@ function ld4_render_wires()
         LD4.term.handles($+1)=h; LD4.term.handleIds($+1,1)=id; LD4.ui.dynamic($+1)=h; ld4_track_board(h);
     end
     ld4_track_board(student_end_wires(p));
+    ld4_font(p);
     LD4.fig.immediate_drawing=drawing;
 endfunction
 
@@ -129,9 +141,12 @@ function ld4_render_journal()
     global LD4;
     if ~isfield(LD4,"ui") then return; end
     if ~isfield(LD4.ui,"journalList") then return; end
-    rows="U, V         I, mA";
-    for m=1:size(LD4.journal,1)
-        rows($+1)=msprintf("%g              %.2f",LD4.journal(m,1),LD4.journal(m,2));
+    rows="Rezistorius       U, V          I, mA"; names=["R1" "R2" "R1+R2"];
+    for tag=1:3
+        measurements=ld4_journal_rows(tag);
+        for k=1:size(measurements,1)
+            rows($+1)=msprintf("%s                 %g              %.3f",names(tag),measurements(k,1),measurements(k,2));
+        end
     end
     LD4.ui.journalList.string=rows;
 endfunction
@@ -170,9 +185,9 @@ function ld4_build_gui()
     student_button(f,[0.87 0.93 0.105 0.044],"Pagalba","ld4_show_actions()");
     p=student_frame(f,[0.025 0.12 0.655 0.77]); LD4.ui.circuitFrame=p;
     right=student_frame(f,[0.70 0.12 0.275 0.77]); LD4.ui.right=right;
-    student_text(p,[0.04 0.87 0.92 0.065],"Omo dėsnio stendas · I = U / R",19,%t);
+    student_text(p,[0.79 0.82 0.19 0.15],student_wrap("Laidas: spauskite abu galus. Pakartoję — pašalinsite. Tarpas sankirtoje: nesujungta.",22),12,%f);
     // Two unobstructed control rows. Measurement journal stays next to the circuit.
-    LD4.ui.journalList=uicontrol(p,"style","listbox","units","normalized","position",[0.04 0.13 0.28 0.25], ...
+    LD4.ui.journalList=uicontrol(p,"style","listbox","units","normalized","position",[0.04 0.82 0.73 0.15], ...
         "string","Matavimai","fontname","DejaVu Sans","fontunits","pixels","fontsize",14,"tag","V02");
     controls=[];
     for k=1:3
@@ -180,9 +195,9 @@ function ld4_build_gui()
         controls($+1)=ld4_button(p,[0.02+(k-1)*0.165 0.025 0.155 0.060],"U"+string(k)+" = "+string(vv)+" V",cb);
     end
     controls($+1)=ld4_button(p,[0.515 0.025 0.155 0.060],"Į R2","ld4_set_resistor(2)",12,[0.52 0.25 0.48]);
-    controls($+1)=ld4_button(p,[0.755 0.35 0.21 0.06],"Maitinimas","ld4_toggle_power()",12);
-    controls($+1)=ld4_button(p,[0.755 0.25 0.21 0.06],"Jungiklis","ld4_toggle_switch()",12);
-    controls($+1)=ld4_button(p,[0.755 0.15 0.21 0.06],"Matuoti","ld4_measure()",13,[0.08 0.39 0.37]);
+    controls($+1)=ld4_button(p,[0.80 0.40 0.18 0.06],"Maitinimas","ld4_toggle_power()",12);
+    controls($+1)=ld4_button(p,[0.80 0.30 0.18 0.06],"Jungiklis","ld4_toggle_switch()",12);
+    controls($+1)=ld4_button(p,[0.80 0.20 0.18 0.06],"Matuoti","ld4_measure()",13,[0.08 0.39 0.37]);
     LD4.ui.instructionLine(1)=student_text(right,[0.07 0.64 0.86 0.31],"",14,%f);
     LD4.ui.instructionLine(1).verticalalignment="top";
     labels=["[A02.01] I1 teorinė, mA";"[A04.01] R1m, Ω";"[A04.02] R2m, Ω";"[A04.03] δ1, %"; ...
@@ -204,7 +219,7 @@ function ld4_build_gui()
     LD4.ui.controls=controls; LD4.ui.dynamic=controls;
     LD4.ui.statusMain=student_text(f,[0.025 0.055 0.95 0.035],"",13,%t,[0.94 0.96 0.96]);
     LD4.ui.statusFix=student_text(f,[0.025 0.020 0.95 0.035],"",12,%f,[0.94 0.96 0.96]);
-    f.visible="on"; ld4_render_stage();
+    ld4_font(f); f.visible="on"; ld4_render_stage();
 endfunction
 
 function ld4_show_actions()
@@ -214,5 +229,15 @@ function ld4_show_actions()
     case 1 then ld4_show_wiring_guide(); case 2 then ld4_show_stand_map();
     case 3 then ld4_toggle_solution(); case 4 then bench_export_current("LD4");
     case 5 then ld4_restore_stage(); case 6 then ld4_restart();
+    end
+endfunction
+
+// Java logical font exists on both Windows and Linux; no external font install.
+function ld4_font(parent)
+    for h=matrix(parent.children,1,-1)
+        if h.type=="uicontrol" then
+            h.fontname="SansSerif";
+            ld4_font(h);
+        end
     end
 endfunction

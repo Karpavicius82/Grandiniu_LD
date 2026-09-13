@@ -51,7 +51,7 @@ try
             cfg=LD2.cfg; ref=ld2_reference_rlc_values(5,f,cfg.R13,cfg.L3,cfg.C4);v=bench_cpp_ac(3,5,f,cfg.R13,cfg.L3,cfg.C4);
             assert_checkalmostequal(v([4 5 6 7 8 9]),[ref.I ref.UR ref.UL ref.UC ref.ULC ref.P],1e-9,1e-9);
         end
-        mprintf("AUTOMATIC V%02d: LD1 + LD2 + LD3 HTML exported\n",n);
+        mprintf("AUTOMATIC V%02d: LD1 + LD2 + LD3 + LD4 HTML exported\n",n);
     end
     // Native atomic storage preserves raw text and binary local snapshots.
     LD1.stepQ(2,1)="1330,012345";
@@ -82,7 +82,7 @@ try
     end
     [p,status]=bench_batch_call(4,folder,output);assert_checkequal(status,1);
     assert_checkequal(p(1),257);assert_checkequal(p(3),257);assert_checkequal(p(4),0);
-    mprintf("AUTOMATIC_PASS: 192 full reports + wrong/missing answers, C++ CFFI folder grading, UTF-8 HTML\n");
+    mprintf("AUTOMATIC_PASS: 256 full reports + wrong/missing answers, C++ CFFI folder grading, UTF-8 HTML\n");
     exit(0);
 catch
     mprintf("AUTOMATIC_FAIL: %s\n",strcat(lasterror()," | "));exit(1);

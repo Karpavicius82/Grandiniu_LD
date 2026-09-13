@@ -57,7 +57,7 @@ endfunction
 
 function ld4_jump_step(n)
     global LD4;
-    if n<1 | n>6 then return; end
+    if n<1 | n>7 then return; end
     if n <= LD4.step | LD4.done(n) | LD4.skipped(n) then
         ld4_set_step(n);
     else

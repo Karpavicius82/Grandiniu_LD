@@ -388,17 +388,16 @@ function bench_ld4_workflow(n,root,gui)
         case 1 then
             for k=1:size(W,1); bench_ld4_click(W(k,1)); bench_ld4_click(W(k,2)); end
         case 2 then
-            bench_ld4_answers(step,u(1)/cfg.R1*1000);
+            bench_ld4_answers(step,u(1)/cfg.R1nom*1000);
             bench_ld4_action("ld4_toggle_power()");
             bench_ld4_action("ld4_toggle_switch()");
-            ld4_set_voltage(u(1)); bench_ld4_action("ld4_measure()");
-            for k=2:3
-                ld4_set_voltage(u(k)); bench_ld4_action("ld4_measure()");
+            for k=3:-1:1
+                bench_ld4_action(msprintf("ld4_set_voltage(LD4.cfg.U%d)",k)); bench_ld4_action("ld4_measure()");
             end
         case 3 then
             bench_ld4_action("ld4_set_resistor(2)");
             for k=1:3
-                ld4_set_voltage(u(k)); bench_ld4_action("ld4_measure()");
+                bench_ld4_action(msprintf("ld4_set_voltage(LD4.cfg.U%d)",k)); bench_ld4_action("ld4_measure()");
             end
         case 4 then
             r1m=(LD4.journal(1,1)/LD4.journal(1,2)+LD4.journal(2,1)/LD4.journal(2,2)+LD4.journal(3,1)/LD4.journal(3,2))/3*1000;
@@ -409,8 +408,13 @@ function bench_ld4_workflow(n,root,gui)
             r2s=(LD4.journal(6,1)-LD4.journal(4,1))/((LD4.journal(6,2)-LD4.journal(4,2))/1000);
             bench_ld4_answers(step,[r1s r2s 1000/r2s]);
         case 6 then
-            LD4.wires=ld4_canonical_wires("S");
-            ld4_set_voltage(u(3)); bench_ld4_action("ld4_measure()");
+            // Remove the old R2 feed/probe through actual terminal callbacks.
+            bench_ld4_click("A_N"); bench_ld4_click("R2A");
+            bench_ld4_click("V_P"); bench_ld4_click("R2A");
+            for wire=["A_N" "R1A";"R1B" "R2A";"V_P" "R1A"]'
+                bench_ld4_click(wire(1)); bench_ld4_click(wire(2));
+            end
+            bench_ld4_action("ld4_set_voltage(LD4.cfg.U3)"); bench_ld4_action("ld4_measure()");
             bench_ld4_answers(step,LD4.journal(7,1)/LD4.journal(7,2)*1000);
         case 7 then
             bench_ld4_answers(step,[1 1]);
@@ -433,7 +437,9 @@ function bench_ld4_workflow(n,root,gui)
     assert_checktrue(and(LD4.done));
     assert_checkequal(LD4.student.number,n);
     if gui then
-        bench_export_report("LD4",root+"tests/results/");
+                old=getenv("LD_DATA_DIR",""); setenv("LD_DATA_DIR",root+"tests/results/");
+        path=bench_export_current("LD4"); setenv("LD_DATA_DIR",old);
+        assert_checktrue(path<>""); assert_checktrue(isfile(path));
         if isfield(LD4,"fig") then delete(LD4.fig); end
     end
 endfunction

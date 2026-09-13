@@ -15,6 +15,7 @@ function m = ld4_wire_mode()
     // Dabartinis režimas pagal etapą: 2 = R1, 3 = R2, 6 = nuoseklus, kiti = kaip ankstesnis.
     global LD4;
     select LD4.step
+    case 1 then m = 1;
     case 2 then m = 1;
     case 3 then m = 2;
     case 6 then m = "S";
@@ -27,18 +28,18 @@ function [ok, reason] = ld4_wiring_valid(wires)
     ok = %f; reason = "";
     m = ld4_wire_mode();
     canon = ld4_canonical_wires(m);
-    if ~isfield(LD4, "wires") | LD4.wires == [] then
+    if wires == [] then
         reason = "Grandinė nesujungta: seką rodys [B04] KAIP SUJUNGTI.";
         return;
     end
-    if size(LD4.wires, 1) > size(canon, 1) then
-        reason = "Per daug laidų (riba " + string(size(canon,1)) + ").";
+    if size(wires, 1) <> size(canon, 1) then
+        reason = "Reikia " + string(size(canon,1)) + " laidų.";
         return;
     end
     for k = 1:size(canon, 1)
         rasta = %f;
-        for mm = 1:size(LD4.wires, 1)
-            par = [LD4.wires(mm,1) LD4.wires(mm,2)];
+        for mm = 1:size(wires, 1)
+            par = [wires(mm,1) wires(mm,2)];
             if and(par == canon(k,:)) | and(par == canon(k, [2 1])) then rasta = %t; end
         end
         if ~rasta then
@@ -68,9 +69,13 @@ function [u, i, ok, msg] = ld4_measure_values()
     if LD4.voltage <= 0 then msg = "Įtampa 0 V: nustatykite mygtuku [B10]/[B11]/[B12]."; return; end
     [wok, wwhy] = ld4_wiring_valid(LD4.wires);
     if ~wok then msg = wwhy; return; end
-    u = LD4.voltage;
-    i = LD4.voltage / ld4_active_resistance() * 1000;
-    ok = %t;
+    bench_core_require();
+    m=ld4_wire_mode();
+    if m=="S" then edges=[1 3 LD4.cfg.R1;3 2 LD4.cfg.R2]; reachable=[%t %t %t];
+    else edges=[1 2 ld4_active_resistance()]; reachable=[%t %t]; end
+    [volts,currents,status]=bench_cpp_dc(edges,reachable,1,2,LD4.voltage);
+    if status<>0 then msg="C++ grandinės skaičiavimas nepavyko."; return; end
+    u=volts(1)-volts(2); i=currents(1)*1000; ok=%t;
 endfunction
 
 function ld4_init_state()
@@ -88,6 +93,8 @@ function ld4_init_state()
     LD4.lastMeasurement = %nan;
     LD4.pending = "";
     LD4.wireMode = 1;
+    LD4.report_wires=list();
+    for k=1:7; LD4.report_wires(k)=emptystr(0,2); end
 endfunction
 
 function expected = ld4_expected_answers()
@@ -95,7 +102,7 @@ function expected = ld4_expected_answers()
     global LD4;
     expected = emptystr(7, 8);
     cfg = LD4.cfg;
-    expected(2,1) = msprintf("%.10g", cfg.U1 / cfg.R1 * 1000);        // A02.01 teorinė I1 (R1)
+    expected(2,1) = msprintf("%.10g", cfg.U1 / cfg.R1nom * 1000);        // A02.01 teorinė I1 (R1)
     r1 = ld4_journal_rows(1); r2 = ld4_journal_rows(2); rs = ld4_journal_rows(3);
     if size(r1, 1) >= 3 then
         rr = mean(r1(:,1) ./ (r1(:,2) / 1000));
@@ -132,5 +139,8 @@ function rows = ld4_journal_rows(tag)
     if ~isfield(LD4, "journal") | LD4.journal == [] then return; end
     for m = 1:size(LD4.journal, 1)
         if LD4.journal(m, 3) == tag then rows($+1, :) = LD4.journal(m, 1:2); end
+    end
+    if size(rows,1)>1 then
+        [unused,order]=gsort(rows(:,1),"g","i"); rows=rows(order,:);
     end
 endfunction

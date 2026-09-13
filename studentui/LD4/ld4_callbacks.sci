@@ -4,45 +4,44 @@
 
 function ld4_terminal_click(id)
     global LD4;
-    if LD4.demoMode then ld4_set_status("Pavyzdyje laidai jau sujungti.","info","Grįžkite paspaudę [B07]."); return; end
-    if LD4.step ~= 1 & LD4.step ~= 3 & LD4.step ~= 6 & ~LD4.done(1) then
-        ld4_set_status("Pirmiausia užbaikite 1 etapo sujungimą.","error","Etapą atveria [E01].");
-        return;
-    end
-    if LD4.pending == "" then
-        LD4.pending = id;
-        ld4_set_status("Pasirinktas [T" + part(ld4_terminal_code(id), 2:3) + "] " + ld4_terminal_name(id) + ".","info","Dabar spauskite antrąjį sujungiamą gnybtą.");
+    if LD4.demoMode then return; end
+    if ~or(LD4.step==[1 6]) then return; end
+    if ~or(ld4_terminal_ids()==id) then return; end
+    if LD4.pending=="" then
+        LD4.pending=id;
+        ld4_set_status("Pasirinktas ["+ld4_terminal_code(id)+"] "+ld4_terminal_name(id),"info","Spauskite kitą gnybtą. Esamas laidas tarp tų pačių gnybtų bus pašalintas.");
     else
-        if id == LD4.pending then
-            LD4.pending = "";
-            ld4_set_status("Pasirinkimas atšauktas.","info","");
-            return;
+        first=LD4.pending; LD4.pending="";
+        if first<>id then
+            found=0;
+            for k=1:size(LD4.wires,1)
+                if and(LD4.wires(k,:)==[first id]) | and(LD4.wires(k,:)==[id first]) then found=k; break; end
+            end
+            if found>0 then
+                LD4.wires(found,:)=[];
+                ld4_set_status("Laidas pašalintas.","ok","");
+            else
+                uses1=sum(LD4.wires==first); uses2=sum(LD4.wires==id);
+                if uses1>=2 | uses2>=2 then
+                    ld4_set_status("Gnybte jau yra du laidai.","error","Pirma pašalinkite netinkamą laidą, paspausdami abu jo galus.");
+                    ld4_render_wires(); return;
+                end
+                LD4.wires($+1,:)=[first id];
+                ld4_set_status("Laidas pridėtas.","ok","Laidą pašalinsite dar kartą paspaudę abu jo galus.");
+            end
+            LD4.done(LD4.step)=%f; LD4.report_wires(LD4.step)=emptystr(0,2);
+            LD4.lastMeasurement=%nan;
         end
-        uses = 0;
-        for m = 1:size(LD4.wires, 1)
-            if LD4.wires(m,1) == id | LD4.wires(m,2) == id then uses = uses + 1; end
-        end
-        if uses >= 2 then
-            LD4.pending = "";
-            ld4_set_status("Gnybtas [T" + part(ld4_terminal_code(id), 2:3) + "] jau su dviem laidais.","error","Zondai prispaudžiami ant rezistoriaus gnybtų.");
-            return;
-        end
-        LD4.wires($+1, :) = [LD4.pending, id];
-        LD4.pending = "";
-        [wok] = ld4_wiring_valid(LD4.wires);
-        m = ld4_wire_mode(); nmax = size(ld4_canonical_wires(m), 1);
-        ld4_set_status("Laidas pridėtas (" + string(size(LD4.wires,1)) + "/" + string(nmax) + ").","ok","");
     end
-    if isfield(LD4, "ui") then
-        if ~isfield(LD4.ui, "headless") | ~LD4.ui.headless then ld4_render_wires(); end
-    end
+    ld4_render_wires(); ld4_student_sync();
 endfunction
 
 function ld4_toggle_power()
     global LD4;
     LD4.powerOn = ~LD4.powerOn;
-    if LD4.powerOn then ld4_set_status("[B01] Maitinimas įJUNGTAS.","ok","Dabar uždarykite jungiklį [B02].");
-    else ld4_set_status("[B01] Maitinimas iŠJUNGTAS.","info","Įtampa neveikia."); end
+    if LD4.powerOn then ld4_set_status("[B01] Maitinimas ĮJUNGTAS.","ok","Dabar uždarykite jungiklį [B02].");
+    else ld4_set_status("[B01] Maitinimas IŠJUNGTAS.","info","Įtampa neveikia."); end
+    ld4_render_wires();
 endfunction
 
 function ld4_toggle_switch()
@@ -50,6 +49,7 @@ function ld4_toggle_switch()
     if ~LD4.powerOn then ld4_set_status("Negalima jungti be maitinimo.","error","Pirmiausia [B01] MAITINIMAS."); return; end
     LD4.switchOn = ~LD4.switchOn;
     if LD4.switchOn then ld4_set_status("[B02] Jungiklis UŽDARYTAS.","ok","Nustatykite įtampą [B10]–[B12] ir matuokite [B03]."); end
+    ld4_render_wires();
 endfunction
 
 function ld4_set_resistor(k)
@@ -69,14 +69,9 @@ endfunction
 
 function ld4_set_voltage(v)
     global LD4;
-    if argn(2) < 1 then v = 0; end
-    LD4.voltage = max(0, min(12, round(v)));
-    if isfield(LD4, "ui") then
-        if isfield(LD4.ui, "headless") then if LD4.ui.headless then return; end end
-        if isfield(LD4.ui, "voltLabel") & is_handle_valid(LD4.ui.voltLabel) then
-            LD4.ui.voltLabel.string = msprintf("%d V", LD4.voltage);
-        end
-    end
+    if ~or(v==[LD4.cfg.U1 LD4.cfg.U2 LD4.cfg.U3]) then return; end
+    LD4.voltage=v; LD4.lastMeasurement=%nan;
+    ld4_render_wires();
 endfunction
 
 function ld4_measure()
@@ -89,6 +84,9 @@ function ld4_measure()
     end
     m = ld4_wire_mode();
     tag = 1; if m == 2 then tag = 2; elseif m == "S" then tag = 3; end
+    if tag==3 & abs(u-LD4.cfg.U3)>1e-9 then
+        ld4_set_status("Nuoseklų jungimą matuokite ties U3.","error","Paspauskite [B12], tada [B03]."); return;
+    end
     rows = ld4_journal_rows(tag);
     for mm = 1:size(rows, 1)
         if abs(rows(mm,1) - u) < 1e-9 then
@@ -102,35 +100,39 @@ function ld4_measure()
     end
     LD4.journal($+1, :) = [u, i, tag];
     LD4.lastMeasurement = i;
+    if tag==3 then LD4.report_wires(6)=LD4.wires; end
     kokia = "R1"; if tag == 2 then kokia = "R2"; elseif tag == 3 then kokia = "R1+R2"; end
     ld4_set_status(msprintf("Užfiksuota (%s): U = %g V, I = %.2f mA (%d/3).", kokia, u, i, size(ld4_journal_rows(tag),1)), "ok","Rodmuo [V02] ir matavimų sąrašas.");
     if isfield(LD4, "ui") then
-        if ~isfield(LD4.ui, "headless") | ~LD4.ui.headless then ld4_render_journal(); end
+        if ~isfield(LD4.ui, "headless") | ~LD4.ui.headless then ld4_render_journal(); ld4_render_wires(); end
     end
 endfunction
 
-function ok = ld4_close_enough(userValue, expectedValue)
-    if isnan(userValue) | isnan(expectedValue) then ok = %f; return; end
-    scale = max([abs(expectedValue), 1e-9]);
-    ok = abs(userValue - expectedValue) <= 0.02 * scale;
+function ok = ld4_close_enough(userValue, expectedValue, rel, absolute)
+    if argn(2)<3 then rel=0.02; end
+    if argn(2)<4 then absolute=0.005; end
+    ok=%f;
+    if isnan(userValue) | isnan(expectedValue) | isinf(userValue) | isinf(expectedValue) then return; end
+    ok=abs(userValue-expectedValue)<=absolute+rel*abs(expectedValue);
 endfunction
 
 function ld4_check_step()
     global LD4;
     n = LD4.step;
+    if LD4.demoMode then return; end
     if n <= 7 & LD4.done(n) then ld4_set_status("Etapas jau atliktas.","ok","Spauskite TOLIAU."); return; end
     select n
     case 1 then
         [wok, wwhy] = ld4_wiring_valid(LD4.wires);
         if ~wok then ld4_set_status(wwhy, "error", "Seką rodo [B04] KAIP SUJUNGTI."); return; end
         LD4.wireMode = 1;
-        LD4.done(1) = %t;
+        LD4.done(1) = %t; LD4.report_wires(1)=LD4.wires;
         ld4_set_status("1 etapas baigtas: R1 grandinė sujungta.","ok","[E02] — teorinė prognozė.");
     case 2 then
         v = ld4_parse_number(LD4.answers(2,1));
-        e = LD4.cfg.U1 / LD4.cfg.R1 * 1000;
+        e = LD4.cfg.U1 / LD4.cfg.R1nom * 1000;
         if isnan(v) then ld4_set_status("Įrašykite teorinę srovę [A02.01], mA.","error","I = U1 / R1 · 1000."); return; end
-        if ~ld4_close_enough(v, e) then ld4_set_status("Teorinė srovė [A02.01] netiksli.","error",msprintf("Tikimasi ≈ %.2f mA.", e)); return; end
+        if ~ld4_close_enough(v, e,0.01,1e-9) then ld4_set_status("Teorinė srovė [A02.01] netiksli.","error",msprintf("Tikimasi ≈ %.2f mA.", e)); return; end
         if size(ld4_journal_rows(1), 1) < 3 then
             ld4_set_status("Trūksta R1 matavimo taškų.","error","[B10]/[B11]/[B12] ir [B03] — trys taškai."); return; end
         LD4.done(2) = %t;
@@ -151,7 +153,7 @@ function ld4_check_step()
             if isnan(v) then ld4_set_status("Įrašykite [" + etik(k) + "].","error","R = U/I; δ = (Rm/Rnom − 1)·100 %."); return; end
             if isnan(e) then ld4_set_status("Trūksta matavimų šiam skaičiavimui.","error","Patikrinkite 2–3 etapų žurnalą."); return; end
             tol = 0.02; if k >= 3 then tol = 0.05; end   // δ% leidžia platesnę ribą
-            if abs(v - e) > tol * max([abs(e), 1e-9]) then
+            if ~ld4_close_enough(v,e,tol,0.005) then
                 ld4_set_status("[" + etik(k) + "] netikslus.","error",msprintf("Tikimasi ≈ %s.", exp(4,k))); return; end
         end
         LD4.done(4) = %t;
@@ -181,11 +183,11 @@ function ld4_check_step()
         if isnan(e) | ~ld4_close_enough(v, e) then
             ld4_set_status("[A06.01] netikslus.","error",msprintf("Tikimasi ≈ %s (Rs = R1 + R2).", exp(6,1))); return; end
         LD4.wireMode = "S";
-        LD4.done(6) = %t;
+        LD4.done(6) = %t; LD4.report_wires(6)=LD4.wires;
         ld4_set_status("6 etapas baigtas: Rs = R1 + R2 patikrinta.","ok","[E07] — išvados.");
     case 7 then
-        if LD4.answers(7,1) ~= "1" then ld4_set_status("[A07.01]: atsakykite 1 arba 2.","error","1 – Taip, 2 – Ne."); return; end
-        if LD4.answers(7,2) ~= "1" then ld4_set_status("[A07.02]: atsakykite 1 arba 2.","error","Ar δ ≤ 5 %?"); return; end
+        if ld4_parse_number(LD4.answers(7,1)) ~= 1 then ld4_set_status("[A07.01]: atsakykite 1 arba 2.","error","1 – Taip, 2 – Ne."); return; end
+        if ld4_parse_number(LD4.answers(7,2)) ~= 1 then ld4_set_status("[A07.02]: atsakykite 1 arba 2.","error","Ar δ ≤ 5 %?"); return; end
         LD4.done(7) = %t;
         ld4_set_status("7 etapas baigtas: darbas atliktas!","ok","[B08] ATASKAITA DĖSTYTOJUI sukuria HTML ataskaitą.");
     end
@@ -212,9 +214,6 @@ function ld4_set_step(n)
     if isfield(LD4, "ui") then
         if ~isfield(LD4.ui, "headless") | ~LD4.ui.headless then
             ld4_render_stage();
-            if isfield(LD4.ui, "instructionLine") & is_handle_valid(LD4.ui.instructionLine(1)) then
-                LD4.ui.instructionLine(1).string = ld4_step_instruction(n);
-            end
         end
     end
 endfunction
@@ -224,11 +223,11 @@ function s = ld4_step_instruction(n)
     cfg = LD4.cfg;
     select n
     case 1 then s = "Sujunkite grandinę su R1: [T01]→[T03], [T04]→[T05], [T06]→[T07], [T08]→[T02], zondai [T11]→[T07], [T12]→[T08]. Maitinimas [B01] išjungtas.";
-    case 2 then s = msprintf("Apskaičiuokite teorinę I1 = U1/R1·1000 (U1=%d V, R1nom=%d Ω) → [A02.01]. Tada [B01], [B02], [B10] U1=%d V, [B03]; [B11] U2=%d V, [B03]; [B12] U3=%d V, [B03].", cfg.U1, cfg.R1nom, cfg.U1, cfg.U2, cfg.U3);
+    case 2 then s = msprintf("Apskaičiuokite teorinę I1 = U1/R1nom·1000 (U1=%d V, R1nom=%d Ω) → [A02.01]. Tada [B01], [B02], [B10] U1=%d V, [B03]; [B11] U2=%d V, [B03]; [B12] U3=%d V, [B03].", cfg.U1, cfg.R1nom, cfg.U1, cfg.U2, cfg.U3);
     case 3 then s = "Spauskite [B13] Į R2 REZISTORIŲ (laidai perjungiami). Tada [B10] U1, [B03]; [B11] U2, [B03]; [B12] U3, [B03].";
     case 4 then s = msprintf("Apskaičiuokite: [A04.01] R1m ir [A04.02] R2m (vidurkiai iš U/I), [A04.03] δ1 %% ir [A04.04] δ2 %% nuo nominalų (%d / %d Ω).", cfg.R1nom, cfg.R2nom);
     case 5 then s = "Iš žurnalo taškų: [A05.01] R1 ir [A05.02] R2 iš I(U) nuolydžių (R = ΔU/ΔI), [A05.03] laidumas G2 = 1000/R2, mS.";
-    case 6 then s = "Nuoseklus jungimas: nutraukite [T08]→[T02], prijunkite [T08]→[T09] ir [T10]→[T02]; zondai [T11]→[T07], [T12]→[T10]. Tada [B12] U3, [B03], ir Rs = U/I → [A06.01].";
+    case 6 then s = "Iš R2 į nuoseklų: pašalinkite [T06]–[T09] ir [T11]–[T09], paspausdami abu laido galus. Pridėkite [T06]–[T07], [T08]–[T09], [T11]–[T07]. Tada [B12], [B03]; Rs = U/I → [A06.01].";
     case 7 then s = "[A07.01] Ar abiejų rezistorių I(U) tiesinės? [A07.02] Ar δ telpa ±5 %? (1 – Taip, 2 – Ne). Tada [B08] ataskaita.";
     else s = "";
     end
@@ -243,6 +242,8 @@ function ld4_save_answers()
             h = LD4.ui.answerEdits(k);
             if is_handle_valid(h) then
                 [st, sl] = ld4_answer_slot(k);
+                if st<>LD4.step | h.visible<>"on" then continue; end
+                if LD4.answers(st,sl)<>h.string then LD4.done(st)=%f; end
                 LD4.answers(st, sl) = h.string;
             end
         end
@@ -305,6 +306,7 @@ function ld4_toggle_solution()
             LD4.wires = LD4.backup.wires; LD4.answers = LD4.backup.answers;
             LD4.voltage = LD4.backup.voltage; LD4.journal = LD4.backup.journal;
             LD4.powerOn = LD4.backup.powerOn; LD4.switchOn = LD4.backup.switchOn;
+            LD4.wireMode=LD4.backup.wireMode; LD4.lastMeasurement=LD4.backup.lastMeasurement;
         end
         if isfield(LD4, "ui") then
             if ~isfield(LD4.ui, "headless") | ~LD4.ui.headless then ld4_render_stage(); end
@@ -317,14 +319,15 @@ function ld4_toggle_solution()
     LD4.backup.wires = LD4.wires; LD4.backup.answers = LD4.answers;
     LD4.backup.voltage = LD4.voltage; LD4.backup.journal = LD4.journal;
     LD4.backup.powerOn = LD4.powerOn; LD4.backup.switchOn = LD4.switchOn;
+    LD4.backup.wireMode=LD4.wireMode; LD4.backup.lastMeasurement=LD4.lastMeasurement;
+    LD4.practice_used=%t;
     LD4.demoMode = %t;
-    LD4.wires = ld4_canonical_wires(1);
+    LD4.wires = ld4_canonical_wires(ld4_wire_mode());
     LD4.powerOn = %t; LD4.switchOn = %t; LD4.voltage = LD4.cfg.U3;
     cfg = LD4.cfg;
     LD4.journal = [cfg.U1 cfg.U1/cfg.R1*1000 1; cfg.U2 cfg.U2/cfg.R1*1000 1; cfg.U3 cfg.U3/cfg.R1*1000 1; ...
                    cfg.U1 cfg.U1/cfg.R2*1000 2; cfg.U2 cfg.U2/cfg.R2*1000 2; cfg.U3 cfg.U3/cfg.R2*1000 2; ...
                    cfg.U3 cfg.U3/(cfg.R1+cfg.R2)*1000 3];
-    LD4.wireMode = 1;
     ld4_set_status("PAVYZDYS rodomas (neišsaugojama).","info","Grįžkite [B07].");
     if isfield(LD4, "ui") then
         if ~isfield(LD4.ui, "headless") | ~LD4.ui.headless then ld4_render_stage(); end
@@ -337,7 +340,8 @@ function ld4_restore_stage()
     LD4.pending = "";
     if LD4.step == 1 then LD4.wires = []; LD4.wireMode = 1; end
     if LD4.step == 3 then LD4.wires = ld4_canonical_wires(2); LD4.wireMode = 2; end
-    if LD4.step == 6 then LD4.wires = ld4_canonical_wires("S"); end
+    if LD4.step == 6 then LD4.wires = ld4_canonical_wires(2); end
+    LD4.done(LD4.step)=%f; LD4.report_wires(LD4.step)=emptystr(0,2);
     ld4_set_status("Etapo stendas atkurtas.","info","");
     if isfield(LD4, "ui") then
         if ~isfield(LD4.ui, "headless") | ~LD4.ui.headless then ld4_render_wires(); end
@@ -358,5 +362,5 @@ endfunction
 function ld4_answers_changed()
     // Atsakymo laukelio redagavimas: nedelsiant saugoma į store.
     global LD4;
-    ld4_save_answers();
+    ld4_save_answers(); ld4_student_sync();
 endfunction

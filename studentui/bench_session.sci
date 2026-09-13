@@ -86,8 +86,9 @@ function bench_autosave(lab)
         if lab=="LD1" then LD1.autosave_error=problem;
             ld1_set_status("Nepavyko išsaugoti juodraščio.","error",problem);
         elseif lab=="LD3" then LD3.autosave_error=problem;
-        elseif lab=="LD4" then LD4.autosave_error=problem;
             ld3_set_status("Nepavyko išsaugoti juodraščio.","error",problem);
+        elseif lab=="LD4" then LD4.autosave_error=problem;
+            ld4_set_status("Nepavyko išsaugoti juodraščio.","error",problem);
         else LD2.autosave_error=problem;ld2_set_status("Nepavyko išsaugoti juodraščio: "+problem,"error");end
     end
 endfunction
