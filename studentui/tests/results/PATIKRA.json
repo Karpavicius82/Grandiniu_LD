@@ -1,7 +1,7 @@
 {
-  "time_utc": "2026-09-13T13:20:19.555384+00:00",
-  "scilab": "\"scilab-2026.1.0\" linux",
-  "command": "./PATIKRINTI.sh; papildomai C++ geometrija ir tools/test_entrypoints.sce",
+  "time_utc": "2026-09-13T16:37:16.329352+00:00",
+  "scilab": "unknown",
+  "command": "./PATIKRINTI.sh visi",
   "status": "PASS",
   "coverage": {
     "LD1_model_variants": 64,
@@ -28,11 +28,13 @@
       "LD1 cancel/accept",
       "LD2 cancel/accept",
       "LD3 cancel/accept"
-    ]
+    ],
+    "LD4_model_variants": 64,
+    "LD4_GUI_stages_per_variant": 7
   },
   "source_sha256": {
     "DESTYTOJUI.sce": "6518ec1acc2679736b3bd2b334381aded90c03e6f313559fde5ca1df46af1aa4",
-    "GUI_PATIKRA.sce": "93016f2281a3f649c8e0d3dae73ec73c57c4ac8baa3c623c9e71640edccc44db",
+    "GUI_PATIKRA.sce": "8659d0548825312ef251a6e03adfd361915823be78e4e51bae206f72543f8d8a",
     "LD1/LD1.sce": "369863c411bca178ef30347fe4b4ae90a4ba00904abacff9b8b41a81b3eec611",
     "LD1/LD1_LOAD.sce": "b68832be3ae679ba79c5a1160bff946408687428edd7c091e9f6503389d7c038",
     "LD1/ld1_callbacks.sci": "502ad0e8d2b58a2db59c90d82e121d034bb42fd514e6072bc58cac4622e8cbc2",
@@ -49,7 +51,7 @@
     "LD2/LD2_SELFTEST.sce": "27bf9690b28b3ec3a7a58ed1294780ee5cd01a2562cfe9b53783147071e3000f",
     "LD2/ld2_callbacks.sci": "dd69994bf3c9809768a84226cd02e37b98c76ac42fe9d5a3ff7e7b92900139ed",
     "LD2/ld2_config.sci": "19309153ea1c66588da7bcec8b9cd991e29b5f7284278808ca1f76d8f13a0273",
-    "LD2/ld2_gui.sci": "dd3aac35b9e0f99557b3363ffc0e43009450ebfc532b856deb24dcfa5d73b5b3",
+    "LD2/ld2_gui.sci": "a1c62781a109681bb7793db4f499e6b3012e5e0696043bec5bebd33a9a1b5510",
     "LD2/ld2_ids.sci": "2fcade1a4777b427c6cf47b201f42e06ad42ed841a2164b716990356d66caea8",
     "LD2/ld2_method.sci": "758578630a6edde2d2fa1096405fa3a601568924e97d2dfa809375a4c3afeae6",
     "LD2/ld2_model.sci": "a42279c8a7994f6ee59794d0527d3aafb1b631609319d547e2b89fffd250fae2",
@@ -57,7 +59,7 @@
     "LD2/ld2_plots.sci": "9ed735cb369d68860c8d8984e15d8935be12b3c670ab9bab233f45272b8ddda5",
     "LD2/ld2_selftest.sci": "07df1ce2cabd6aedc98108550c916533de0463482068abd750dd6a292b3d5297",
     "LD2/ld2_storage.sci": "acb2dd48748d2c8c39b2c3ad8181922d55b77134405d17b7111053c064eaaa0b",
-    "LD2/ld2_student.sci": "a4fdfb6893aa26d951a45a0e549c47a3e0f514c393522a6a2d8884251ae71436",
+    "LD2/ld2_student.sci": "e624064a0a36555caf64528cd6cc117b4e223bfe8ec01565978e94d246c06b75",
     "LD2/ld2_utils.sci": "f4bf3c3a5252a983789a1c5d865fa6caeb8785af088f3ba9a4fec2f35f8f71ac",
     "LD2/ld2_variants.sci": "bb83e4c3e41e7c5cef485c10dd9928869b0ed5056c6ff6985a80cb8694e8dfbc",
     "LD2/ld2_wiring.sci": "433b86664876bb8c1c60a44b73587c6e46008717d5055bf6b9d866f4254606a3",
@@ -70,24 +72,34 @@
     "LD3/ld3_ids.sci": "f75650e2a021cea623cd1aa656da1f49282ac8091774f64559dfa5c199bf57e4",
     "LD3/ld3_student.sci": "5eff0aff0a7a1ee60865e541154cc1c23fd14338edce3b5062d6aeb4554b4d20",
     "LD3/ld3_utils.sci": "dccea4a1c5740eaf20be44cba573427b31312e25d390736e2dbf2a616464cd54",
+    "LD4/LD4.sce": "651a8b837bcf0188e3aa59081c9eb6edcf293a47808c391592d10b603bfe8b9d",
+    "LD4/LD4_LOAD.sce": "300d733f6b1491287fcdf7872b8def86208458ad8f00f422b0205a1adb5a3414",
+    "LD4/ld4_callbacks.sci": "520fbe705eb78ada0f413cf8e0c129199bc166f9ef70807af7319c0ed2414781",
+    "LD4/ld4_circuit.sci": "ff751166a9ddc9f14d52b3ce20022778ee4e28af13c1648a6eb7a9420706f9f6",
+    "LD4/ld4_config.sci": "f4166ba3945c6f3aa35a3db4e711b0d01d0d34456ca2ca186119ac78dbcae5df",
+    "LD4/ld4_gui.sci": "be75125355ec0051389576e749334d7c95a0f8189c0c88c42c733f763b712385",
+    "LD4/ld4_ids.sci": "80cb9c72e4855e147ff12a6a59c174b37ffa89ef696cec5ad975c7718767995d",
+    "LD4/ld4_student.sci": "83cc5a485c83d7148f4610bb7c73b81fc18920c055a2afecbd4d1aaf0b08f1e9",
+    "LD4/ld4_utils.sci": "883c340d7aecb31edf71a401f2d97bc890d15a892ae2172c345394b5c46f6b1f",
     "PALEISTI.sh": "d135f0d78c8aaf76d2440c05331b9a2b9735a0bc0c20fd967e71952b5282411d",
     "PATIKRINTI.sh": "a2d596ad6c9a5df00d2b7082373ebeb8929836c4f977668515871cec33a470b5",
     "PERZIURA.sce": "53fa236f6574984056d2f21386392b5d4941c5de74fd2ac48fcac6cbffcee0cc",
     "PERZIURA_LD2.sce": "64461ba07fcf298f561d061979c518213bfd81b439d918dbf98c0f8c1a6e7a35",
     "PERZIURA_LD3.sce": "17ff85ef2dd5d0e5c25d9096e1691f8c94b46b4748fa27d16cdbe7a45746d23b",
-    "STENDAS.sce": "48f19f0e72b02ecfc5ae3b6f36cf8f9acdb7fa9c307289d7324eb101aaeb53a7",
-    "bench_common.sci": "e15ff369f32c0f2985c168faa5de0b219f4aec5cf333ce3b83e31eeec61d2eda",
-    "bench_report.sci": "2aaf183330beaf6e095b69d8be97122ef1ca54bc63b737e1b75aaa66d14352c5",
-    "bench_session.sci": "358c4ba5afb1a5ad6e9dc0a111f5357afa64d7903c6ab1f11ed6d0ed202aa3df",
+    "PERZIURA_LD4.sce": "106b1951440333fc8e4b8acf511a71cb9d6650e3e6dd12cd3a6cd78df1beebdc",
+    "STENDAS.sce": "178731efbe6742d7e62a441c61a0f6124a3c3e10d669b0dcfd01d6d105f8f9fe",
+    "bench_common.sci": "4341231a0b2f4ea2975c4e207eb1bd4a1ab85ac21d53067a4741a71eaf405e9c",
+    "bench_report.sci": "8d259f94671726528c13d87cdc8f8745f61e356f32a02447d6750a0813e651a2",
+    "bench_session.sci": "45f35604760b9fb99f466da4ff9291eb1d66e6686c43d3d3ac8b01d7ea161c0f",
     "bench_teacher.sci": "8de6d5b3de9924f8f0e301c893d7d3f82c0dd74e158534487d6aebbc0cd6f3c0",
-    "student_profile.sci": "922143ce18a4bed2ce406c03f04f8b5eeaa713bfedb4ad0244e20e68d10549bf",
+    "student_profile.sci": "063e0787fc27256ab41e48585f3d3b610215f9b6fa398919b251594e5adf35d6",
     "student_style.sci": "1d5a3bd10bf3533add3bd6c8fbeac967e773bf15a2eab3c2a6911254970b54c0",
-    "tests/AUTOMATINIS.sce": "55aed6e8fcbd45e0a87c3bb0e4a5e57b78b200bbfee5b1fe26f526929572604e",
-    "tests/HEADLESS.sce": "a83daebec37072116e353b056aaa6850bf6e5aa498bb6e6e29a313cdf5bf4200",
-    "tests/workflows.sci": "389a3928f7700322d4110a3dd6f11a64cce43b694d4dc2a449670495b263388a"
+    "tests/AUTOMATINIS.sce": "727a40a1828b81d4689d252b8d5d49ceedce94041cb878fd31fd95d272fe5d47",
+    "tests/HEADLESS.sce": "e7caf3831cd4f52544bfc1869b1b27ab91bad2d8c5eb77c5f7da4cf4b0d9ec5a",
+    "tests/workflows.sci": "f43af04624bd4feca143949a18e167f7f4caa993d1ecaa83244613498d37003c"
   },
   "log_sha256": {
-    "modelis.log": "fc6e6022484a870af8e7ff0431e995f3ae8e2269bc270b2dfb30bb60ceb0bf49",
-    "langai.log": "fb50798ccbdd5600df7e435ee487f94986d0a7962d91979dde18014c58adb0a2"
+    "modelis.log": "65e45531f69c202ae1877e8ac993d9b79a2db9e93432577a7d533cb403e9152b",
+    "langai.log": "3d0c82424431e3735558d677d5d96885e49d7fb4de878b8f7d97f5282573f1f7"
   }
 }

@@ -1,0 +1,13 @@
+Shared archive loaded.
+Link done.
+PASS LD1: registracijos atšaukimas, variantas 17, vardas, grupė, tikras meniu ir langas
+PASS LD2: registracijos atšaukimas, variantas 17, vardas, grupė, tikras meniu ir langas
+/home/runner/work/_temp/ld-ergonomics/LD3-start.png 1280 812
+PASS LD3: registracijos atšaukimas, variantas 17, vardas, grupė, tikras meniu ir langas
+  "ENTRYPOINTS_PASS"
+
+(process:2768): Gtk-WARNING **: 13:24:28.753: Locale not supported by C library.
+	Using the fallback 'C' locale.
+
+(scilab-bin:2768): dbind-WARNING **: 13:24:28.800: AT-SPI: Error retrieving accessibility bus address: org.freedesktop.DBus.Error.ServiceUnknown: The name org.a11y.Bus was not provided by any .service files
+xwininfo: can not set locale properly

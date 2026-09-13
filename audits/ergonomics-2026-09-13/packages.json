@@ -1,0 +1,28 @@
+[
+  {
+    "platform": "Linux",
+    "file": "Grandiniu_LD-Linux.zip",
+    "bytes": 566461,
+    "sha256": "16704f59d2235d3a3060022f03a44372ccacdc0f9aba51a3aaf4647cbb2c17f4",
+    "runtime_files_verified": 54,
+    "binary_files_verified": [
+      "ldcore.so",
+      "ldcheck",
+      "mokytojas"
+    ],
+    "source_commit": "d0ede96154d3f6c0b359d97fdd67a01d96a4c906"
+  },
+  {
+    "platform": "Windows",
+    "file": "Grandiniu_LD-Windows.zip",
+    "bytes": 931035,
+    "sha256": "9758c1b5977a816b7b4a65bb6f4ee1e4e155e57b6843bb63caff7f1e00831374",
+    "runtime_files_verified": 54,
+    "binary_files_verified": [
+      "ldcore.dll",
+      "ldcheck.exe",
+      "mokytojas.exe"
+    ],
+    "source_commit": "d0ede96154d3f6c0b359d97fdd67a01d96a4c906"
+  }
+]

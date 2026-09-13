@@ -65,6 +65,32 @@ def fixture(lab, n, identity):
         vector(6, [1, 1], ["choice", "choice"])
         report["evidence"] = dict(wiring={"s1": [["E_P", "K1"], ["K2", "A_P"], ["A_N", "R1A"],
                                           ["R1B", "E_N"], ["V_P", "R1A"], ["V_N", "R1B"]]})
+    elif lab == "LD4":
+        n1_ = [100, 120, 150, 180, 220, 270, 330, 390][a]
+        n2_ = [470, 560, 680, 820, 1000, 1200, 1500, 1800][b]
+        d1 = n % 11 - 5
+        d2 = (3 * n) % 11 - 5
+        r1a_ = round(n1_ * (1 + d1 / 100) * 10) / 10
+        r2a_ = round(n2_ * (1 + d2 / 100) * 10) / 10
+        u1_, u2_, u3_ = [(3, 6, 9), (4, 8, 12), (2, 5, 8), (5, 10, 12),
+                         (3, 7, 11), (6, 9, 12), (2, 6, 10), (4, 7, 10)][b]
+        report["parameters"] = dict(R1nom=n1_, R2nom=n2_, R1=r1a_, R2=r2a_, U1=u1_, U2=u2_, U3=u3_)
+        vector(2, [u1_ / r1a_ * 1000], ["mA"])
+        for tag, rr in [(1, r1a_), (2, r2a_)]:
+            for k, u in [(1, u1_), (2, u2_), (3, u3_)]:
+                observation(f"r{tag}u{k}", u, "V")
+                observation(f"r{tag}i{k}", u / rr * 1000, "mA")
+        observation("su1", u3_, "V")
+        observation("si1", u3_ / (r1a_ + r2a_) * 1000, "mA")
+        r1m = r1a_; r2m = r2a_
+        vector(4, [r1m, r2m, (r1m / n1_ - 1) * 100, (r2m / n2_ - 1) * 100], ["Ohm", "Ohm", "1", "1"])
+        vector(5, [r1a_, r2a_, 1000 / r2a_], ["Ohm", "Ohm", "mS"])
+        vector(6, [r1a_ + r2a_], ["Ohm"])
+        vector(7, [1, 1], ["choice", "choice"])
+        series = [["E_P", "K1"], ["K2", "A_P"], ["A_N", "R1A"], ["R1B", "R2A"],
+                  ["R2B", "E_N"], ["V_P", "R1A"], ["V_N", "R2B"]]
+        report["evidence"] = dict(wiring={"s1": {"pairs": series, "meter": "DC"},
+                                          "s6": {"pairs": series, "meter": "DC"}})
     else:
         report["parameters"] = dict(E_RC=9,F_RC=frc,R8=r8,C2=4.7e-6,E_RL=9,F_RL=frl,R9=r9,L1=.5,
                                     E_RLC=5,R13=r13,L3=l,C4=c)

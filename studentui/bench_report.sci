@@ -57,6 +57,31 @@ function r=bench_report_data(lab)
         params=struct("R",cfg.R,"U1",cfg.U1,"U2",cfg.U2,"U3",cfg.U3);
         evidence.wiring=struct("s1",struct("pairs",bench_pairs(LD3.wires),"meter","DC"));
         note="";
+    elseif lab=="LD4" then
+        st=LD4.student; cfg=LD4.cfg;
+        if isfield(LD4,"assessment") then if LD4.assessment then mode="assessment"; end; end
+        if isfield(LD4,"practice_used") then practice=LD4.practice_used; end
+        specs=["2" "1" "mA";"4" "1" "Ohm";"4" "2" "Ohm";"4" "3" "1";"4" "4" "1"; ...
+               "5" "1" "Ohm";"5" "2" "Ohm";"5" "3" "mS";"6" "1" "Ohm";"7" "1" "choice";"7" "2" "choice"];
+        for k=1:size(specs,1)
+            step=bench_safe_number(specs(k,1)); q=bench_safe_number(specs(k,2));
+            answers($+1)=bench_answer(msprintf("s%d.q%d",step,q),LD4.answers(step,q),specs(k,3));
+        end
+        if isfield(LD4,"journal") then
+            pref=["r1" "r2" "s"];
+            for tag=1:3
+                rows=ld4_journal_rows(tag); n=min(3,size(rows,1));
+                for k=1:n
+                    observations($+1)=bench_observation(msprintf("%su%d",pref(tag),k),rows(k,1),"V");
+                    observations($+1)=bench_observation(msprintf("%si%d",pref(tag),k),rows(k,2),"mA");
+                end
+            end
+        end
+        params=struct("R1nom",cfg.R1nom,"R2nom",cfg.R2nom,"R1",cfg.R1,"R2",cfg.R2, ...
+                      "U1",cfg.U1,"U2",cfg.U2,"U3",cfg.U3);
+        evidence.wiring=struct("s1",struct("pairs",bench_pairs(LD4.wires),"meter","DC"), ...
+                               "s6",struct("pairs",bench_pairs(ld4_canonical_wires("S")),"meter","DC"));
+        note="";
     else
         if LD2.example_active then error("Grįžkite iš pavyzdžio į savo darbą prieš išsaugodami ataskaitą."); end
         s=LD2.state; st=s.student; cfg=LD2.cfg;

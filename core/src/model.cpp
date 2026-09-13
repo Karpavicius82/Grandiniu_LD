@@ -16,9 +16,16 @@ Bank bank(int variant) {
     const double rld[]={33,47,56,68,82,100,120,150};
     const double uu[][3]={{3,6,9},{4,8,12},{2,5,8},{5,10,12},{3,7,11},{6,9,12},{2,6,10},{4,7,10}};
     double l=ls[a]*1e-3,c=cs[b]*1e-9;
+    // LD4-64-A-2026: E24 nominalai + deterministinis ±5 % (d1=variant%11-5, d2=3*variant%11-5).
+    const double n1[]={100,120,150,180,220,270,330,390};
+    const double n2[]={470,560,680,820,1000,1200,1500,1800};
+    const double d1=(variant%11)-5,d2=((3*variant)%11)-5;
+    const double a1=std::round(n1[a]*(1+d1/100.0)*10)/10.0;
+    const double a2=std::round(n2[b]*(1+d2/100.0)*10)/10.0;
     return {dc[a],dc[b],dc[(a+b)%8],rc[a],35+5.0*(b+1),rl[b],35+5.0*(a+1),
             std::round(std::sqrt(l/c)/(2.8+.35*(a+1)+.20*(b+1))),l,c,
-            uu[b][0],uu[b][1],uu[b][2],rld[a]};
+            uu[b][0],uu[b][1],uu[b][2],rld[a],
+            n1[a],n2[b],a1,a2};
 }
 Values ac(int kind,double E,double f,double R,double L,double C) {
     for(double v:{E,f,R,L,C}) if(!std::isfinite(v)) throw std::runtime_error("non_finite");

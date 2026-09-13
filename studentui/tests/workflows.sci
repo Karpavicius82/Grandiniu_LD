@@ -327,3 +327,113 @@ function bench_ld3_workflow(n,root,gui)
         elseif isfield(LD3,"fig") then delete(LD3.fig); end
     end
 endfunction
+
+// ------------------------------- LD4 ----------------------------------------
+function bench_ld4_action(callback)
+    global LD4;
+    if LD4.ui.headless then execstr(callback); return; end
+    for k=1:size(LD4.ui.dynamic,"*")
+        h=LD4.ui.dynamic(k);
+        if h.callback==callback then bench_button(h); return; end
+    end
+    error("Nėra matomo LD4 mygtuko: "+callback);
+endfunction
+
+function bench_ld4_click(id)
+    bench_ld4_action(msprintf("ld4_terminal_click(""%s"")",id));
+endfunction
+
+function bench_ld4_primary()
+    global LD4;
+    if LD4.ui.headless then ld4_student_primary();
+    else bench_button(LD4.ui.studentPrimary); end
+endfunction
+
+function bench_ld4_answers(step,values)
+    global LD4;
+    if LD4.ui.headless then ld4_test_answers(step,values); return; end
+    vi=1;
+    for k=1:11
+        [st,sl]=ld4_answer_slot_global(k);
+        if st==step & vi<=size(values,"*") then
+            LD4.ui.answerEdits(k).string=msprintf("%.12g",values(vi));
+            execstr(LD4.ui.answerEdits(k).callback);
+            vi=vi+1;
+        end
+    end
+endfunction
+
+function [st,sl]=ld4_answer_slot_global(k)
+    mapa=[2 1;4 1;4 2;4 3;4 4;5 1;5 2;5 3;6 1;7 1;7 2];
+    st=mapa(k,1); sl=mapa(k,2);
+endfunction
+
+function bench_ld4_workflow(n,root,gui)
+    global LD4;
+    if argn(2)<3 then gui=%f; end
+    cfg=ld4_variant_config(n);
+    [valid,why]=ld4_validate_config(cfg);
+    assert_checktrue(valid);
+    LD4=struct("cfg",cfg,"student",student_profile(n,"Automatinė Patikra","TEST","LD4"), ...
+        "ui",struct("headless",~gui));
+    ld4_start();
+    if gui then
+        if isfield(LD4,"fig") then LD4.fig.figure_name="PATIKRA · LD4 · variantas "+string(n); end
+    end
+    W=["E_P" "K1";"K2" "A_P";"A_N" "R1A";"R1B" "E_N";"V_P" "R1A";"V_N" "R1B"];
+    u=[cfg.U1 cfg.U2 cfg.U3];
+    for step=1:7
+        assert_checkequal(LD4.step,step);
+        select step
+        case 1 then
+            for k=1:size(W,1); bench_ld4_click(W(k,1)); bench_ld4_click(W(k,2)); end
+        case 2 then
+            bench_ld4_answers(step,u(1)/cfg.R1*1000);
+            bench_ld4_action("ld4_toggle_power()");
+            bench_ld4_action("ld4_toggle_switch()");
+            ld4_set_voltage(u(1)); bench_ld4_action("ld4_measure()");
+            for k=2:3
+                ld4_set_voltage(u(k)); bench_ld4_action("ld4_measure()");
+            end
+        case 3 then
+            bench_ld4_action("ld4_set_resistor(2)");
+            for k=1:3
+                ld4_set_voltage(u(k)); bench_ld4_action("ld4_measure()");
+            end
+        case 4 then
+            r1m=(LD4.journal(1,1)/LD4.journal(1,2)+LD4.journal(2,1)/LD4.journal(2,2)+LD4.journal(3,1)/LD4.journal(3,2))/3*1000;
+            r2m=(LD4.journal(4,1)/LD4.journal(4,2)+LD4.journal(5,1)/LD4.journal(5,2)+LD4.journal(6,1)/LD4.journal(6,2))/3*1000;
+            bench_ld4_answers(step,[r1m r2m (r1m/cfg.R1nom-1)*100 (r2m/cfg.R2nom-1)*100]);
+        case 5 then
+            r1s=(LD4.journal(3,1)-LD4.journal(1,1))/((LD4.journal(3,2)-LD4.journal(1,2))/1000);
+            r2s=(LD4.journal(6,1)-LD4.journal(4,1))/((LD4.journal(6,2)-LD4.journal(4,2))/1000);
+            bench_ld4_answers(step,[r1s r2s 1000/r2s]);
+        case 6 then
+            LD4.wires=ld4_canonical_wires("S");
+            ld4_set_voltage(u(3)); bench_ld4_action("ld4_measure()");
+            bench_ld4_answers(step,LD4.journal(7,1)/LD4.journal(7,2)*1000);
+        case 7 then
+            bench_ld4_answers(step,[1 1]);
+        end
+        bench_ld4_primary();
+        if ~LD4.done(step) then
+            detail="";
+            if isfield(LD4.ui,"statusMain") then detail=": "+LD4.ui.statusMain.string; end
+            error("LD4 V"+string(n)+" etapas "+string(step)+detail);
+        end
+        if step==3 then
+            assert_checkequal(size(LD4.journal,1),6);
+        end
+        if step==6 then
+            assert_checkequal(size(LD4.journal,1),7);
+            assert_checkalmostequal(LD4.journal(7,2),u(3)/(cfg.R1+cfg.R2)*1000,1e-3,1e-3);
+        end
+        if gui then mprintf("PASS LD4 V%02d: etapas %d\n",n,step); end
+    end
+    assert_checktrue(and(LD4.done));
+    assert_checkequal(LD4.student.number,n);
+    if gui then
+        bench_export_report("LD4",root+"tests/results/");
+        if isfield(LD4,"fig") then delete(LD4.fig); end
+    end
+endfunction
