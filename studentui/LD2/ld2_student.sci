@@ -330,7 +330,7 @@ function ld2_render_controls()
         end
     end
     if step==4 | step==7 | step>=9 then
-        h=ld2_button_reg(p,[0.75 0.035 0.21 0.055],"Nuimti zondus","ld2_remove_voltage_probes()"); ld2_track(h);
+        h=ld2_button_reg(p,[0.75 0.035 0.21 0.055],"Nuimti zondus","ld2_remove_voltage_probes()",%f,%t,12); ld2_track(h);
         h=ld2_button_reg(p,[0.75 0.115 0.21 0.055],"Matavimai","ld2_show_journal()"); ld2_track(h);
     end
     if LD2.example_active then
@@ -354,6 +354,7 @@ function ld2_component_box(parent,pos,main,sub,bg)
         fr.tag="component:GEN";
         ld2_text(fr,[0.07 0.77 0.86 0.16],"ŠALTINIS",12,%t,"left",[0.94 0.97 0.97],[0.13 0.19 0.23]);
         txt=strsubst(sub," • ",ascii(10));
+        if phase=="RLC" then txt=strsubst(txt," Hz",ascii(10)+"Hz"); end
         ld2_text(fr,[0.07 0.31 0.86 0.40],txt,14,%t,"left",[0.94 0.97 0.97],[0.13 0.19 0.23]);
         label="Įjungti"; if LD2.state.power then label="Išjungti"; end
         h=ld2_button_reg(fr,[0.07 0.06 0.86 0.22],label,"ld2_power_toggle()",%f,%t,12); ld2_track(h);
@@ -370,7 +371,8 @@ function ld2_component_box(parent,pos,main,sub,bg)
         fr=ld2_frame(parent,pos,[0.93 0.96 0.96]);
         fr.tag="component:AM";
         ld2_text(fr,[0.06 0.77 0.88 0.16],"A~",15,%t,"center",[0.93 0.96 0.96],[0.13 0.19 0.23]);
-        ld2_text(fr,[0.04 0.41 0.92 0.25],ld2_amp_display_text(),12,%t,"center",[0.93 0.96 0.96],[0.13 0.19 0.23]);
+        reading=strsubst(ld2_amp_display_text()," mA",ascii(10)+"mA");
+        ld2_text(fr,[0.04 0.34 0.92 0.36],reading,12,%t,"center",[0.93 0.96 0.96],[0.13 0.19 0.23]);
         if step==4 | step==7 | step>=9 then
             h=ld2_button_reg(fr,[0.06 0.06 0.88 0.24],"Matuoti I","ld2_measure_current()",%t,%f,12); ld2_track(h);
             h.string="<html><center>[B14] I</center></html>";

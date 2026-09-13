@@ -11,6 +11,7 @@ Tikrinami **patys studento langai**, jų kontaktai, valdikliai ir laidai. Ši pa
 | LD3 U3 ir maitinimas | 56,32 × 24 px persidengimas, esant 1280 × 800 langui | Įtampos parinktys apačioje; maitinimas, jungiklis ir matavimas atskiroje juostoje |
 | LD1 bendros srovės matavimas | Šaltinio ir ampermetro kontaktų centrai skyrėsi tik 16,77 px | Ampermetras virš šaltinio, abu kontaktai prie savo prietaiso |
 | LD1 R2 / VR1 ir apatinė šyna | Per maži vertikalūs tarpai, kontaktų ir kodų persidengimai | Perskaičiuotos R2, VR1, šynos ir jų kontaktų koordinatės |
+| LD2 etiketės ir rodmenys | Kitoje Linux aplinkoje trumpinamas ilgas mygtuko tekstas, netelpa prietaiso rodmuo ir pertekliniai nuliai | Suvienodintas šriftas, sutalpintas mygtukas, matavimo vienetas atskiroje eilutėje; patikrintas tikras rodmuo ties rezonansu |
 | LD2 gretimi RLC kontaktai | Kai kurių centrų tarpas tik 29,34 px | Perskaičiuoti komponentų plotis ir kontaktų centrai |
 | Kontaktų priklausomybė | Kai kurie kontaktai nutolę nuo savo komponento be matomos jungties | Trumpi kontaktų išvadai iki savo komponento; simbolis ir T kodas pačiame kontakte, visas pavadinimas užvedus pelę |
 | Laidai | Skirtingas storis pagal orientaciją; laidai piešiami ant kontaktų teksto | Bendras 3 px storis; atkarpos baigiasi ties kontaktų kraštais |

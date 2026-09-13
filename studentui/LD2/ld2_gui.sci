@@ -136,7 +136,7 @@ endfunction
 function h = ld2_text(parent, pos, str, fs, bold, align, bg, fg)
     if size(strindex(str,ascii(10)),"*")>0 then str="<html>"+strsubst(str,ascii(10),"<br>")+"</html>"; end
     h = uicontrol(parent, "style","text", "units","normalized", ...
-        "position",pos, "string",str, "fontname","Arial", "fontunits","pixels", "fontsize",max([11 fs]), ...
+        "position",pos, "string",str, "fontname","DejaVu Sans", "fontunits","pixels", "fontsize",max([11 fs]), ...
         "horizontalalignment",align, "backgroundcolor",bg, ...
         "foregroundcolor",fg);
     if bold then h.fontweight = "bold"; end
@@ -145,7 +145,7 @@ endfunction
 
 function h = ld2_button(parent, pos, str, cb, fs, bg)
     h = uicontrol(parent, "style","pushbutton", "units","normalized", ...
-        "position",pos, "string",str, "fontname","Arial", "fontunits","pixels", "fontsize",max([11 fs]), ...
+        "position",pos, "string",str, "fontname","DejaVu Sans", "fontunits","pixels", "fontsize",max([11 fs]), ...
         "callback",cb, "backgroundcolor",bg);
     // Numerių registras: [Bxx] priešdelis (kai telpa), tag ir tooltip.
     // h.callback lieka NEPAKITĖS – jį tiksliai naudoja testai.
@@ -165,7 +165,7 @@ endfunction
 
 function h = ld2_edit(parent, pos, value)
     h = uicontrol(parent, "style","edit", "units","normalized", ...
-        "position",pos, "string",value, "fontname","Arial", "fontunits","pixels", "fontsize",13, ...
+        "position",pos, "string",value, "fontname","DejaVu Sans", "fontunits","pixels", "fontsize",13, ...
         "horizontalalignment","right", "backgroundcolor",[0.94 0.96 0.96],"relief","solid");
     ld2_track(h);
 endfunction
@@ -699,9 +699,9 @@ endfunction
 function s=ld2_source_text(phase)
     global LD2;
     select phase
-    case "RC" then s=msprintf("%.1f V RMS • %.1f Hz",LD2.cfg.E_RC,LD2.cfg.F_RC);
-    case "RL" then s=msprintf("%.1f V RMS • %.1f Hz",LD2.cfg.E_RL,LD2.cfg.F_RL);
-    case "RLC" then s=msprintf("%.1f V RMS • %.1f Hz",LD2.cfg.E_RLC,LD2.state.freq);
+    case "RC" then s=msprintf("%g V RMS • %g Hz",LD2.cfg.E_RC,LD2.cfg.F_RC);
+    case "RL" then s=msprintf("%g V RMS • %g Hz",LD2.cfg.E_RL,LD2.cfg.F_RL);
+    case "RLC" then s=msprintf("%g V RMS • %g Hz",LD2.cfg.E_RLC,LD2.state.freq);
     end
 endfunction
 
@@ -712,9 +712,9 @@ function ld2_draw_rlc_chain(parent,active,c)
     ld2_component_box(parent,[0.22 0.55 0.10 0.13],"A~", ...
         "AMPERMETRAS",[0.91 0.97 0.92]);
     ld2_component_box(parent,[0.39 0.55 0.10 0.13], ...
-        msprintf("C4 = %.2f nF",LD2.cfg.C4*1e9),"KONDENSATORIUS",[1.00 0.97 0.87]);
+        msprintf("C4 = %g nF",LD2.cfg.C4*1e9),"KONDENSATORIUS",[1.00 0.97 0.87]);
     ld2_component_box(parent,[0.56 0.55 0.10 0.13], ...
-        msprintf("L3 = %.2f mH",LD2.cfg.L3*1e3),"RITĖ",[1.00 0.97 0.87]);
+        msprintf("L3 = %g mH",LD2.cfg.L3*1e3),"RITĖ",[1.00 0.97 0.87]);
     ld2_component_box(parent,[0.73 0.55 0.10 0.13], ...
         msprintf("R13 = %.0f Ω",LD2.cfg.R13),"REZISTORIUS",[1.00 0.97 0.87]);
     ld2_component_box(parent,[0.42 0.14 0.20 0.14],"V~ VOLTMETRAS", ...

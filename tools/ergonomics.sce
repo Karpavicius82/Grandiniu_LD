@@ -39,6 +39,12 @@ try
             ld2_render_step(); geometry_dump(LD2.ui.figure,label+"-before",fd);
             if phase<>"OVERVIEW" then
                 ld2_set_phase_connections(phase,ld2_solution_connections(st)); ld2_render_step();
+                if st==9 then
+                    // Inspect real, populated readouts at resonance, not only
+                    // the short idle dash. Voltage/current still use the model.
+                    LD2.state.freq=1/(2*%pi*sqrt(cfg.L3*cfg.C4)); LD2.state.power=%t;
+                    ld2_measure_current(); ld2_measure_voltage();
+                end
                 geometry_dump(LD2.ui.figure,label+"-wired",fd);
                 allowed=ld2_allowed_pairs(st);
                 for pair=1:size(allowed,1)-1
