@@ -1,0 +1,88 @@
+Start testing: Sep 13 14:34 EEST
+----------------------------------------------------------
+1/5 Testing: grading
+1/5 Test: grading
+Command: "/usr/bin/python3" "/home/pc/Grandiniu_LD-git/core/tests/test_grading.py" "/tmp/grandiniu-closure-20260913/ldcheck"
+Directory: /tmp/grandiniu-closure-20260913
+"grading" start time: Sep 13 14:34 EEST
+Output:
+----------------------------------------------------------
+{"status": "PASS", "full_reports": 650, "seconds": 4.054, "adversarial_files": 17, "deterministic_replay": true, "conflicting_ids": true, "multiple_attempts": true, "utf8_paths": true, "ld3_batch": true}
+<end of output>
+Test time =   8.22 sec
+----------------------------------------------------------
+Test Passed.
+"grading" end time: Sep 13 14:34 EEST
+"grading" time elapsed: 00:00:08
+----------------------------------------------------------
+
+2/5 Testing: native_abi
+2/5 Test: native_abi
+Command: "/usr/bin/python3" "/home/pc/Grandiniu_LD-git/core/tests/test_native.py" "/tmp/grandiniu-closure-20260913/ldcore.so"
+Directory: /tmp/grandiniu-closure-20260913
+"native_abi" start time: Sep 13 14:34 EEST
+Output:
+----------------------------------------------------------
+PASS: production C ABI, DC/multiple sources/wye/delta/floating neutral, atomic binary writes, cancel and replay
+<end of output>
+Test time =   0.19 sec
+----------------------------------------------------------
+Test Passed.
+"native_abi" end time: Sep 13 14:34 EEST
+"native_abi" time elapsed: 00:00:00
+----------------------------------------------------------
+
+3/5 Testing: instruction_registry
+3/5 Test: instruction_registry
+Command: "/usr/bin/python3" "/home/pc/Grandiniu_LD-git/core/../tools/check_instruction_registry.py" "--root" "/home/pc/Grandiniu_LD-git/core/.."
+Directory: /tmp/grandiniu-closure-20260913
+"instruction_registry" start time: Sep 13 14:34 EEST
+Output:
+----------------------------------------------------------
+== Instrukcijų <-> registrų patikra (šaknis: /home/pc/Grandiniu_LD-git/core/..) ==
+LD1: registras studentui/LD1/ld1_ids.sci — 78 kodų; unikalių nuorodų tekstuose — 69; padengimas 69/78 (88.5%)
+LD2: registras studentui/LD2/ld2_ids.sci — 145 kodų; unikalių nuorodų tekstuose — 124; padengimas 124/145 (85.5%)
+LD3: registras studentui/LD3/ld3_ids.sci — 38 kodų; unikalių nuorodų tekstuose — 38; padengimas 38/38 (100.0%)
+Patikrinta failų: 13; nuorodų iš viso: 1187; unikalių kodų: 133
+RESULT: OK — visos nuorodos egzistuoja registruose (exit 0)
+<end of output>
+Test time =   0.09 sec
+----------------------------------------------------------
+Test Passed.
+"instruction_registry" end time: Sep 13 14:34 EEST
+"instruction_registry" time elapsed: 00:00:00
+----------------------------------------------------------
+
+4/5 Testing: mokytojas
+4/5 Test: mokytojas
+Command: "/usr/bin/python3" "/home/pc/Grandiniu_LD-git/core/tests/test_mokytojas.py" "/tmp/grandiniu-closure-20260913/mokytojas"
+Directory: /tmp/grandiniu-closure-20260913
+"mokytojas" start time: Sep 13 14:34 EEST
+Output:
+----------------------------------------------------------
+{"status": "PASS", "tool": "mokytojas", "checks": ["csv_append", "sha256_dedup", "klaidu_ivedimas", "atsiliepimai", "zurnalas_matrica", "geriausias_bandymas", "drive_be_rakto", "usage"]}
+<end of output>
+Test time =   0.12 sec
+----------------------------------------------------------
+Test Passed.
+"mokytojas" end time: Sep 13 14:34 EEST
+"mokytojas" time elapsed: 00:00:00
+----------------------------------------------------------
+
+5/5 Testing: mokytojas_ui
+5/5 Test: mokytojas_ui
+Command: "/usr/bin/python3" "/home/pc/Grandiniu_LD-git/core/tests/test_mokytojas_ui.py" "/tmp/grandiniu-closure-20260913/mokytojas"
+Directory: /tmp/grandiniu-closure-20260913
+"mokytojas_ui" start time: Sep 13 14:34 EEST
+Output:
+----------------------------------------------------------
+{"status": "PASS", "tool": "mokytojas_ui", "checks": ["puslapis", "statusas", "startas", "eigis", "zurnalas", "klaidos_kelias", "404", "uzdarymas"]}
+<end of output>
+Test time =   0.23 sec
+----------------------------------------------------------
+Test Passed.
+"mokytojas_ui" end time: Sep 13 14:34 EEST
+"mokytojas_ui" time elapsed: 00:00:00
+----------------------------------------------------------
+
+End testing: Sep 13 14:34 EEST

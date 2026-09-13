@@ -1,0 +1,11 @@
+{
+  "status": "PASS",
+  "platform": "posix",
+  "actual_exported_reports": 193,
+  "ld1_full_variants": 64,
+  "ld2_full_variants": 64,
+  "ld3_full_variants": 64,
+  "wrong_and_missing_preserved": true,
+  "seconds": 9.235,
+  "cffi_folder_grading": true
+}

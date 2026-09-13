@@ -1,8 +1,8 @@
 # Grandinių virtualūs laboratoriniai darbai (Scilab)
 
-Interaktyvūs elektros grandinių laboratoriniai darbai: Scilab sąsaja, bendras C++ branduolys ir automatinis LD1 / LD2 ataskaitų vertinimas.
+Interaktyvūs elektros grandinių laboratoriniai darbai: Scilab sąsaja, bendras C++ branduolys ir automatinis LD1 / LD2 / LD3 ataskaitų vertinimas.
 
-**Studentas pateikia vieną HTML ataskaitą. Dėstytojas pasirenka darbų aplanką ir gauna balus, klaidų komentarus bei CSV suvestinę.** [Naudojimas, rubrika ir surinkimas](core/README.md).
+**Studentas pateikia vieną HTML ataskaitą. Dėstytojas pasirenka darbų aplanką ir gauna balus, klaidų komentarus bei CSV suvestinę.** [Naudojimas, rubrika ir surinkimas](core/README.md). [Naujausia automatinio vertinimo patikra](audits/closure-2026-09-13/README.md).
 
 Windows / Linux paketai su C++ branduoliu kuriami [GitHub Actions](https://github.com/Karpavicius82/Grandiniu_LD/actions/workflows/native.yml). Šaltinių kopijai pirmiausia reikia surinkti branduolį pagal `core/README.md`.
 

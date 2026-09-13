@@ -1,5 +1,7 @@
 # Minimalios sistemos priėmimo sąlygos
 
+**Aktuali įgyvendinimo patikra:** [2026-09-13 automatinio vertinimo protokolas](../closure-2026-09-13/README.md). Toliau pateikta lentelė išlaiko pradinę 2026-09-11 būseną; ji nėra naujausio leidimo rezultatų suvestinė.
+
 2026-09-11. Tai projekto vidinė pradinė priėmimo bazė. Vartotojas nurodė, kad išorinis vertintojas dar nepateikė standarto ar kriterijų. Šios sąlygos leidžia pradėti įgyvendinimą ir ruošti įrodymus; jos nėra išorinio vertintojo jau suteikta aprobacija.
 
 Privaloma: C/C++ branduolys, Scilab stendas, Windows ir Linux, 13 laboratorinių darbų, po 64 pastovius variantus ir paketinis studentų ataskaitų vertinimas. Pradinė fizikinė apimtis — tiesinės virtualios grandinės, nusistovėjusi DC ir sinusoidinė AC būsena. Metodikos turi aiškiai skirti virtualų matavimą nuo fiziniu prietaisu gauto rezultato.

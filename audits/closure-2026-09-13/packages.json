@@ -1,0 +1,16 @@
+{
+  "Linux": {
+    "file": "dist/Grandiniu_LD-Linux.zip",
+    "sha256": "109101d7b3c01962a5747d7614399b13cd19e7db703fa3b248cd8ca92e97c8cd",
+    "ci_run": 34754800285,
+    "runtime_matches_worktree_after_crlf_normalization": true,
+    "zip_crc": "PASS"
+  },
+  "Windows": {
+    "file": "dist/Grandiniu_LD-Windows.zip",
+    "sha256": "872599a92806036bf336cd80f94497072ac5a4c2330dad5c2531c903383266c1",
+    "ci_run": 34754800285,
+    "runtime_matches_worktree_after_crlf_normalization": true,
+    "zip_crc": "PASS"
+  }
+}
