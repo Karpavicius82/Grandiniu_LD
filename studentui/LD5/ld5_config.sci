@@ -4,6 +4,7 @@
 // ============================================================================
 
 function cfg = ld5_variant_config(n)
+    if ~ld5_valid_index(n,64) then error("Eilės numeris turi būti sveikas skaičius nuo 1 iki 64."); end
     r1nom = [100; 120; 150; 180; 220; 270; 330; 390];
     rvnom = [470; 560; 680; 820; 1000; 1200; 1500; 1800];
     pp    = [25 50 75; 20 45 70; 30 55 80; 15 40 65; 35 60 85; 25 60 90; 10 50 80; 30 50 70];
@@ -23,9 +24,14 @@ function [valid, why] = ld5_validate_config(cfg)
     n1 = [100 120 150 180 220 270 330 390];
     n2 = [470 560 680 820 1000 1200 1500 1800];
     pp = [25 50 75; 20 45 70; 30 55 80; 15 40 65; 35 60 85; 25 60 90; 10 50 80; 30 50 70];
-    if ~isfield(cfg, "R1nom") | ~isfield(cfg, "RVnom") | ~isfield(cfg, "R1") | ~isfield(cfg, "RV") then
-        valid = %f; why = "Trūksta laukų.";
+    for field=["R1nom" "RVnom" "R1" "RV" "E" "P1" "P2" "P3"]
+        if ~isfield(cfg,field) then valid=%f; why="Trūksta priskirtų reikšmių."; return; end
+        v=cfg(field);
+        if type(v)<>1 | size(v,"*")<>1 then valid=%f; why="Netinkama priskirta reikšmė."; return; end
+        if ~isreal(v) | isnan(v) | isinf(v) then valid=%f; why="Reikšmė turi būti baigtinis skaičius."; return; end
+        if v<=0 then valid=%f; why="Reikšmė turi būti teigiama."; return; end
     end
+    if cfg.E<>9 then valid=%f; why="LD5 šaltinis turi būti 9 V."; return; end
     if valid then
         if size(find(n1 == cfg.R1nom), "*") == 0 | size(find(n2 == cfg.RVnom), "*") == 0 then
             valid = %f; why = "Nominalai ne iš E24 banko.";

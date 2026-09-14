@@ -10,6 +10,17 @@ maitinimą ir jungiklį valdykite stendo dešinėje. Papildomi veiksmai – vir�
 **Pagalba** meniu; apačioje galima grįžti į ankstesnį etapą arba atverti kontaktų žemėlapį.
 Laido tarpas sankirtoje reiškia, kad laidai elektriškai nesujungti.
 
+**LD5 – įtampos daliklis:** sujunkite septynis laidus pagal **Pagalba → Kaip sujungti**.
+Gnybtus galima keisti tik pirmame etape; esamą laidą pašalinsite paspaudę abu jo galus.
+Toliau įjunkite maitinimą, uždarykite jungiklį ir rinkitės **P1 / P2 / P3**.
+Parinkta padėtis išryškinama; RV laukelyje rodoma tos padėties aktyvi varža.
+Voltmetras ir ampermetras atsinaujina iškart, **Matuoti** įrašo rodmenis į žurnalą.
+Kiekvieną padėtį užtenka išmatuoti vieną kartą. Atsakymuose tinka kablelis arba taškas;
+prieš **Tikrinti** nereikia spausti Enter. Po šešto etapo spauskite **Įrašyti ataskaitą**.
+Pavyzdžio peržiūra nekeičia jūsų matavimų ir jos negalima pateikti kaip ataskaitos.
+LD5 skaičiavimams ir ataskaitų vertinimui naudojamas bendras C++ branduolys.
+LD5 turi 64 pastovius variantus: `LD5/VARIANTAI.csv`.
+
 Pabaigoje spauskite **Išsaugoti ataskaitą**. Sukurtą vieną HTML failą iš
 naudotojo aplanko `Grandiniu_LD_darbai` persiųskite dėstytojui. Nebaigtą
 ataskaitą taip pat galima išsaugoti per Pagalbą. LD1 ir LD2 juodraščiai saugomi automatiškai
@@ -24,7 +35,7 @@ Reikia Scilab 2026.1.0 ir jūsų OS atitinkančio paketo su `bin/ldcore.dll`
 (Windows) arba `bin/ldcore.so` (Linux). Kompiliatorius studentui nereikalingas.
 
 Linux: `./PALEISTI.sh`. Scilab aplinkoje: vykdykite `STENDAS.sce` ir pasirinkite darbą.
-Atskirai galima vykdyti `LD1/LD1.sce`, `LD2/LD2.sce` arba `LD3/LD3.sce`.
+Atskirai galima vykdyti atitinkamą `LD1/LD1.sce`–`LD5/LD5.sce` failą.
 Paleidiklis ieško įdiegto Scilab; prireikus nurodykite `SCILAB_BIN=/visas/kelias/bin/scilab`.
 
 Prieš pradedant studentas įveda **eilės numerį sąraše (1–64), vardą ir pavardę,

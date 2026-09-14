@@ -18,11 +18,11 @@ function [term_xy,boxes]=ld5_layout()
     global LD5;
     // All terminals sit outside their own component, with 36 x 40 px targets.
     boxes=struct("E",[7 63 15 16],"K",[38.5 65 12 14],"A",[66 63 14 16], ...
-        "R1",[18 39 19 14],"RV",[54 39 19 14],"V",[35 12 21 16]);
+        "R1",[18 39 19 14],"RV",[54 39 19 14],"V",[54 12 19 16]);
     term_xy=struct("E_N",[4.5 72],"E_P",[24.5 72], ...
         "K1",[35.5 72],"K2",[53.5 72],"A_P",[63.5 72],"A_N",[83 72], ...
         "R1A",[15 46],"R1B",[40 46],"RVA",[51 46],"RVB",[76 46], ...
-        "V_P",[32 20],"V_N",[59 20]);
+        "V_P",[51 20],"V_N",[76 20]);
 endfunction
 
 function xy=ld5_terminal_xy(id)
@@ -100,14 +100,18 @@ function ld5_render_wires()
         ld5_polyline(pts,col);
     end
     [tt,bb]=ld5_layout(); ids=["E" "K" "A" "R1" "RV" "V"];
-    names=["ŠALTINIS" "JUNGIKLIS" "AMPERMETRAS" "R1" "RV (potenciometras)" "VOLTMETRAS"];
+    names=["ŠALTINIS" "JUNGIKLIS" "AMPERMETRAS" "R1" "RV" "VOLTMETRAS"];
     switchText="Atviras"; if LD5.switchOn then switchText="Uždarytas"; end
     powerText="Išjungtas"; if LD5.powerOn then powerText="9 V"; end
     [u,i,valid,reason]=ld5_measure_values();
     ampText="— mA"; voltText="— V";
     if valid then ampText=msprintf("%.3f mA",i); voltText=msprintf("%g V",u); end
-    vals=[powerText switchText ampText msprintf("%d Ω ±5%%",LD5.cfg.R1nom) ...
-          msprintf("%d Ω ±5%%",LD5.cfg.RVnom) voltText];
+    rvText=msprintf("%g Ω",LD5.cfg.RV);
+    if ld5_valid_index(LD5.position,3) then
+        names(5)=msprintf("RV · P%d (%d %%)",LD5.position,LD5.cfg("P"+string(LD5.position)));
+        rvText=msprintf("%g Ω",ld5_rv_at(LD5.position));
+    end
+    vals=[powerText switchText ampText msprintf("%g Ω",LD5.cfg.R1) rvText voltText];
     pairs=["E_N" "E_P";"K1" "K2";"A_P" "A_N";"R1A" "R1B";"RVA" "RVB";"V_P" "V_N"];
     for k=1:6
         r=bb(ids(k))/100; bg=[0.94 0.97 0.97];
@@ -119,16 +123,25 @@ function ld5_render_wires()
         h=student_text(fr,[0.06 0.66 0.88 0.24],names(k),12,%t,bg); h.horizontalalignment="center";
         h=student_text(fr,[0.06 0.15 0.88 0.36],vals(k),16,%t,bg); h.horizontalalignment="center";
         h.tag="reading:"+ids(k);
+        if k==4 then h.tooltipstring=msprintf("Priskirta R1: %g Ω; nominali %d Ω ±5 %%.",LD5.cfg.R1,LD5.cfg.R1nom); end
+        if k==5 then h.tooltipstring=msprintf("Visa RV: %g Ω; nominali %d Ω ±5 %%. Rodoma aktyvi RV dalis.",LD5.cfg.RV,LD5.cfg.RVnom); end
     end
     tids=ld5_terminal_ids();
     for id=matrix(tids,1,-1)
         bg=[0.08 0.39 0.37]; if id==LD5.pending then bg=[0.60 0.39 0.06]; end
         cb="ld5_terminal_click("""+id+""")";
         h=student_terminal(p,ld5_terminal_xy(id),ld5_terminal_button_text(id),ld5_terminal_code(id),cb,ld5_terminal_name(id),bg);
-        if LD5.demoMode | (LD5.step<>1 & LD5.step<>6) then h.enable="off"; end
+        h.horizontalalignment="center";
+        if LD5.demoMode | LD5.step<>1 then h.enable="off"; end
         LD5.term.handles($+1)=h; LD5.term.handleIds($+1,1)=id; LD5.ui.dynamic($+1)=h; ld5_track_board(h);
     end
     ld5_track_board(student_end_wires(p));
+    for k=1:3
+        h=LD5.ui.controls(k); h.backgroundcolor=[0.94 0.96 0.96]; h.foregroundcolor=[0.08 0.20 0.22];
+        if LD5.position==k then h.backgroundcolor=[0.08 0.39 0.37]; h.foregroundcolor=[1 1 1]; end
+    end
+    LD5.ui.controls(6).enable="off";
+    if ~LD5.demoMode & or(LD5.step==[2 3]) then LD5.ui.controls(6).enable="on"; end
     ld5_font(p);
     LD5.fig.immediate_drawing=drawing;
 endfunction
@@ -137,11 +150,11 @@ function ld5_render_journal()
     global LD5;
     if ~isfield(LD5,"ui") then return; end
     if ~isfield(LD5.ui,"journalList") then return; end
-    rows="Rezistorius       U, V          I, mA"; names=["R1" "R2" "R1+R2"];
+    rows="Padėtis (%)          U, V          I, mA";
     for tag=1:3
         measurements=ld5_journal_rows(tag);
         for k=1:size(measurements,1)
-            rows($+1)=msprintf("%s                 %g              %.3f",names(tag),measurements(k,1),measurements(k,2));
+            rows($+1)=msprintf("P%d (%d %%)          %.4f          %.3f",tag,LD5.cfg("P"+string(tag)),measurements(k,1),measurements(k,2));
         end
     end
     LD5.ui.journalList.string=rows;
@@ -160,10 +173,12 @@ function ld5_render_stage()
             yy=0.55-row*0.10; row=row+1;
             lab.position=[0.07 yy 0.53 0.075]; h.position=[0.63 yy 0.30 0.075];
             h.string=LD5.answers(st,sl); h.visible="on"; lab.visible="on";
+            h.enable="on"; if LD5.demoMode then h.enable="off"; end
         end
     end
     LD5.ui.instructionLine(1).string=student_wrap(ld5_step_instruction(LD5.step),38);
     LD5.ui.progress.string=string(LD5.step)+" / 6 etapas";
+    if LD5.demoMode then LD5.ui.progress.string="PAVYZDYS"; end
     LD5.ui.identity.string=student_caption(LD5.student);
     ld5_render_wires(); ld5_render_journal(); ld5_student_sync();
 endfunction
@@ -197,7 +212,7 @@ function ld5_build_gui()
     LD5.ui.instructionLine(1).verticalalignment="top";
     labels=["[A02.01] U2 teorinė, V";"[A04.01] U1t, V";"[A04.02] U3t, V";"[A04.03] ΔU, V"; ...
         "[A04.04] diapazonas, %";"[A05.01] I2, mA";"[A05.02] dalis, %"; ...
-        "[A06.01] Reguliavimas sklandus? 1 T / 2 N";"[A06.02] Dalikio dėsnis galioja? 1 T / 2 N"];
+        "[A06.01] Sklandus?";"[A06.02] Dalikio dėsnis?"];
     LD5.ui.answerEdits=[]; LD5.ui.answerLabels=[];
     for k=1:9
         LD5.ui.answerLabels($+1)=student_text(right,[0.07 0.5 0.53 0.075],student_wrap(labels(k),22),14,%f);

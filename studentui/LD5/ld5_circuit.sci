@@ -18,30 +18,35 @@ function [u, i, ok, msg] = ld5_measure_values()
     u = %nan; i = %nan; ok = %f; msg = "";
     if ~LD5.powerOn then msg = "Maitinimas išjungtas: įjunkite [B01]."; return; end
     if ~LD5.switchOn then msg = "Jungiklis atidarytas: uždarykite [B02]."; return; end
-    if LD5.position < 1 then msg = "Padėtis nenustatyta: [B10]/[B11]/[B12]."; return; end
+    if ~ld5_valid_index(LD5.position,3) then msg = "Padėtis nenustatyta: [B10]/[B11]/[B12]."; return; end
     if ~isfield(LD5, "wires") | LD5.wires == [] then msg = "Grandinė nesujungta: [B04] KAIP SUJUNGTI."; return; end
     [wok, wwhy] = ld5_wiring_valid(LD5.wires);
     if ~wok then msg = wwhy; return; end
     rvd = ld5_rv_at(LD5.position);
-    u = LD5.cfg.E * rvd / (LD5.cfg.R1 + rvd);
-    i = LD5.cfg.E / (LD5.cfg.R1 + rvd) * 1000;
+    bench_core_require();
+    [volts,currents,status]=bench_cpp_dc([1 3 LD5.cfg.R1;3 2 rvd],[%t %t %t],1,2,LD5.cfg.E);
+    if status<>0 then msg="C++ grandinės skaičiavimas nepavyko."; return; end
+    u = volts(3)-volts(2);
+    i = currents(1)*1000;
     ok = %t;
 endfunction
 
 function [ok, reason] = ld5_wiring_valid(wires)
-    global LD5;
     ok = %f; reason = "";
     canon = ld5_canonical_wires();
-    if ~isfield(LD5, "wires") | LD5.wires == [] then
+    if wires == [] then
         reason = "Grandinė nesujungta: seką rodys [B04] KAIP SUJUNGTI."; return;
     end
-    if size(LD5.wires, 1) > size(canon, 1) then
+    if type(wires)<>10 | size(wires,2)<>2 then
+        reason="Netinkami sujungimo duomenys."; return;
+    end
+    if size(wires, 1) > size(canon, 1) then
         reason = "Per daug laidų (riba " + string(size(canon,1)) + ")."; return;
     end
     for k = 1:size(canon, 1)
         rasta = %f;
-        for mm = 1:size(LD5.wires, 1)
-            par = [LD5.wires(mm,1) LD5.wires(mm,2)];
+        for mm = 1:size(wires, 1)
+            par = wires(mm,:);
             if and(par == canon(k,:)) | and(par == canon(k, [2 1])) then rasta = %t; end
         end
         if ~rasta then
@@ -62,6 +67,8 @@ function ld5_init_state()
     LD5.switchOn = %f;
     LD5.position = 0;      // 0 = nenustatyta; 1..3 = padėtys
     LD5.wires = [];
+    LD5.report_wires = list();
+    for k=1:6; LD5.report_wires(k)=emptystr(0,2); end
     LD5.journal = [];      // [U, I_mA, padėtis]
     LD5.answers = emptystr(6, 8);
     LD5.demoMode = %f;
@@ -69,22 +76,29 @@ function ld5_init_state()
     LD5.pending = "";
 endfunction
 
+function ok=ld5_valid_index(n,maximum)
+    ok=%f;
+    if type(n)<>1 | size(n,"*")<>1 then return; end
+    if ~isreal(n) | isnan(n) | isinf(n) then return; end
+    ok=n>=1 & n<=maximum & n==floor(n);
+endfunction
+
 function expected = ld5_expected_answers()
     global LD5;
-    expected = emptystr(6, 8);
+    expected = %nan*ones(6, 8);
     cfg = LD5.cfg;
     rv2 = ld5_rv_at(2);
-    expected(2,1) = msprintf("%.10g", cfg.E * rv2 / (cfg.R1 + rv2));       // A02.01 U2 teorinė, V
-    expected(4,1) = msprintf("%.10g", cfg.E * ld5_rv_at(1) / (cfg.R1 + ld5_rv_at(1))); // A04.01 U1t
-    expected(4,2) = msprintf("%.10g", cfg.E * ld5_rv_at(3) / (cfg.R1 + ld5_rv_at(3))); // A04.02 U3t
+    expected(2,1) = cfg.E * rv2 / (cfg.R1 + rv2);
+    expected(4,1) = cfg.E * ld5_rv_at(1) / (cfg.R1 + ld5_rv_at(1));
+    expected(4,2) = cfg.E * ld5_rv_at(3) / (cfg.R1 + ld5_rv_at(3));
     u3 = cfg.E * ld5_rv_at(3) / (cfg.R1 + ld5_rv_at(3));
     u1 = cfg.E * ld5_rv_at(1) / (cfg.R1 + ld5_rv_at(1));
-    expected(4,3) = msprintf("%.10g", u3 - u1);                              // A04.03 ΔU diapazonas
-    expected(4,4) = msprintf("%.10g", (u3 - u1) / cfg.E * 100);              // A04.04 diapazonas % nuo E
-    expected(5,1) = msprintf("%.10g", cfg.E / (cfg.R1 + rv2) * 1000);        // A05.01 I2, mA
-    expected(5,2) = msprintf("%.10g", rv2 / (cfg.R1 + rv2) * 100);           // A05.02 dalis %
-    expected(6,1) = "1";
-    expected(6,2) = "1";
+    expected(4,3) = u3 - u1;
+    expected(4,4) = (u3 - u1) / cfg.E * 100;
+    expected(5,1) = cfg.E / (cfg.R1 + rv2) * 1000;
+    expected(5,2) = rv2 / (cfg.R1 + rv2) * 100;
+    expected(6,1) = 1;
+    expected(6,2) = 1;
 endfunction
 
 function rows = ld5_journal_rows(tag)

@@ -369,6 +369,7 @@ bool ld5_wiring(const Json& pairs,bool& valid) {
         for(int k=0;k<7;++k) canonical.insert({std::min(std::string(cs[k][0]),std::string(cs[k][1])),
                                                std::max(std::string(cs[k][0]),std::string(cs[k][1]))});
         for(auto& w:pairs) {
+            if(!w.is_array()||w.size()!=2) {valid=false;return false;}
             const auto a=text(w.at(0)),b2=text(w.at(1));
             if(a.empty()||b2.empty()) {valid=false;return false;}
             if(!unique.insert({std::min(a,b2),std::max(a,b2)}).second) return false;

@@ -60,3 +60,5 @@ endif()
 add_test(NAME instruction_registry COMMAND "${Python3_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/../tools/check_instruction_registry.py" --root "${CMAKE_CURRENT_SOURCE_DIR}/..")
 add_test(NAME mokytojas COMMAND "${Python3_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/tests/test_mokytojas.py" "$<TARGET_FILE:mokytojas>")
 add_test(NAME mokytojas_ui COMMAND "${Python3_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/tests/test_mokytojas_ui.py" "$<TARGET_FILE:mokytojas>")
+
+add_test(NAME ld5_grading COMMAND "${Python3_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/tests/test_ld5_grading.py" "$<TARGET_FILE:ldcheck>")

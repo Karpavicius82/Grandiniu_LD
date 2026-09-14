@@ -29,7 +29,7 @@ function ld5_start()
         if isfield(LD5.ui, "headless") then
             if LD5.ui.headless then needgui = %f; end
         end
-        if isfield(LD5.ui, "standFrame") then needgui = %f; end  // jau pastatyta
+        if isfield(LD5.ui, "circuitFrame") then needgui = %f; end  // jau pastatyta
     end
     if needgui & ~isfield(LD5, "fig") then
         ld5_build_gui();
@@ -41,7 +41,7 @@ function ld5_student_primary()
     global LD5;
     if LD5.demoMode then ld5_toggle_solution(); return; end
     ld5_save_answers();
-    if LD5.step == 6 & LD5.done(6) then
+    if LD5.step == 6 & and(LD5.done) then
         bench_export_current("LD5");
         return;
     end
@@ -57,7 +57,7 @@ endfunction
 
 function ld5_jump_step(n)
     global LD5;
-    if n<1 | n>7 then return; end
+    if ~ld5_valid_index(n,6) then return; end
     if n <= LD5.step | LD5.done(n) | LD5.skipped(n) then
         ld5_set_step(n);
     else
@@ -70,7 +70,9 @@ function ld5_student_sync()
     if ~isfield(LD5, "ui") then return; end
     if isfield(LD5.ui, "headless") then if LD5.ui.headless then return; end end
     if isfield(LD5.ui, "studentPrimary") & is_handle_valid(LD5.ui.studentPrimary) then
-        if LD5.step == 6 & LD5.done(6) then
+        if LD5.demoMode then
+            LD5.ui.studentPrimary.string="GRĮŽTI Į SAVO DARBĄ";
+        elseif LD5.step == 6 & and(LD5.done) then
             LD5.ui.studentPrimary.string = "ĮRAŠYTI ATASKAITĄ";
         elseif LD5.done(LD5.step) then
             LD5.ui.studentPrimary.string = "TOLIAU →";

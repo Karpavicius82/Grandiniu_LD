@@ -98,7 +98,7 @@ function r=bench_report_data(lab)
             step=bench_safe_number(specs(k,1)); q=bench_safe_number(specs(k,2));
             answers($+1)=bench_answer(msprintf("s%d.q%d",step,q),LD5.answers(step,q),specs(k,3));
         end
-        if isfield(LD5,"journal") then
+        if isfield(LD5,"journal") & LD5.journal<>[] then
             // Pagal padėtį (1,2,3) — ne pagal matavimo eilę.
             for tag=1:3
                 row=find(LD5.journal(:,3)==tag);
@@ -112,7 +112,6 @@ function r=bench_report_data(lab)
                       "P1",cfg.P1,"P2",cfg.P2,"P3",cfg.P3);
         w=emptystr(0,2);
         if isfield(LD5,"report_wires") then w=LD5.report_wires(1); end
-        if w==emptystr(0,2) then w=LD5.wires; end
         evidence.wiring=struct("s1",struct("pairs",bench_pairs(w),"meter","DC"));
         note="";
     else

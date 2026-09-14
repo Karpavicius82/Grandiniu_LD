@@ -501,6 +501,10 @@ function bench_ld5_workflow(n,root,gui)
         select step
         case 1 then
             for k=1:size(W,1); bench_ld5_click(W(k,1)); bench_ld5_click(W(k,2)); end
+            // Removing a real wire must fail checking; reconnect in reverse order.
+            bench_ld5_click("V_P"); bench_ld5_click("RVA");
+            bench_ld5_primary(); assert_checkfalse(LD5.done(1));
+            bench_ld5_click("RVA"); bench_ld5_click("V_P");
         case 2 then
             bench_ld5_answers(step,u2);
             bench_ld5_action("ld5_toggle_power()");
@@ -536,7 +540,10 @@ function bench_ld5_workflow(n,root,gui)
     assert_checktrue(and(LD5.done));
     assert_checkequal(LD5.student.number,n);
     if gui then
-        bench_export_report("LD5",root+"tests/results/");
+        before=size(listfiles(bench_documents()+"/*.html"),"*");
+        bench_ld5_primary();
+        assert_checkequal(size(listfiles(bench_documents()+"/*.html"),"*"),before+1);
+        assert_checktrue(strindex(LD5.ui.statusMain.string,"Ataskaita išsaugota")<>[]);
         if isfield(LD5,"fig") then delete(LD5.fig); end
     end
 endfunction
