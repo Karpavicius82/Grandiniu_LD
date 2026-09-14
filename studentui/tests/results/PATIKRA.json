@@ -1,21 +1,41 @@
 {
-  "time_utc": "2026-09-14T15:04:23.136488+00:00",
-  "scilab": "unknown",
-  "command": "./PATIKRINTI.sh visi",
+  "time_utc": "2026-09-14T18:32:39.517760+00:00",
+  "scilab": "2026.1.0",
   "status": "PASS",
+  "command": "tools/test_ld5.py on Windows/Linux; ctest (7 suites); tools/test_automatic_reports.py (321 reports per OS)",
+  "source_commit": "517d5a0a3fa7a660fcf3e70ffc94380c780498b3",
+  "ci": "https://github.com/Karpavicius82/Grandiniu_LD/actions/runs/34880604834",
   "coverage": {
-    "LD4_GUI_variants": [
+    "status": "PASS",
+    "source_commit": "517d5a0a3fa7a660fcf3e70ffc94380c780498b3",
+    "ci": "https://github.com/Karpavicius82/Grandiniu_LD/actions/runs/34880604834",
+    "platforms": [
+      "Windows 2022",
+      "Ubuntu 22.04"
+    ],
+    "scilab": "2026.1.0",
+    "gui_variants": [
       1,
       17,
       64
     ],
-    "LD4_GUI_stages_per_variant": 7,
-    "LD4_geometry_cases_per_OS": 42,
-    "LD4_geometry_errors": 0,
-    "actual_reports_per_OS": 257,
-    "operating_system_mouse_events": false,
-    "LD5_model_variants": 64,
-    "LD5_GUI_stages_per_variant": 6
+    "stages": 6,
+    "geometry_cases_per_os": 36,
+    "geometry_errors": 0,
+    "contact_target_px": [
+      36,
+      40
+    ],
+    "minimum_contact_gap_px": 47.84,
+    "tolerance_comparisons_per_os": 108,
+    "ld5_full_report_variants_per_os": 64,
+    "all_actual_reports_per_os": 321,
+    "native_test_suites_per_os": 7,
+    "actual_report_button": true,
+    "draft_restore": true,
+    "os_mouse_event_injection": false,
+    "physical_dpi_sweep": false,
+    "external_approval": false
   },
   "source_sha256": {
     "DESTYTOJUI.sce": "6518ec1acc2679736b3bd2b334381aded90c03e6f313559fde5ca1df46af1aa4",
@@ -68,12 +88,12 @@
     "LD4/ld4_utils.sci": "883c340d7aecb31edf71a401f2d97bc890d15a892ae2172c345394b5c46f6b1f",
     "LD5/LD5.sce": "1a371628adec117b09c31d984fcab3df87320d21194085ecc999ba8c1ccf0bbb",
     "LD5/LD5_LOAD.sce": "989d1a1ba9571c88e4e7429d02ffcfda1cf0dc4db786b381cf703b9202037845",
-    "LD5/ld5_callbacks.sci": "a2565c6f3a1fe83b3988ad0add03154326c4cf9e1f46e9f7873837bc4db6a082",
-    "LD5/ld5_circuit.sci": "c4c742bd01aa23b72a4398cf618592254b49f9b80dfbfec271416b2197591f85",
-    "LD5/ld5_config.sci": "ff4dccc4db9676566980e1446bb5e2c7b68561f6f058f34b95d089eef422884d",
-    "LD5/ld5_gui.sci": "e012db847c8997dcbe064cb2fd8c01abfd12491be5cbb80b85064512b34a80e9",
-    "LD5/ld5_ids.sci": "e1252ef69dd966af535f4b31d6c7585b0e2c74991a1cbadd308856e12300a318",
-    "LD5/ld5_student.sci": "f2cf85ec850de4bf327656c73c938a366f67a3bdf5862d6454d4bf0993aefadc",
+    "LD5/ld5_callbacks.sci": "2f933d255bd8b78547063c2e663091f6ccc416cd0a2aa838c119143b2e458069",
+    "LD5/ld5_circuit.sci": "816388bae90f5ef2392d186730b70e950f2050bfb7ee620281b71955ca361c11",
+    "LD5/ld5_config.sci": "ab33584d6b38386c0db425ad43a9f1f1208d1a9b28e86e1fc9f48c1e667e700d",
+    "LD5/ld5_gui.sci": "1aa3f256acd8127b6ae425071a38cc7ced5bff522817d5d80a86bd84ff23b8c0",
+    "LD5/ld5_ids.sci": "e63e06f0769ab8d232485b604099f8f5bcab5c68481c7ececda551f621d1c459",
+    "LD5/ld5_student.sci": "4ccae54cb02a00653a2c9fcdc2cad7714bfc88dca53e91408fface671d521df7",
     "LD5/ld5_utils.sci": "552a07d05594823fe27cd5e6449cd2e93538c7a76da00cb016f750af2c53c294",
     "PALEISTI.sh": "d135f0d78c8aaf76d2440c05331b9a2b9735a0bc0c20fd967e71952b5282411d",
     "PATIKRINTI.sh": "a2d596ad6c9a5df00d2b7082373ebeb8929836c4f977668515871cec33a470b5",
@@ -81,20 +101,25 @@
     "PERZIURA_LD2.sce": "64461ba07fcf298f561d061979c518213bfd81b439d918dbf98c0f8c1a6e7a35",
     "PERZIURA_LD3.sce": "17ff85ef2dd5d0e5c25d9096e1691f8c94b46b4748fa27d16cdbe7a45746d23b",
     "PERZIURA_LD4.sce": "1dbd04909b487b5586d41b2dc9ce650e3c29e92443841768e5f7fe86826050d8",
-    "PERZIURA_LD5.sce": "be11620e69744a61fd1a7d89e37a0ed5b48fcad87abe827a295834d1cca43576",
+    "PERZIURA_LD5.sce": "1e059d014b6e9b73b6cbd4b1c85a3e35a6b34906e1413c9a83bc9aaa4eb04e5e",
     "STENDAS.sce": "b47976e8bfda7843222ca738253375fe5d14c075ab30e0e6867daea56846731e",
     "bench_common.sci": "85c36e1f52e7728a4a209a4aa2abbfdf0d68a2e959728341c2f632ae7aca8695",
-    "bench_report.sci": "28bc23e8abb3a0bc9837f74226454ca3a9907da37ab3f8049363354c41e42170",
-    "bench_session.sci": "cb54f9661706097081450d717067bb97ce79000322c30dadaf3a8476e5fdda75",
+    "bench_report.sci": "60e8639077cae0bdafcac6fa03189ba41374d78234b584af1794cbadcfbbb2bd",
+    "bench_session.sci": "9c71b4e7ab19e880fd55a1c884bd7e7d20c0dc3b81fc241203f43a74033becf7",
     "bench_teacher.sci": "8de6d5b3de9924f8f0e301c893d7d3f82c0dd74e158534487d6aebbc0cd6f3c0",
     "student_profile.sci": "ee30bcf28cbdc844d9bfc8677f6b8406ab52f2b30209767c713c7f8d8744f67a",
     "student_style.sci": "1d5a3bd10bf3533add3bd6c8fbeac967e773bf15a2eab3c2a6911254970b54c0",
     "tests/AUTOMATINIS.sce": "e38222c9c1b229a2cfb107f364602f4d79998b0ddee8870e39be8323bd680ff9",
     "tests/HEADLESS.sce": "483f54b06c9997b4b133b4303ecd2fe66732cf2ff546b191822f449a59dc5aeb",
-    "tests/workflows.sci": "999332d99f600616788229eb38df2f5ee2d6d043728a5eecd08b6d0847b7ff07"
+    "tests/workflows.sci": "b38e44aa845c9ec94c2e19e1de8c55bb25fb24f99d9d77d9ae8a78c6aee5fa6a"
   },
   "log_sha256": {
-    "modelis.log": "22a41df94c927d28d3e5286e27172ae9c7ad7baf4362462d10ab04fc21a8aee8",
-    "langai.log": "5d2e59edc6b8fcf04f991f4fa01ad85811e32f3f4983cc500c2a20142a0d9b68"
+    "audits/ld5-c9b18f3-fixes/ctest.log": "b326f411601b16ea10eda5a08f28bdb6f6e9c317d8913664659d7e9bf54fd958",
+    "audits/ld5-c9b18f3-fixes/linux/geometry.log": "74795d76c66d408f57a9e5c90e693d14cbf8e39176b2bdb51e83b064c7d0a681",
+    "audits/ld5-c9b18f3-fixes/linux/scilab.log": "55eea7bde760d74f2c169b25865992fb57d463e74228ef75457e36466cd9fc77",
+    "audits/ld5-c9b18f3-fixes/linux/verdict.log": "66ba384456d79837e1fb055eba1770584ac5fa0a468246ebd788056f12cf8f86",
+    "audits/ld5-c9b18f3-fixes/windows/geometry.log": "d8e9ac6d166e97aaebc446b822c1110ffb4d0e269b0a338e23b397b330ed3086",
+    "audits/ld5-c9b18f3-fixes/windows/scilab.log": "5ad066368d33f21edb498a49524d6340668146738b8d373f42318b1ae7f44ffd",
+    "audits/ld5-c9b18f3-fixes/windows/verdict.log": "cdd38b699672e8449e1d44deab6bceaf2a523d6ecf7af016edcda119e36576ee"
   }
 }

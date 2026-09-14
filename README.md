@@ -2,6 +2,8 @@
 
 Interaktyvūs elektros grandinių laboratoriniai darbai: Scilab sąsaja, bendras C++ branduolys ir automatinis LD1–LD5 ataskaitų vertinimas.
 
+[LD5 pataisos ir Windows/Linux patikra](audits/ld5-c9b18f3-fixes/README.md): gnybtai, gyvi rodmenys, studento eiga ir automatinis ataskaitų vertinimas.
+
 **Studentas pateikia vieną HTML ataskaitą. Dėstytojas pasirenka darbų aplanką ir gauna balus, klaidų komentarus bei CSV suvestinę.** [Naudojimas, rubrika ir surinkimas](core/README.md). [Naujausia automatinio vertinimo patikra](audits/closure-2026-09-13/README.md).
 
 Windows / Linux paketai su C++ branduoliu kuriami [GitHub Actions](https://github.com/Karpavicius82/Grandiniu_LD/actions/workflows/native.yml). Šaltinių kopijai pirmiausia reikia surinkti branduolį pagal `core/README.md`.

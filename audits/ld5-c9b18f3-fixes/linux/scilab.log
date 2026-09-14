@@ -1,0 +1,33 @@
+
+(process:2916): Gtk-WARNING **: 18:26:39.551: Locale not supported by C library.
+	Using the fallback 'C' locale.
+
+(scilab-bin:2916): dbind-WARNING **: 18:26:39.623: AT-SPI: Error retrieving accessibility bus address: org.freedesktop.DBus.Error.ServiceUnknown: The name org.a11y.Bus was not provided by any .service files
+Shared archive loaded.
+Link done.
+PASS LD5 V01: etapas 1
+PASS LD5 V01: etapas 2
+PASS LD5 V01: etapas 3
+PASS LD5 V01: etapas 4
+PASS LD5 V01: etapas 5
+PASS LD5 V01: etapas 6
+PASS LD5 V17: etapas 1
+PASS LD5 V17: etapas 2
+PASS LD5 V17: etapas 3
+PASS LD5 V17: etapas 4
+PASS LD5 V17: etapas 5
+PASS LD5 V17: etapas 6
+PASS LD5 V64: etapas 1
+PASS LD5 V64: etapas 2
+PASS LD5 V64: etapas 3
+PASS LD5 V64: etapas 4
+PASS LD5 V64: etapas 5
+PASS LD5 V64: etapas 6
+xwininfo: can not set locale properly
+/home/runner/work/_temp/ld5-ui/E1.png 1280 812
+xwininfo: can not set locale properly
+/home/runner/work/_temp/ld5-ui/E4.png 1280 812
+xwininfo: can not set locale properly
+/home/runner/work/_temp/ld5-ui/E6.png 1280 812
+xwininfo: can not set locale properly
+/home/runner/work/_temp/ld5-ui/rodmenys.png 1280 812
