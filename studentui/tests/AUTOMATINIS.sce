@@ -1,10 +1,10 @@
 mode(-1);
 root=get_absolute_file_path("AUTOMATINIS.sce")+"../";
 try
-    exec(root+"LD1/LD1_LOAD.sce",-1); exec(root+"LD2/LD2_LOAD.sce",-1); exec(root+"LD3/LD3_LOAD.sce",-1); exec(root+"LD4/LD4_LOAD.sce",-1);
+    exec(root+"LD1/LD1_LOAD.sce",-1); exec(root+"LD2/LD2_LOAD.sce",-1); exec(root+"LD3/LD3_LOAD.sce",-1); exec(root+"LD4/LD4_LOAD.sce",-1); exec(root+"LD5/LD5_LOAD.sce",-1);
     exec(root+"tests/workflows.sci",-1); exec(root+"bench_teacher.sci",-1);
     bench_core_require();
-    global LD1 LD2 LD3 LD4;
+    global LD1 LD2 LD3 LD4 LD5;
     for bad=["1+2" "exec(""x"")" "%nan" "NaN" "Inf" "1e999" "1 2" "1.2.3" "" "0x10" "(2)"]
         assert_checktrue(isnan(ld1_parse_number(bad)));assert_checktrue(isnan(ld2_safe_number(bad)));
     end
@@ -45,6 +45,9 @@ try
         bench_ld4_workflow(n,root,%f);
         LD4.student.name="Patikra Žąsė "+string(n);LD4.student.group="TEST-DC";
         bench_export_report("LD4",folder);
+        bench_ld5_workflow(n,root,%f);
+        LD5.student.name="Patikra Žąsė "+string(n);LD5.student.group="TEST-DC";
+        bench_export_report("LD5",folder);
         bench_export_report("LD3",folder);
         // Independent Scilab formula vs actual C++ MNA backend.
         for f=[0 40 1000 5000 10000]
@@ -81,7 +84,7 @@ try
         [p,status]=bench_batch_call(2,folder,output);assert_checktrue(status>=0);
     end
     [p,status]=bench_batch_call(4,folder,output);assert_checkequal(status,1);
-    assert_checkequal(p(1),257);assert_checkequal(p(3),257);assert_checkequal(p(4),0);
+    assert_checkequal(p(1),321);assert_checkequal(p(3),321);assert_checkequal(p(4),0);
     mprintf("AUTOMATIC_PASS: 256 full reports + wrong/missing answers, C++ CFFI folder grading, UTF-8 HTML\n");
     exit(0);
 catch

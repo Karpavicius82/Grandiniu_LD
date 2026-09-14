@@ -96,7 +96,7 @@ function bench_write_new(path,contents)
 endfunction
 
 function bench_mode(lab)
-    global LD1 LD2 LD3 LD4;
+    global LD1 LD2 LD3 LD4 LD5;
     selected=x_choose(["Atsiskaitymas · atsakymus tikrina dėstytojo programa"; ...
         "Mokymasis · galima tikrinti atsakymus ir matyti pavyzdžius"],"Darbo režimas");
     if selected==0 then return;end
@@ -118,5 +118,10 @@ function bench_mode(lab)
         if selected==2 then LD4.practice_used=%t; end
         if LD4.assessment then ld4_set_status("Atsiskaitymo režimas: atsakymus tikrins dėstytojo programa.","ok","");
         else ld4_set_status("Mokymosi režimas: galima tikrintis ir naudotis pagalba.","ok",""); end
+    elseif lab=="LD5" then
+        LD5.assessment=(selected==1);
+        if selected==2 then LD5.practice_used=%t; end
+        if LD5.assessment then ld5_set_status("Atsiskaitymo režimas: atsakymus tikrins dėstytojo programa.","ok","");
+        else ld5_set_status("Mokymosi režimas: galima tikrintis ir naudotis pagalba.","ok",""); end
     end
 endfunction

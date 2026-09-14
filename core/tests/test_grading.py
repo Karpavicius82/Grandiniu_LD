@@ -91,6 +91,30 @@ def fixture(lab, n, identity):
                   ["R2B", "E_N"], ["V_P", "R1A"], ["V_N", "R2B"]]
         report["evidence"] = dict(wiring={"s1": {"pairs": [["E_P","K1"],["K2","A_P"],["A_N","R1A"],["R1B","E_N"],["V_P","R1A"],["V_N","R1B"]], "meter": "DC"},
                                           "s6": {"pairs": series, "meter": "DC"}})
+    elif lab == "LD5":
+        n1_ = [100, 120, 150, 180, 220, 270, 330, 390][a]
+        n2_ = [470, 560, 680, 820, 1000, 1200, 1500, 1800][b]
+        d1 = n % 11 - 5
+        d2 = (3 * n) % 11 - 5
+        r1a_ = round(n1_ * (1 + d1 / 100) * 10) / 10
+        rva_ = round(n2_ * (1 + d2 / 100) * 10) / 10
+        p1_, p2_, p3_ = [(25, 50, 75), (20, 45, 70), (30, 55, 80), (15, 40, 65),
+                          (35, 60, 85), (25, 60, 90), (10, 50, 80), (30, 50, 70)][b]
+        report["parameters"] = dict(R1nom=n1_, RVnom=n2_, R1=r1a_, RV=rva_, E=9, P1=p1_, P2=p2_, P3=p3_)
+        rv2 = rva_ * p2_ / 100
+        rv1 = rva_ * p1_ / 100
+        rv3 = rva_ * p3_ / 100
+        u1_, u2_, u3_ = 9*rv1/(r1a_+rv1), 9*rv2/(r1a_+rv2), 9*rv3/(r1a_+rv3)
+        vector(2, [u2_], ["V"])
+        for k, u in [(1, u1_), (2, u2_), (3, u3_)]:
+            observation(f"u{k}", u, "V")
+            observation(f"i{k}", 9/(r1a_ + [rv1, rv2, rv3][k-1]) * 1000, "mA")
+        vector(4, [u1_, u3_, u3_ - u1_, (u3_ - u1_) / 9 * 100], ["V", "V", "V", "1"])
+        vector(5, [9/(r1a_+rv2)*1000, rv2/(r1a_+rv2)*100], ["mA", "1"])
+        vector(6, [1, 1], ["choice", "choice"])
+        series = [["E_P", "K1"], ["K2", "A_P"], ["A_N", "R1A"], ["R1B", "RVA"],
+                  ["RVB", "E_N"], ["V_P", "RVA"], ["V_N", "RVB"]]
+        report["evidence"] = dict(wiring={"s1": {"pairs": series, "meter": "DC"}})
     else:
         report["parameters"] = dict(E_RC=9,F_RC=frc,R8=r8,C2=4.7e-6,E_RL=9,F_RL=frl,R9=r9,L1=.5,
                                     E_RLC=5,R13=r13,L3=l,C4=c)

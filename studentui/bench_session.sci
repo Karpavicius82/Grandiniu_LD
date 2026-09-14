@@ -1,7 +1,7 @@
 // Local resume files are separate from submitted reports. Keep the last two
 // complete snapshots; a failed save must leave the previous snapshot intact.
 function session=bench_snapshot(lab)
-    global LD1 LD2 LD3 LD4;
+    global LD1 LD2 LD3 LD4 LD5;
     session=struct("format","Grandiniu-LD-session-1","lab",lab,"state",struct());
     if lab=="LD1" then
         session.cfg=LD1.cfg; session.student=LD1.student;
@@ -20,6 +20,12 @@ function session=bench_snapshot(lab)
         for field=fieldnames(LD4)'
             if or(field==["ui" "fig" "term" "base" "root" "cfg" "student" "backup" "autosave_paths" "autosave_error"]) then continue; end
             session.state(field)=LD4(field);
+        end
+    elseif lab=="LD5" then
+        session.cfg=LD5.cfg; session.student=LD5.student;
+        for field=fieldnames(LD5)'
+            if or(field==["ui" "fig" "term" "base" "root" "cfg" "student" "backup" "autosave_paths" "autosave_error"]) then continue; end
+            session.state(field)=LD5(field);
         end
     else
         session.cfg=LD2.cfg;session.student=LD2.state.student;session.state=LD2.state;
@@ -52,6 +58,9 @@ function bench_autosave(lab)
     elseif lab=="LD4" then
         if ~isfield(LD4,"autosave_enabled") then return; end
         if ~LD4.autosave_enabled then return; end
+    elseif lab=="LD5" then
+        if ~isfield(LD5,"autosave_enabled") then return; end
+        if ~LD5.autosave_enabled then return; end
     else
         if ~isfield(LD2,"autosave_enabled") then return; end
         if ~LD2.autosave_enabled | LD2.example_active then return; end
@@ -88,6 +97,7 @@ function bench_autosave(lab)
         elseif lab=="LD3" then LD3.autosave_error=problem;
             ld3_set_status("Nepavyko išsaugoti juodraščio.","error",problem);
         elseif lab=="LD4" then LD4.autosave_error=problem;
+        elseif lab=="LD5" then LD5.autosave_error=problem;
             ld4_set_status("Nepavyko išsaugoti juodraščio.","error",problem);
         else LD2.autosave_error=problem;ld2_set_status("Nepavyko išsaugoti juodraščio: "+problem,"error");end
     end
@@ -104,6 +114,7 @@ function session=bench_read_snapshot(path,lab)
     if lab=="LD1" then expected=ld1_variant_config(st.number);
     elseif lab=="LD3" then expected=ld3_variant_config(st.number);
     elseif lab=="LD4" then expected=ld4_variant_config(st.number);
+    elseif lab=="LD5" then expected=ld5_variant_config(st.number);
     else expected=ld2_variant_config(st.number);end
     if ~isequal(session.cfg,expected) then error("Juodraščio variantas ir parametrai nesutampa.");end
     if lab=="LD1" then
@@ -112,6 +123,8 @@ function session=bench_read_snapshot(path,lab)
         if or(size(session.state.answers)<>[6 8]) | session.state.step<1 | session.state.step>6 then error("Sugadinti LD3 atsakymai.");end
     elseif lab=="LD4" then
         if or(size(session.state.answers)<>[7 8]) | session.state.step<1 | session.state.step>7 then error("Sugadinti LD4 atsakymai.");end
+    elseif lab=="LD5" then
+        if or(size(session.state.answers)<>[6 8]) | session.state.step<1 | session.state.step>6 then error("Sugadinti LD5 atsakymai.");end
     else
         if or(size(session.state.answers_text)<>[12 8]) | session.state.step<1 | session.state.step>12 then error("Sugadinti LD2 atsakymai.");end
     end
@@ -162,6 +175,17 @@ function bench_restore_snapshot(session)
             ld4_set_step(step);
             for field=fieldnames(session.state)';LD4(field)=session.state(field);end
             ld4_set_status("Juodraštis atkurtas: "+student_caption(LD4.student),"ok","");
+        elseif session.lab=="LD5" then
+            step=session.state.step;
+            LD5.cfg=session.cfg;LD5.student=session.student;
+            LD5.step=0;
+            for field=fieldnames(session.state)'
+                if field=="step" then continue;end
+                LD5(field)=session.state(field);
+            end
+            ld5_set_step(step);
+            for field=fieldnames(session.state)';LD5(field)=session.state(field);end
+            ld5_set_status("Juodraštis atkurtas: "+student_caption(LD5.student),"ok","");
         else
             LD2.cfg=session.cfg;LD2.state=session.state;LD2.state.power=%f;
             LD2.example_active=%f;LD2.ui.answer_step=0;LD2.ui.answer_edits=[];

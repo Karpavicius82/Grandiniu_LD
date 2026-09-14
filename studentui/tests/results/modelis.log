@@ -62,5 +62,5 @@ PASS V61: LD1 matavimai, visi 12 LD2 etapų, LD3 variantas ir Ohmo modelis
 PASS V62: LD1 matavimai, visi 12 LD2 etapų, LD3 variantas ir Ohmo modelis
 PASS V63: LD1 matavimai, visi 12 LD2 etapų, LD3 variantas ir Ohmo modelis
 PASS V64: LD1 matavimai, visi 12 LD2 etapų, LD3 variantas ir Ohmo modelis
-REGISTRY_OK: LD1 78, LD2 145, LD3 38, LD4 45 kodų — unikalūs, pavyzdiniai T01/B01 rasti
-HEADLESS_PASS: 64 LD1 + 64 LD2 + 64 LD3 + 64 LD4 variantai, įvesties atmetimas, 768 LD2 etapų, Ohmo modelis, sesijos atkūrimas
+REGISTRY_OK: LD1 78, LD2 145, LD3 38, LD4 45, LD5 41 kodų — unikalūs, pavyzdiniai T01/B01 rasti
+HEADLESS_PASS: 64 LD1 + 64 LD2 + 64 LD3 + 64 LD4 + 64 LD5 variantai, įvesties atmetimas, 768 LD2 etapų, Ohmo modelis, sesijos atkūrimas

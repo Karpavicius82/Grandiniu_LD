@@ -443,3 +443,100 @@ function bench_ld4_workflow(n,root,gui)
         if isfield(LD4,"fig") then delete(LD4.fig); end
     end
 endfunction
+
+
+// ------------------------------- LD5 ----------------------------------------
+function bench_ld5_action(callback)
+    global LD5;
+    if LD5.ui.headless then execstr(callback); return; end
+    for k=1:size(LD5.ui.dynamic,"*")
+        h=LD5.ui.dynamic(k);
+        if h.callback==callback then bench_button(h); return; end
+    end
+    error("Nėra matomo LD5 mygtuko: "+callback);
+endfunction
+
+function bench_ld5_click(id)
+    bench_ld5_action(msprintf("ld5_terminal_click(""%s"")",id));
+endfunction
+
+function bench_ld5_primary()
+    global LD5;
+    if LD5.ui.headless then ld5_student_primary();
+    else bench_button(LD5.ui.studentPrimary); end
+endfunction
+
+function bench_ld5_answers(step,values)
+    global LD5;
+    if LD5.ui.headless then ld5_test_answers(step,values); return; end
+    vi=1;
+    for k=1:9
+        mapa=[2 1;4 1;4 2;4 3;4 4;5 1;5 2;6 1;6 2];
+        st=mapa(k,1);
+        if st==step & vi<=size(values,"*") then
+            LD5.ui.answerEdits(k).string=msprintf("%.12g",values(vi));
+            execstr(LD5.ui.answerEdits(k).callback);
+            vi=vi+1;
+        end
+    end
+endfunction
+
+function bench_ld5_workflow(n,root,gui)
+    global LD5;
+    if argn(2)<3 then gui=%f; end
+    cfg=ld5_variant_config(n);
+    [valid,why]=ld5_validate_config(cfg);
+    assert_checktrue(valid);
+    LD5=struct("cfg",cfg,"student",student_profile(n,"Automatinė Patikra","TEST","LD5"), ...
+        "ui",struct("headless",~gui));
+    ld5_start();
+    if gui then
+        if isfield(LD5,"fig") then LD5.fig.figure_name="PATIKRA · LD5 · variantas "+string(n); end
+    end
+    W=["E_P" "K1";"K2" "A_P";"A_N" "R1A";"R1B" "RVA";"RVB" "E_N";"V_P" "RVA";"V_N" "RVB"];
+    rv2=cfg.RV*cfg.P2/100; rv1=cfg.RV*cfg.P1/100; rv3=cfg.RV*cfg.P3/100;
+    u2=cfg.E*rv2/(cfg.R1+rv2); u1=cfg.E*rv1/(cfg.R1+rv1); u3=cfg.E*rv3/(cfg.R1+rv3);
+    for step=1:6
+        assert_checkequal(LD5.step,step);
+        select step
+        case 1 then
+            for k=1:size(W,1); bench_ld5_click(W(k,1)); bench_ld5_click(W(k,2)); end
+        case 2 then
+            bench_ld5_answers(step,u2);
+            bench_ld5_action("ld5_toggle_power()");
+            bench_ld5_action("ld5_toggle_switch()");
+            bench_ld5_action("ld5_set_position(2)"); bench_ld5_action("ld5_measure()");
+        case 3 then
+            bench_ld5_action("ld5_set_position(1)"); bench_ld5_action("ld5_measure()");
+            bench_ld5_action("ld5_set_position(3)"); bench_ld5_action("ld5_measure()");
+        case 4 then
+            bench_ld5_answers(step,[u1 u3 u3-u1 (u3-u1)/cfg.E*100]);
+        case 5 then
+            bench_ld5_answers(step,[cfg.E/(cfg.R1+rv2)*1000 rv2/(cfg.R1+rv2)*100]);
+        case 6 then
+            bench_ld5_answers(step,[1 1]);
+        end
+        bench_ld5_primary();
+        if ~LD5.done(step) then
+            detail="";
+            if isfield(LD5.ui,"statusMain") then detail=": "+LD5.ui.statusMain.string; end
+            error("LD5 V"+string(n)+" etapas "+string(step)+detail);
+        end
+        if step==3 then
+            assert_checkequal(size(LD5.journal,1),3);
+            for k=1:3
+                rvk=cfg.RV*cfg("P"+string(k))/100;
+                uk=cfg.E*rvk/(cfg.R1+rvk);
+                row=find(LD5.journal(:,3)==k);
+                assert_checkalmostequal(LD5.journal(row,1),uk,1e-3,1e-3);
+            end
+        end
+        if gui then mprintf("PASS LD5 V%02d: etapas %d\n",n,step); end
+    end
+    assert_checktrue(and(LD5.done));
+    assert_checkequal(LD5.student.number,n);
+    if gui then
+        bench_export_report("LD5",root+"tests/results/");
+        if isfield(LD5,"fig") then delete(LD5.fig); end
+    end
+endfunction
