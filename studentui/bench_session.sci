@@ -1,7 +1,7 @@
 // Local resume files are separate from submitted reports. Keep the last two
 // complete snapshots; a failed save must leave the previous snapshot intact.
 function session=bench_snapshot(lab)
-    global LD1 LD2 LD3 LD4 LD5 LD6;
+    global LD1 LD2 LD3 LD4 LD5 LD6 LD7;
     session=struct("format","Grandiniu-LD-session-1","lab",lab,"state",struct());
     if lab=="LD1" then
         session.cfg=LD1.cfg; session.student=LD1.student;
@@ -37,6 +37,14 @@ function session=bench_snapshot(lab)
             if or(field==["ui" "fig" "term" "base" "root" "cfg" "student" "backup" "autosave_paths" "autosave_error"]) then continue; end
             session.state(field)=LD6(field);
         end
+    elseif lab=="LD7" then
+        if LD7.demoMode then error("Grįžkite į savo darbą prieš išsaugodami juodraštį."); end
+        ld7_save_answers();
+        session.cfg=LD7.cfg; session.student=LD7.student;
+        for field=fieldnames(LD7)'
+            if or(field==["ui" "fig" "term" "base" "root" "cfg" "student" "backup" "autosave_paths" "autosave_error"]) then continue; end
+            session.state(field)=LD7(field);
+        end
     else
         session.cfg=LD2.cfg;session.student=LD2.state.student;session.state=LD2.state;
     end
@@ -57,7 +65,7 @@ function path=bench_save_snapshot(lab)
 endfunction
 
 function bench_autosave(lab)
-    global LD1 LD2 LD3 LD4 LD5 LD6 BENCH_AUTOSAVE_SUSPENDED;
+    global LD1 LD2 LD3 LD4 LD5 LD6 LD7 BENCH_AUTOSAVE_SUSPENDED;
     if BENCH_AUTOSAVE_SUSPENDED==%t then return; end
     if lab=="LD1" then
         if ~isfield(LD1,"autosave_enabled") then return; end
@@ -74,6 +82,9 @@ function bench_autosave(lab)
     elseif lab=="LD6" then
         if ~isfield(LD6,"autosave_enabled") then return; end
         if ~LD6.autosave_enabled | LD6.demoMode then return; end
+    elseif lab=="LD7" then
+        if ~isfield(LD7,"autosave_enabled") then return; end
+        if ~LD7.autosave_enabled | LD7.demoMode then return; end
     else
         if ~isfield(LD2,"autosave_enabled") then return; end
         if ~LD2.autosave_enabled | LD2.example_active then return; end
@@ -107,6 +118,11 @@ function bench_autosave(lab)
             LD6.autosave_paths($+1)=path;
             if size(LD6.autosave_paths,"*")>2 then mdelete(LD6.autosave_paths(1));LD6.autosave_paths(1)=[];end
             LD6.autosave_error="";
+        elseif lab=="LD7" then
+            if ~isfield(LD7,"autosave_paths") then LD7.autosave_paths=emptystr(0,1); end
+            LD7.autosave_paths($+1)=path;
+            if size(LD7.autosave_paths,"*")>2 then mdelete(LD7.autosave_paths(1));LD7.autosave_paths(1)=[];end
+            LD7.autosave_error="";
         else
             if ~isfield(LD2,"autosave_paths") then LD2.autosave_paths=emptystr(0,1); end
             LD2.autosave_paths($+1)=path;
@@ -125,6 +141,8 @@ function bench_autosave(lab)
             ld5_set_status("Nepavyko išsaugoti juodraščio.","error",problem);
         elseif lab=="LD6" then LD6.autosave_error=problem;
             ld6_set_status("Nepavyko išsaugoti juodraščio.","error",problem);
+        elseif lab=="LD7" then LD7.autosave_error=problem;
+            ld7_set_status("Nepavyko išsaugoti juodraščio.","error",problem);
         else LD2.autosave_error=problem;ld2_set_status("Nepavyko išsaugoti juodraščio: "+problem,"error");end
     end
 endfunction
@@ -142,6 +160,7 @@ function session=bench_read_snapshot(path,lab)
     elseif lab=="LD4" then expected=ld4_variant_config(st.number);
     elseif lab=="LD5" then expected=ld5_variant_config(st.number);
     elseif lab=="LD6" then expected=ld6_variant_config(st.number);
+elseif lab=="LD7" then expected=ld7_variant_config(st.number);
     else expected=ld2_variant_config(st.number);end
     if ~isequal(session.cfg,expected) then error("Juodraščio variantas ir parametrai nesutampa.");end
     if lab=="LD1" then
@@ -154,13 +173,15 @@ function session=bench_read_snapshot(path,lab)
         if or(size(session.state.answers)<>[6 8]) | ~ld5_valid_index(session.state.step,6) then error("Sugadinti LD5 atsakymai.");end
     elseif lab=="LD6" then
         if or(size(session.state.answers)<>[6 8]) | ~ld6_valid_index(session.state.step,6) then error("Sugadinti LD6 atsakymai.");end
+    elseif lab=="LD7" then
+        if or(size(session.state.answers)<>[6 8]) | ~ld7_valid_index(session.state.step,6) then error("Sugadinti LD7 atsakymai.");end
     else
         if or(size(session.state.answers_text)<>[12 8]) | session.state.step<1 | session.state.step>12 then error("Sugadinti LD2 atsakymai.");end
     end
 endfunction
 
 function bench_restore_snapshot(session)
-    global LD1 LD2 LD3 LD4 LD5 LD6 BENCH_AUTOSAVE_SUSPENDED;
+    global LD1 LD2 LD3 LD4 LD5 LD6 LD7 BENCH_AUTOSAVE_SUSPENDED;
     BENCH_AUTOSAVE_SUSPENDED=%t;
     try
         if session.lab=="LD1" then
@@ -230,6 +251,19 @@ function bench_restore_snapshot(session)
             LD6.lastMeasurement=%nan;
             ld6_render_stage();
             ld6_set_status("Juodraštis atkurtas: "+student_caption(LD6.student),"ok","Maitinimas išjungtas.");
+        elseif session.lab=="LD7" then
+            LD7.cfg=session.cfg;LD7.student=session.student;
+            // Apply the store before rendering, so stale edits cannot overwrite it.
+            for field=fieldnames(session.state)';LD7(field)=session.state(field);end
+            if ~isfield(session.state,"report_wires") then
+                LD7.report_wires=list();
+                for k=1:3;LD7.report_wires(k)=emptystr(0,2);end
+                LD7.done(:)=%f;
+            end
+            LD7.powerOn=%f;LD7.switchOn=%f;LD7.demoMode=%f;LD7.pending="";
+            LD7.lastMeasurement=%nan;
+            ld7_render_stage();
+            ld7_set_status("Juodraštis atkurtas: "+student_caption(LD7.student),"ok","Maitinimas išjungtas.");
         else
             LD2.cfg=session.cfg;LD2.state=session.state;LD2.state.power=%f;
             LD2.example_active=%f;LD2.ui.answer_step=0;LD2.ui.answer_edits=[];

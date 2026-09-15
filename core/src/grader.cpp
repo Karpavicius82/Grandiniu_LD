@@ -476,6 +476,64 @@ void grade_ld6_sources(Grader& grader,const Json& report,const Bank& variant) {
             valid?"Patikrinkite šaltinių poliškumą ir zondus prie R.":"Trūksta tinkamo sujungimo įrodymo.",valid?"":"missing_evidence");
     }
 }
+bool ld7_wiring(const Json& pairs,bool& valid,int mode=1) {
+    std::vector<std::pair<std::string,std::string>> required={{"E_P","K1"},{"K2","A_P"},{"A_N","R_A"},{"V_P","R_A"},{"V_N","R_B"}};
+    if(mode==1) required.push_back({"R_B","E_N"});
+    if(mode==2) required={{"V_P","E_P"},{"V_N","E_N"}};
+    if(mode==3) required={{"E_P","K1"},{"K2","A_P"},{"A_N","E_N"}};
+    try {
+        if(!pairs.is_array()) {valid=false;return false;}
+        if(pairs.size()!=required.size()) return false;
+        std::set<std::pair<std::string,std::string>> unique,canonical;
+        for(const auto& wire:required) canonical.insert({std::min(wire.first,wire.second),std::max(wire.first,wire.second)});
+        for(auto& w:pairs) {
+            if(!w.is_array()||w.size()!=2) {valid=false;return false;}
+            const auto a=text(w.at(0)),b2=text(w.at(1));
+            if(a.empty()||b2.empty()) {valid=false;return false;}
+            if(!unique.insert({std::min(a,b2),std::max(a,b2)}).second) return false;
+        }
+        return unique==canonical;
+    } catch(const std::exception&) {valid=false;return false;}
+}
+void grade_ld7(Grader& grader,const Json& report,const Bank& variant) {
+    parameters(report,{{"E",variant.e7},{"r",variant.r7},{"R1",variant.w71},{"R2",variant.w72},
+                       {"R3",variant.w73},{"R4",variant.w74},{"R5",variant.w75}});
+    const double E=variant.e7,r=variant.r7;
+    const double load[5]={variant.w71,variant.w72,variant.w73,variant.w74,variant.w75};
+    double volts[5],cur[5],p[5];
+    for(int k=0;k<5;++k) {
+        volts[k]=E*load[k]/(load[k]+r);
+        cur[k]=E/(load[k]+r)*1000;
+        p[k]=volts[k]*cur[k];
+        grader.measured("u"+std::to_string(k+1),"Matavimas: U, padėtis P"+std::to_string(k+1),volts[k],"V",0,.005);
+        grader.measured("i"+std::to_string(k+1),"Matavimas: I, padėtis P"+std::to_string(k+1),cur[k],"mA",.02);
+    }
+    grader.measured("te_u","Matavimas: tuščiosios eigos įtampa U0",E*1e6/(1e6+r),"V",0,.005);
+    grader.measured("tj_i","Matavimas: trumpojo jungimo srovė Ik",E/(r+1e-6)*1000,"mA",.02);
+    grader.answer("s3.q1","Vidinė varža r iš dviejų taškų: r = (U5−U1)/(I1−I5)",r,"Ohm","r = ΔU/ΔI; srovę perkelti į amperus.",.03,1e-9);
+    grader.answer("s3.q2","Patikra: E = U1 + I1·r",E,"V","I1 – amperais.",.01,1e-9);
+    grader.answer("s4.q1","Galia padėtyje P1: P1 = U1 · I1",p[0],"mW","P = U[V] · I[mA] = mW.",.02,1e-9);
+    grader.answer("s4.q2","Galia padėtyje P3: P3 = U3 · I3",p[2],"mW","P = U[V] · I[mA] = mW.",.02,1e-9);
+    grader.answer("s4.q3","Galia padėtyje P5: P5 = U5 · I5",p[4],"mW","P = U[V] · I[mA] = mW.",.02,1e-9);
+    grader.answer("s4.q4","Teorinė didžiausioji galia: Pmax = E²/(4r)",1000*E*E/(4*r),"mW","Pmax = E²/(4r) W → ×1000 mW.",.02,1e-9);
+    grader.answer("s4.q5","Naudingumo koeficientas padėtyje P3: η3 = (U3/E)·100 %",50.0,"1","η = R3/(R3+r) · 100.",.02,1e-9);
+    grader.answer("s5.q1","Tuščiosios eigos įtampa U0",E*1e6/(1e6+r),"V","U0 ≈ E (TE).",.01,1e-9);
+    grader.answer("s5.q2","Trumpojo jungimo srovė Ik = E/r",E/r*1000,"mA","Ik = E/r A → ×1000 mA.",.02,1e-9);
+    grader.answer("s6.q1","Išvada: galia didžiausia, kai R = r",1,"choice","1 – Taip, 2 – Ne.",0,0);
+    grader.answer("s6.q2","Išvada: suderinamumo režime η = 50 %",1,"choice","1 – Taip, 2 – Ne.",0,0);
+    grader.answer("s6.q3","Išvada: kodėl U mažėja didėjant srovei",1,"choice","1 – krista vidinėje varžoje, 2 – keičiasi šaltinio EV.",0,0);
+    const std::pair<const char*,int> wiring_stages[]={{"s1",1},{"s5te",2},{"s5tj",3}};
+    const char* wiring_labels[3]={"Sujungimas: E → K → A → R grįžimas; voltmetras prie R",
+                                  "Sujungimas (TE): voltmetras prie šaltinio galų",
+                                  "Sujungimas (TJ): ampermetras vietoj krovinio"};
+    for(auto& entry:wiring_stages) {
+        bool valid=true,correct=false;
+        try {correct=ld7_wiring(report.at("evidence").at("wiring").at(entry.first).at("pairs"),valid,entry.second);}
+        catch(const std::exception&) {valid=false;}
+        grader.add(std::string(entry.first)+".wiring",wiring_labels[entry.second-1],correct,
+            valid?"Patikrinkite laidus pagal schemas ir zondų vietas.":"Trūksta tinkamo sujungimo įrodymo.",valid?"":"missing_evidence");
+    }
+}
 void grade_ld3(Grader& g,const Json& r,const Bank& b) {
     parameters(r,{{"R",b.r},{"U1",b.u1},{"U2",b.u2},{"U3",b.u3}});
     const double uu[3]={b.u1,b.u2,b.u3},im[3]={b.u1/b.r*1000,b.u2/b.r*1000,b.u3/b.r*1000};
@@ -529,7 +587,7 @@ Json read_report(const std::filesystem::path& path) {
 }
 Json grade(const Json& r) {
     require(r.at("schema_version").is_number_integer()&&r.at("schema_version")==1,"unsupported_schema");
-    auto lab=text(r.at("lab_id"));require(lab=="LD1"||lab=="LD2"||lab=="LD3"||lab=="LD4"||lab=="LD5"||lab=="LD6","unsupported_lab");
+    auto lab=text(r.at("lab_id"));require(lab=="LD1"||lab=="LD2"||lab=="LD3"||lab=="LD4"||lab=="LD5"||lab=="LD6"||lab=="LD7","unsupported_lab");
     const bool sources_revision=lab=="LD6"&&r.at("lab_revision")=="2"&&r.at("rubric_version")=="LD6-2"&&r.at("bank_id")=="LD6-64-B-2026";
     require(sources_revision||(r.at("lab_revision")=="1"&&r.at("rubric_version")==lab+"-1"&&r.at("bank_id")==lab+"-64-A-2026"),"unsupported_version");
     require(r.at("variant").is_number_integer(),"variant_type");
@@ -541,7 +599,7 @@ Json grade(const Json& r) {
     auto id=text(r.at("submission_id"),128);require(!id.empty(),"submission_identity");
     require(r.at("mode")=="learning"||r.at("mode")=="assessment","mode");
     text(r.at("note"),32000);
-    Grader g(r);if(lab=="LD1") grade_dc(g,r,b);else if(lab=="LD2") grade_ac(g,r,b);else if(lab=="LD3") grade_ld3(g,r,b);else if(lab=="LD4") grade_ld4(g,r,b);else if(lab=="LD5") grade_ld5(g,r,b);else if(sources_revision) grade_ld6_sources(g,r,b);else grade_ld6(g,r,b);g.finish();
+    Grader g(r);if(lab=="LD1") grade_dc(g,r,b);else if(lab=="LD2") grade_ac(g,r,b);else if(lab=="LD3") grade_ld3(g,r,b);else if(lab=="LD4") grade_ld4(g,r,b);else if(lab=="LD5") grade_ld5(g,r,b);else if(lab=="LD7") grade_ld7(g,r,b);else if(sources_revision) grade_ld6_sources(g,r,b);else grade_ld6(g,r,b);g.finish();
     int points=0;for(auto& item:g.items) points+=item.at("points").get<int>();
     return {{"status","graded"},{"submission_id",id},{"student",s},{"lab_id",lab},{"variant",variant},
             {"mode",r.at("mode")},{"bank_id",r.at("bank_id")},{"lab_revision",r.at("lab_revision")},{"rubric_version",r.at("rubric_version")},

@@ -1,6 +1,8 @@
 # Grandinių virtualūs laboratoriniai darbai (Scilab)
 
-Interaktyvūs elektros grandinių laboratoriniai darbai: Scilab sąsaja, bendras C++ branduolys ir automatinis LD1–LD6 ataskaitų vertinimas.
+Interaktyvūs elektros grandinių laboratoriniai darbai: Scilab sąsaja, bendras C++ branduolys ir automatinis LD1–LD7 ataskaitų vertinimas.
+
+LD7: šaltinis E su vidine varža r, reostatas penkiose padėtyse; išorinė charakteristika U(I), galios kreivė P(R), suderinamumo režimas R = r, tuščiosios eigos ir trumpojo jungimo matavimai; 64 variantai, šeši etapai ir automatinis 27 kriterijų vertinimas.
 
 LD6: E1, nuoseklus, priešpriešinis ir lygiagretus šaltinių jungimas; 64 variantai, šeši etapai ir automatinis 25 kriterijų vertinimas. [Studento eiga](studentui/README.md) · [LD6 pataisų patikra](audits/ld6-1b0f00a-fixes/README.md).
 
@@ -53,7 +55,7 @@ Fizinių ekranų ir visų DPI skalių patikra neatlikta.
 
 ## Turinys
 
-- `studentui/` – vienintelis aktyvus šaltinis: bendra studento sąsaja, LD1–LD6
+- `studentui/` – vienintelis aktyvus šaltinis: bendra studento sąsaja, LD1–LD7
   variantai, elementų numerių registrai (T/B/E/F/V/H/W/D/A kodai) ir automatinė patikra.
 - `audits/` – LD2 nepriklausomo kryžminio audito medžiaga, naudota prieš v2.0.
 - `dist/` – paruoštas savarankiškas studento versijos ZIP paketas.

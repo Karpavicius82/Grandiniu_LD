@@ -1,1 +1,1 @@
-GUI_FAIL: assert_checkequal: Assertion failed: expected = 1  while computed = 0 (1 values are different)
+GUI_PASS: LD1 9, LD2 12, LD3 6, LD4 7 ir LD5 6 ir LD6 6 ir LD7 6 etapai, variantai 1/17/64, mygtukų funkcijos, matavimai, duomenų išlaikymas, eksportas

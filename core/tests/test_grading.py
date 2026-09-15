@@ -130,6 +130,29 @@ def fixture(lab, n, identity):
         series = [["E1_P", "K1"], ["K2", "A_P"], ["A_N", "R_A"], ["R_B", "E1_N"],
                   ["V_P", "R_A"], ["V_N", "R_B"]]
         report["evidence"] = dict(wiring={"s1": {"pairs": series, "meter": "DC"}})
+    elif lab == "LD7":
+        e7_ = [3, 4, 5, 6, 7, 8, 10, 12][b]
+        r7_ = [22, 27, 33, 39, 47, 56, 68, 82][a]
+        m7 = [0.33, 0.56, 1.0, 1.8, 3.0]
+        load = [round(k * r7_ * 10) / 10 for k in m7]
+        report["parameters"] = dict(E=e7_, r=r7_, **{f"R{k + 1}": v for k, v in enumerate(load)})
+        for k, rr in enumerate(load):
+            observation(f"u{k + 1}", e7_ * rr / (rr + r7_), "V")
+            observation(f"i{k + 1}", e7_ / (rr + r7_) * 1000, "mA")
+        observation("te_u", e7_ * 1e6 / (1e6 + r7_), "V")
+        observation("tj_i", e7_ / (r7_ + 1e-6) * 1000, "mA")
+        vector(3, [r7_, e7_], ["Ohm", "V"])
+        vector(4, [e7_ * load[0] / (load[0] + r7_) * e7_ / (load[0] + r7_) * 1000,
+                   e7_ * load[2] / (load[2] + r7_) * e7_ / (load[2] + r7_) * 1000,
+                   e7_ * load[4] / (load[4] + r7_) * e7_ / (load[4] + r7_) * 1000,
+                   1000 * e7_ * e7_ / (4 * r7_), 50.0], ["mW", "mW", "mW", "mW", "1"])
+        vector(5, [e7_ * 1e6 / (1e6 + r7_), e7_ / r7_ * 1000], ["V", "mA"])
+        vector(6, [1, 1, 1], ["choice", "choice", "choice"])
+        report["evidence"] = dict(wiring={
+            "s1": {"pairs": [["E_P", "K1"], ["K2", "A_P"], ["A_N", "R_A"], ["R_B", "E_N"],
+                             ["V_P", "R_A"], ["V_N", "R_B"]], "meter": "DC"},
+            "s5te": {"pairs": [["V_P", "E_P"], ["V_N", "E_N"]], "meter": "DC"},
+            "s5tj": {"pairs": [["E_P", "K1"], ["K2", "A_P"], ["A_N", "E_N"]], "meter": "DC"}})
     else:
         report["parameters"] = dict(E_RC=9,F_RC=frc,R8=r8,C2=4.7e-6,E_RL=9,F_RL=frl,R9=r9,L1=.5,
                                     E_RLC=5,R13=r13,L3=l,C4=c)

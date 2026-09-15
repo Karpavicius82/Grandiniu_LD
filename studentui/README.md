@@ -21,6 +21,13 @@ Pavyzdžio peržiūra nekeičia jūsų matavimų ir jos negalima pateikti kaip a
 LD5 skaičiavimams ir ataskaitų vertinimui naudojamas bendras C++ branduolys.
 LD5 turi 64 pastovius variantus: `LD5/VARIANTAI.csv`.
 
+**LD7 – įtampos, srovės ir galios suderinamumas:** šeši etapai, trys sujungimai:
+darbinė grandinė E → jungiklis → ampermetras → reostatas R (penkios padėtys P1–P5),
+tuščioji eiga (voltmetras prie šaltinio) ir trumpasis jungimas (ampermetras vietoj krovinio).
+Keisdami padėtį matuokite [B03]; žurnale kaupiami U, I ir P = U·I. Skaičiuojama vidinė
+varža r = ΔU/ΔI, galia kiekvienoje padėtyje, Pmax = E²/(4r) ir naudingumo koeficientas.
+64 variantai: `LD7/VARIANTAI.csv`, bankas `LD7-64-A-2026`, ataskaitos revizija 1.
+
 **LD6 – nuoseklus ir lygiagretus šaltinių jungimas:** šeši etapai, keturios
 studento jungiamos schemos: E1, nuosekliai, priešpriešiais ir lygiagrečiai.
 Režimo mygtukas išsaugo jūsų tos schemos laidus. Jungdami išjunkite maitinimą;
@@ -47,7 +54,7 @@ Reikia Scilab 2026.1.0 ir jūsų OS atitinkančio paketo su `bin/ldcore.dll`
 (Windows) arba `bin/ldcore.so` (Linux). Kompiliatorius studentui nereikalingas.
 
 Linux: `./PALEISTI.sh`. Scilab aplinkoje: vykdykite `STENDAS.sce` ir pasirinkite darbą.
-Atskirai galima vykdyti atitinkamą `LD1/LD1.sce`–`LD6/LD6.sce` failą.
+Atskirai galima vykdyti atitinkamą `LD1/LD1.sce`–`LD7/LD7.sce` failą.
 Paleidiklis ieško įdiegto Scilab; prireikus nurodykite `SCILAB_BIN=/visas/kelias/bin/scilab`.
 
 Prieš pradedant studentas įveda **eilės numerį sąraše (1–64), vardą ir pavardę,

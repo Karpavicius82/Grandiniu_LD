@@ -63,3 +63,4 @@ add_test(NAME mokytojas_ui COMMAND "${Python3_EXECUTABLE}" "${CMAKE_CURRENT_SOUR
 
 add_test(NAME ld5_grading COMMAND "${Python3_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/tests/test_ld5_grading.py" "$<TARGET_FILE:ldcheck>")
 add_test(NAME ld6_sources COMMAND "${Python3_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/tests/test_ld6_grading.py" "$<TARGET_FILE:ldcheck>" "$<TARGET_FILE:ldcore>")
+add_test(NAME ld7_grading COMMAND "${Python3_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/tests/test_ld7_grading.py" "$<TARGET_FILE:ldcheck>" "$<TARGET_FILE:ldcore>")

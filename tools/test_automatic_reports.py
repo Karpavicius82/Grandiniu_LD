@@ -27,9 +27,9 @@ with tempfile.TemporaryDirectory(prefix='LD ataskaitos Žąsė ') as temp:
     assert result.returncode==0 and 'AUTOMATIC_PASS:' in log,log
     data=json.loads((Path(temp)/'CFFI-vertinimas/vertinimai.json').read_text(encoding='utf-8'))
     counts=Counter((r['lab_id'],r['points'],r['max_points']) for r in data['results'])
-    assert counts==Counter({('LD1',22,22):64,('LD2',50,50):64,('LD3',15,15):64,('LD4',27,27):64,('LD5',16,16):64,('LD6',25,25):64,('LD2',48,50):1}),counts
-    evidence=dict(status='PASS',platform=os.name,actual_exported_reports=385,
-                  ld1_full_variants=64,ld2_full_variants=64,ld3_full_variants=64,ld4_full_variants=64,ld5_full_variants=64,ld6_full_variants=64,wrong_and_missing_preserved=True,
+    assert counts==Counter({('LD1',22,22):64,('LD2',50,50):64,('LD3',15,15):64,('LD4',27,27):64,('LD5',16,16):64,('LD6',25,25):64,('LD7',27,27):64,('LD2',48,50):1}),counts
+    evidence=dict(status='PASS',platform=os.name,actual_exported_reports=449,
+                  ld1_full_variants=64,ld2_full_variants=64,ld3_full_variants=64,ld4_full_variants=64,ld5_full_variants=64,ld6_full_variants=64,ld7_full_variants=64,wrong_and_missing_preserved=True,
                   seconds=round(time.monotonic()-start,3),cffi_folder_grading=True)
     if a.evidence:a.evidence.write_text(json.dumps(evidence,indent=2)+'\n',encoding='utf-8')
     print(json.dumps(evidence))

@@ -42,6 +42,9 @@ function lines=student_parameter_lines(lab,cfg)
             msprintf("Apkrova R = %.1f Ω (nom. %.0f Ω ±5%%).",cfg.R,cfg.Rnom); ...
             msprintf("Šaltinių vidinės varžos: r1 = %g Ω; r2 = %g Ω.",cfg.r1,cfg.r2); ...
             "Tiriami vienas E1, abu nuosekliai, priešpriešiais ir lygiagrečiai."];
+    elseif lab=="LD7" then
+        lines=[msprintf("Šaltinis: E = %.0f V (vidinė varža nežymima — nustatysite 3 etape).",cfg.E); ...
+            msprintf("Reostato padėtys: P1 = %.1f Ω; P2 = %.1f Ω; P3 = %.1f Ω; P4 = %.1f Ω; P5 = %.1f Ω.",cfg.R1,cfg.R2,cfg.R3,cfg.R4,cfg.R5)];
     else
         lines=[msprintf("RC: %.1f V RMS; %.1f Hz; R8 = %.0f Ω; C2 = %.2f µF.",cfg.E_RC,cfg.F_RC,cfg.R8,cfg.C2*1e6); ...
             msprintf("RL: %.1f V RMS; %.1f Hz; R9 = %.0f Ω; L1 = %.3f H.",cfg.E_RL,cfg.F_RL,cfg.R9,cfg.L1); ...
@@ -82,6 +85,9 @@ function [ok,st,cfg]=student_enroll(lab,previous)
             elseif lab=="LD6" then
                 cfg=ld6_variant_config(st.number);
                 [valid,why]=ld6_validate_config(cfg); if ~valid then error(why); end
+            elseif lab=="LD7" then
+                cfg=ld7_variant_config(st.number);
+                [valid,why]=ld7_validate_config(cfg); if ~valid then error(why); end
             else
                 cfg=ld2_variant_config(st.number);
                 [valid,why]=ld2_validate_config(cfg); if ~valid then error(why); end

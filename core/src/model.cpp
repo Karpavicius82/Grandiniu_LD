@@ -29,12 +29,19 @@ Bank bank(int variant) {
     const double r6n[]={100,120,150,180,220,270,330,390};
     const double d6=((variant*5)%11)-5;
     const double r6=std::round(r6n[a]*(1+d6/100.0)*10)/10.0;
+    // LD7-64-A-2026: suderinamumo tyrimas — E pagal stulpelį b, vidinė varža r pagal
+    // eilutę a (E12 serija); reostato padėtys R_k = round(m_k*r*10)/10 apiplaukia r.
+    const double ev7[]={3,4,5,6,7,8,10,12};
+    const double rv7[]={22,27,33,39,47,56,68,82};
+    const double m7[]={0.33,0.56,1.0,1.8,3.0};
+    double w7[5];
+    for(int k=0;k<5;++k) w7[k]=std::round(m7[k]*rv7[a]*10)/10.0;
     return {dc[a],dc[b],dc[(a+b)%8],rc[a],35+5.0*(b+1),rl[b],35+5.0*(a+1),
             std::round(std::sqrt(l/c)/(2.8+.35*(a+1)+.20*(b+1))),l,c,
             uu[b][0],uu[b][1],uu[b][2],rld[a],
             n1[a],n2[b],a1,a2,
             pp[b][0],pp[b][1],pp[b][2],
-            (double)e2v[b],r6,(double)r6n[a]};
+            (double)e2v[b],r6,(double)r6n[a],ev7[b],(double)rv7[a],w7[0],w7[1],w7[2],w7[3],w7[4]};
 }
 Values ac(int kind,double E,double f,double R,double L,double C) {
     for(double v:{E,f,R,L,C}) if(!std::isfinite(v)) throw std::runtime_error("non_finite");

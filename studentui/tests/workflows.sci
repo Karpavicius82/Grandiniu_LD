@@ -437,7 +437,11 @@ function bench_ld4_workflow(n,root,gui)
     assert_checktrue(and(LD4.done));
     assert_checkequal(LD4.student.number,n);
     if gui then
-                old=getenv("LD_DATA_DIR",""); setenv("LD_DATA_DIR",root+"tests/results/");
+                // Atstatome tikrąjį kelią, kai LD_DATA_DIR prieš tai nebuvo nustatytas:
+                // tuščia reikšmė sugadintų visus vėlesnius bench_documents() kreipinius.
+                if getos()=="Windows" then userdir=getenv("USERPROFILE",SCIHOME); else userdir=getenv("HOME",SCIHOME); end
+                old=getenv("LD_DATA_DIR",fullfile(userdir,"Grandiniu_LD_darbai"));
+                setenv("LD_DATA_DIR",root+"tests/results/");
         path=bench_export_current("LD4"); setenv("LD_DATA_DIR",old);
         assert_checktrue(path<>""); assert_checktrue(isfile(path));
         if isfield(LD4,"fig") then delete(LD4.fig); end
@@ -635,5 +639,101 @@ function bench_ld6_workflow(number,root,gui)
         assert_checkequal(size(listfiles(bench_documents()+"/*.html"),"*"),before+1);
         assert_checktrue(strindex(LD6.ui.statusMain.string,"Ataskaita išsaugota")<>[]);
         delete(LD6.fig);
+    end
+endfunction
+
+
+// ------------------------------- LD7 ----------------------------------------
+function bench_ld7_action(callback)
+    global LD7;
+    if LD7.ui.headless then execstr(callback); return; end
+    for k=1:size(LD7.ui.dynamic,"*")
+        h=LD7.ui.dynamic(k);
+        if h.callback==callback then bench_button(h); return; end
+    end
+    error("Nėra matomo LD7 mygtuko: "+callback);
+endfunction
+
+function bench_ld7_click(id)
+        bench_ld7_action(msprintf("ld7_terminal_click(""%s"")",id));
+endfunction
+
+function bench_ld7_primary()
+    global LD7;
+    if LD7.ui.headless then ld7_student_primary();
+    else bench_button(LD7.ui.studentPrimary); end
+endfunction
+
+function bench_ld7_answers(step,values)
+    global LD7;
+    if LD7.ui.headless then ld7_test_answers(step,values); return; end
+    value_index=1;
+    for index=1:12
+        [answer_step,slot]=ld7_answer_slot(index);
+        if answer_step==step then
+            LD7.ui.answerEdits(index).string=msprintf("%.17g",values(value_index));
+            value_index=value_index+1;
+        end
+    end
+endfunction
+
+function bench_ld7_connect(mode)
+    global LD7;
+    wires=ld7_canonical_wires(mode);
+    assert_checkequal(size(LD7.wires,1),0);
+    for index=1:size(wires,1)
+        bench_ld7_click(wires(index,1)); bench_ld7_click(wires(index,2));
+    end
+    bench_ld7_click(wires($,1)); bench_ld7_click(wires($,2));
+    [valid,message]=ld7_wiring_valid(LD7.wires); assert_checkfalse(valid);
+    bench_ld7_click(wires($,2)); bench_ld7_click(wires($,1));
+    [valid,message]=ld7_wiring_valid(LD7.wires); assert_checktrue(valid);
+endfunction
+
+function bench_ld7_workflow(number,root,gui)
+    global LD7;
+    if argn(2)<3 then gui=%f; end
+    cfg=ld7_variant_config(number); [valid,message]=ld7_validate_config(cfg); assert_checktrue(valid);
+    LD7=struct("cfg",cfg,"student",student_profile(number,"Automatinė Patikra","TEST","LD7"),"ui",struct("headless",~gui));
+    ld7_start();
+    loads=[cfg.R1 cfg.R2 cfg.R3 cfg.R4 cfg.R5];
+    for step=1:6
+        assert_checkequal(LD7.step,step);
+        select step
+        case 1 then
+            bench_ld7_connect(1);
+        case 2 then
+            bench_ld7_action("ld7_toggle_power()"); bench_ld7_action("ld7_toggle_switch()");
+            for k=1:5
+                bench_ld7_action("ld7_set_position("+string(k)+")");
+                bench_ld7_action("ld7_measure()");
+            end
+            bench_ld7_action("ld7_toggle_power()");
+        case 3 then
+            bench_ld7_answers(step,[cfg.r cfg.E]);
+        case 4 then
+            uu=cfg.E*loads./(loads+cfg.r); ii=cfg.E./(loads+cfg.r)*1000;
+            bench_ld7_answers(step,[uu(1)*ii(1) uu(3)*ii(3) uu(5)*ii(5) 1000*cfg.E^2/(4*cfg.r) 50]);
+        case 5 then
+            bench_ld7_connect(2);
+            bench_ld7_action("ld7_toggle_power()"); bench_ld7_action("ld7_measure()"); bench_ld7_action("ld7_toggle_power()");
+            bench_ld7_action("ld7_set_mode(3)");
+            bench_ld7_connect(3);
+            bench_ld7_action("ld7_toggle_power()"); bench_ld7_action("ld7_toggle_switch()"); bench_ld7_action("ld7_measure()"); bench_ld7_action("ld7_toggle_power()");
+            bench_ld7_answers(step,[cfg.E*1e6/(1e6+cfg.r) cfg.E/cfg.r*1000]);
+        case 6 then
+            bench_ld7_answers(step,[1 1 1]);
+        end
+        bench_ld7_primary();
+        if ~LD7.done(step) then error("LD7 variantas "+string(number)+", etapas "+string(step)); end
+        if gui then mprintf("PASS LD7 V%02d: etapas %d\n",number,step); end
+    end
+    assert_checktrue(and(LD7.done)); assert_checkequal(size(LD7.journal,1),7);
+    if gui then
+        before=size(listfiles(bench_documents()+"/*.html"),"*");
+        bench_ld7_primary();
+        assert_checkequal(size(listfiles(bench_documents()+"/*.html"),"*"),before+1);
+        assert_checktrue(strindex(LD7.ui.statusMain.string,"Ataskaita išsaugota")<>[]);
+        delete(LD7.fig);
     end
 endfunction
