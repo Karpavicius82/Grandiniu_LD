@@ -1,0 +1,24 @@
+Internal ctest changing into directory: /tmp/ld-build
+Test project /tmp/ld-build
+    Start 1: layout_geometry
+1/9 Test #1: layout_geometry ..................   Passed    0.00 sec
+    Start 2: grading
+2/9 Test #2: grading ..........................   Passed    6.46 sec
+    Start 3: native_abi
+3/9 Test #3: native_abi .......................   Passed    0.14 sec
+    Start 4: instruction_registry
+4/9 Test #4: instruction_registry .............   Passed    0.08 sec
+    Start 5: mokytojas
+5/9 Test #5: mokytojas ........................   Passed    0.08 sec
+    Start 6: mokytojas_ui
+6/9 Test #6: mokytojas_ui .....................   Passed    0.21 sec
+    Start 7: ld5_grading
+7/9 Test #7: ld5_grading ......................   Passed    0.14 sec
+    Start 8: ld6_sources
+8/9 Test #8: ld6_sources ......................   Passed    0.20 sec
+    Start 9: ld7_grading
+9/9 Test #9: ld7_grading ......................   Passed    0.18 sec
+
+100% tests passed, 0 tests failed out of 9
+
+Total Test time (real) =   7.49 sec

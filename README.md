@@ -2,7 +2,7 @@
 
 Interaktyvūs elektros grandinių laboratoriniai darbai: Scilab sąsaja, bendras C++ branduolys ir automatinis LD1–LD7 ataskaitų vertinimas.
 
-LD7: šaltinis E su vidine varža r, reostatas penkiose padėtyse; išorinė charakteristika U(I), galios kreivė P(R), suderinamumo režimas R = r, tuščiosios eigos ir trumpojo jungimo matavimai; 64 variantai, šeši etapai ir automatinis 27 kriterijų vertinimas.
+LD7: šaltinis E su vidine varža r, reostatas penkiose padėtyse; išorinė charakteristika U(I), galios kreivė P(R), suderinamumo režimas R = r, tuščiosios eigos ir trumpojo jungimo matavimai; 64 variantai, šeši etapai ir automatinis 27 kriterijų vertinimas. [LD7 Windows ir Linux priėmimo patikra](audits/ld7-f5dd729/README.md).
 
 LD6: E1, nuoseklus, priešpriešinis ir lygiagretus šaltinių jungimas; 64 variantai, šeši etapai ir automatinis 25 kriterijų vertinimas. [Studento eiga](studentui/README.md) · [LD6 pataisų patikra](audits/ld6-1b0f00a-fixes/README.md).
 
