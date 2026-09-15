@@ -154,14 +154,15 @@ function ld6_render_journal()
     global LD6;
     if ~isfield(LD6,"ui") then return; end
     if ~isfield(LD6.ui,"journalList") then return; end
-    rows="Režimas              U, V          I, mA";
+    rows=emptystr(0,1);
     modes=["E1";"Nuosekliai";"Priešpriešiais";"Lygiagrečiai"];
     for tag=1:4
         measurements=ld6_journal_rows(tag);
         for k=1:size(measurements,1)
-            rows($+1)=msprintf("%-10s          %.4f          %.3f",modes(tag),measurements(k,1),measurements(k,2));
+            rows($+1)=msprintf("%s     %.4f V     %.3f mA",modes(tag),measurements(k,1),measurements(k,2));
         end
     end
+    if rows==[] then rows="Matavimų dar nėra."; end
     LD6.ui.journalList.string=rows;
 endfunction
 
