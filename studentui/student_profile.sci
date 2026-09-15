@@ -35,6 +35,9 @@ function lines=student_parameter_lines(lab,cfg)
     elseif lab=="LD5" then
         lines=[msprintf("R1 nom. = %.0f Ω ±5%%; RV nom. = %.0f Ω ±5%%; E = %.0f V.",cfg.R1nom,cfg.RVnom,cfg.E); ...
             msprintf("Potenciometro padėtys: %d %%, %d %%, %d %%.",cfg.P1,cfg.P2,cfg.P3)];
+    elseif lab=="LD6" then
+        lines=[msprintf("E1 = %.0f V (fiksuotas); E2 = %.0f V (pagal variantą).",cfg.E1,cfg.E2); ...
+            msprintf("Krovinys R = %.1f Ω (nom. %.0f Ω ±5%%).",cfg.R,cfg.Rnom)];
     else
         lines=[msprintf("RC: %.1f V RMS; %.1f Hz; R8 = %.0f Ω; C2 = %.2f µF.",cfg.E_RC,cfg.F_RC,cfg.R8,cfg.C2*1e6); ...
             msprintf("RL: %.1f V RMS; %.1f Hz; R9 = %.0f Ω; L1 = %.3f H.",cfg.E_RL,cfg.F_RL,cfg.R9,cfg.L1); ...
@@ -72,6 +75,9 @@ function [ok,st,cfg]=student_enroll(lab,previous)
             elseif lab=="LD5" then
                 cfg=ld5_variant_config(st.number);
                 [valid,why]=ld5_validate_config(cfg); if ~valid then error(why); end
+            elseif lab=="LD6" then
+                cfg=ld6_variant_config(st.number);
+                [valid,why]=ld6_validate_config(cfg); if ~valid then error(why); end
             else
                 cfg=ld2_variant_config(st.number);
                 [valid,why]=ld2_validate_config(cfg); if ~valid then error(why); end

@@ -115,6 +115,21 @@ def fixture(lab, n, identity):
         series = [["E_P", "K1"], ["K2", "A_P"], ["A_N", "R1A"], ["R1B", "RVA"],
                   ["RVB", "E_N"], ["V_P", "RVA"], ["V_N", "RVB"]]
         report["evidence"] = dict(wiring={"s1": {"pairs": series, "meter": "DC"}})
+    elif lab == "LD6":
+        e2_ = [3, 4, 5, 6, 7, 8, 10, 12][b]
+        r6n_ = [100, 120, 150, 180, 220, 270, 330, 390][a]
+        d6 = ((n * 5) % 11) - 5
+        r6_ = round(r6n_ * (1 + d6 / 100) * 10) / 10
+        report["parameters"] = dict(E1=9, E2=e2_, R=r6_, Rnom=r6n_)
+        vector(2, [9 / r6_ * 1000], ["mA"])
+        for k, (u_, i_) in enumerate([(9, 9/r6_*1000), (9+e2_, (9+e2_)/r6_*1000), (9-e2_, (9-e2_)/r6_*1000)]):
+            observation(f"u{k+1}", u_, "V")
+            observation(f"i{k+1}", i_, "mA")
+        vector(4, [9+e2_, (9+e2_)/r6_*1000, 9-e2_, (9-e2_)/r6_*1000], ["V", "mA", "V", "mA"])
+        vector(6, [1, 1], ["choice", "choice"])
+        series = [["E1_P", "K1"], ["K2", "A_P"], ["A_N", "R_A"], ["R_B", "E1_N"],
+                  ["V_P", "R_A"], ["V_N", "R_B"]]
+        report["evidence"] = dict(wiring={"s1": {"pairs": series, "meter": "DC"}})
     else:
         report["parameters"] = dict(E_RC=9,F_RC=frc,R8=r8,C2=4.7e-6,E_RL=9,F_RL=frl,R9=r9,L1=.5,
                                     E_RLC=5,R13=r13,L3=l,C4=c)

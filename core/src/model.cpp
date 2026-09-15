@@ -24,11 +24,17 @@ Bank bank(int variant) {
     const double a2=std::round(n2[b]*(1+d2/100.0)*10)/10.0;
     // LD5-64-A-2026: potenciometro padėtys % pagal stulpelį b.
     const double pp[][3]={{25,50,75},{20,45,70},{30,55,80},{15,40,65},{35,60,85},{25,60,90},{10,50,80},{30,50,70}};
+    // LD6-64-A-2026: E2 pagal b, R (krovinys) E24 su ±5 % pagal a.
+    const double e2v[]={3,4,5,6,7,8,10,12};
+    const double r6n[]={100,120,150,180,220,270,330,390};
+    const double d6=((variant*5)%11)-5;
+    const double r6=std::round(r6n[a]*(1+d6/100.0)*10)/10.0;
     return {dc[a],dc[b],dc[(a+b)%8],rc[a],35+5.0*(b+1),rl[b],35+5.0*(a+1),
             std::round(std::sqrt(l/c)/(2.8+.35*(a+1)+.20*(b+1))),l,c,
             uu[b][0],uu[b][1],uu[b][2],rld[a],
             n1[a],n2[b],a1,a2,
-            pp[b][0],pp[b][1],pp[b][2]};
+            pp[b][0],pp[b][1],pp[b][2],
+            (double)e2v[b],r6,(double)r6n[a]};
 }
 Values ac(int kind,double E,double f,double R,double L,double C) {
     for(double v:{E,f,R,L,C}) if(!std::isfinite(v)) throw std::runtime_error("non_finite");

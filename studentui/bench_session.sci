@@ -1,7 +1,7 @@
 // Local resume files are separate from submitted reports. Keep the last two
 // complete snapshots; a failed save must leave the previous snapshot intact.
 function session=bench_snapshot(lab)
-    global LD1 LD2 LD3 LD4 LD5;
+    global LD1 LD2 LD3 LD4 LD5 LD6;
     session=struct("format","Grandiniu-LD-session-1","lab",lab,"state",struct());
     if lab=="LD1" then
         session.cfg=LD1.cfg; session.student=LD1.student;
@@ -123,6 +123,7 @@ function session=bench_read_snapshot(path,lab)
     elseif lab=="LD3" then expected=ld3_variant_config(st.number);
     elseif lab=="LD4" then expected=ld4_variant_config(st.number);
     elseif lab=="LD5" then expected=ld5_variant_config(st.number);
+    elseif lab=="LD6" then expected=ld6_variant_config(st.number);
     else expected=ld2_variant_config(st.number);end
     if ~isequal(session.cfg,expected) then error("Juodraščio variantas ir parametrai nesutampa.");end
     if lab=="LD1" then
@@ -133,6 +134,8 @@ function session=bench_read_snapshot(path,lab)
         if or(size(session.state.answers)<>[7 8]) | session.state.step<1 | session.state.step>7 then error("Sugadinti LD4 atsakymai.");end
     elseif lab=="LD5" then
         if or(size(session.state.answers)<>[6 8]) | ~ld5_valid_index(session.state.step,6) then error("Sugadinti LD5 atsakymai.");end
+    elseif lab=="LD6" then
+        if or(size(session.state.answers)<>[6 8]) | session.state.step<1 | session.state.step>6 then error("Sugadinti LD6 atsakymai.");end
     else
         if or(size(session.state.answers_text)<>[12 8]) | session.state.step<1 | session.state.step>12 then error("Sugadinti LD2 atsakymai.");end
     end
