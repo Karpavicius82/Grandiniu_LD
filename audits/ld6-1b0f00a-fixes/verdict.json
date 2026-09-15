@@ -1,0 +1,36 @@
+{
+  "status": "PASS",
+  "source_commit": "a294a9bab889013acbb4ec5bfc59edda483d9e84",
+  "ci": "https://github.com/Karpavicius82/Grandiniu_LD/actions/runs/34991244185",
+  "platforms": [
+    "Windows Server 2022",
+    "Ubuntu 22.04"
+  ],
+  "scilab": "2026.1.0",
+  "lab": "LD6",
+  "gui_variants": [
+    1,
+    17,
+    64
+  ],
+  "stages": 6,
+  "circuit_modes": 4,
+  "geometry_cases_per_os": 39,
+  "geometry_errors": 0,
+  "contact_target_px": [
+    36,
+    40
+  ],
+  "minimum_contact_gap_px": 47.84,
+  "tolerance_comparisons_per_os": 132,
+  "ld6_full_report_variants_per_os": 64,
+  "all_actual_reports_per_os": 385,
+  "native_test_suites_per_os": 8,
+  "mna_cases_per_os": 258,
+  "actual_report_button": true,
+  "draft_restore": true,
+  "resize_callback": true,
+  "os_mouse_event_injection": false,
+  "physical_dpi_sweep": false,
+  "external_approval": false
+}

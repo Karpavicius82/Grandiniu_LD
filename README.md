@@ -2,7 +2,7 @@
 
 Interaktyvūs elektros grandinių laboratoriniai darbai: Scilab sąsaja, bendras C++ branduolys ir automatinis LD1–LD6 ataskaitų vertinimas.
 
-LD6: E1, nuoseklus, priešpriešinis ir lygiagretus šaltinių jungimas; 64 variantai, šeši etapai ir automatinis 25 kriterijų vertinimas. [Studento eiga](studentui/README.md).
+LD6: E1, nuoseklus, priešpriešinis ir lygiagretus šaltinių jungimas; 64 variantai, šeši etapai ir automatinis 25 kriterijų vertinimas. [Studento eiga](studentui/README.md) · [LD6 pataisų patikra](audits/ld6-1b0f00a-fixes/README.md).
 
 [LD5 pataisos ir Windows/Linux patikra](audits/ld5-c9b18f3-fixes/README.md): gnybtai, gyvi rodmenys, studento eiga ir automatinis ataskaitų vertinimas.
 
@@ -29,7 +29,7 @@ LD1 turi naujus 64 pastovius virtualius variantus. LD2 išlaiko originalų
 `LD2-64-A-2026` priskyrimą. Vardas, grupė ir variantas išlieka eksportuose;
 LD2 juos išlaiko ir išsaugotame darbe. Pakeitus tik vardą ar grupę atliktas darbas išlieka.
 
-[Naudojimas ir variantai](studentui/README.md) · [Ankstesnis Scilab paketas](dist/Grandiniu_LD-studentui.zip)
+[Naudojimas ir variantai](studentui/README.md) · [Windows ir Linux paketas su C++ branduoliu](dist/Grandiniu_LD-studentui.zip)
 
 ## Automatinė patikra
 
@@ -46,13 +46,14 @@ procese ir uždaromi pasibaigus patikrai.
 - Su 1, 17 ir 64 variantais visi LD1, LD2 ir LD3 etapai atliekami per tikrų
   langų valdiklių funkcijas; tikrinamas ir duomenų išlaikymas, eksportas bei sesijos atkūrimas.
 
-Patikra praėjo su **Scilab 2026.1.0 Linux**. Žurnalai ir tikrintų failų hash:
-[`studentui/tests/results/`](studentui/tests/results/). Windows vaizdas šiai
-sąsajai dar netikrintas.
+Naudojamas **Scilab 2026.1.0**. [LD6 Windows ir Linux patikra](audits/ld6-1b0f00a-fixes/README.md)
+apima tikrus valdiklius, geometriją ir ataskaitų vertinimą. Paketų šaltinių SHA256:
+[`studentui/tests/results/PATIKRA.json`](studentui/tests/results/PATIKRA.json).
+Fizinių ekranų ir visų DPI skalių patikra neatlikta.
 
 ## Turinys
 
-- `studentui/` – vienintelis aktyvus šaltinis: bendra studento sąsaja, LD1–LD3
+- `studentui/` – vienintelis aktyvus šaltinis: bendra studento sąsaja, LD1–LD6
   variantai, elementų numerių registrai (T/B/E/F/V/H/W/D/A kodai) ir automatinė patikra.
 - `audits/` – LD2 nepriklausomo kryžminio audito medžiaga, naudota prieš v2.0.
 - `dist/` – paruoštas savarankiškas studento versijos ZIP paketas.

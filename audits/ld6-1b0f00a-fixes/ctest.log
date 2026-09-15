@@ -1,0 +1,65 @@
+native (ubuntu-22.04)	Complete reports and adversarial imports	﻿2026-09-15T15:52:07.4629084Z ##[group]Run ctest --test-dir build -C Release --output-on-failure
+native (ubuntu-22.04)	Complete reports and adversarial imports	2026-09-15T15:52:07.4629646Z [36;1mctest --test-dir build -C Release --output-on-failure[0m
+native (ubuntu-22.04)	Complete reports and adversarial imports	2026-09-15T15:52:07.4730742Z shell: /usr/bin/bash -e {0}
+native (ubuntu-22.04)	Complete reports and adversarial imports	2026-09-15T15:52:07.4731023Z env:
+native (ubuntu-22.04)	Complete reports and adversarial imports	2026-09-15T15:52:07.4731307Z   pythonLocation: /opt/hostedtoolcache/Python/3.12.14/x64
+native (ubuntu-22.04)	Complete reports and adversarial imports	2026-09-15T15:52:07.4731758Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.12.14/x64/lib/pkgconfig
+native (ubuntu-22.04)	Complete reports and adversarial imports	2026-09-15T15:52:07.4732429Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.14/x64
+native (ubuntu-22.04)	Complete reports and adversarial imports	2026-09-15T15:52:07.4732818Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.14/x64
+native (ubuntu-22.04)	Complete reports and adversarial imports	2026-09-15T15:52:07.4733208Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.14/x64
+native (ubuntu-22.04)	Complete reports and adversarial imports	2026-09-15T15:52:07.4733588Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.12.14/x64/lib
+native (ubuntu-22.04)	Complete reports and adversarial imports	2026-09-15T15:52:07.4733913Z ##[endgroup]
+native (ubuntu-22.04)	Complete reports and adversarial imports	2026-09-15T15:52:07.7801463Z Internal ctest changing into directory: /home/runner/work/Grandiniu_LD/Grandiniu_LD/build
+native (ubuntu-22.04)	Complete reports and adversarial imports	2026-09-15T15:52:07.8312461Z Test project /home/runner/work/Grandiniu_LD/Grandiniu_LD/build
+native (ubuntu-22.04)	Complete reports and adversarial imports	2026-09-15T15:52:07.8564546Z     Start 1: layout_geometry
+native (ubuntu-22.04)	Complete reports and adversarial imports	2026-09-15T15:52:07.8638684Z 1/8 Test #1: layout_geometry ..................   Passed    0.00 sec
+native (ubuntu-22.04)	Complete reports and adversarial imports	2026-09-15T15:52:07.8641558Z     Start 2: grading
+native (ubuntu-22.04)	Complete reports and adversarial imports	2026-09-15T15:52:13.5309208Z 2/8 Test #2: grading ..........................   Passed    5.67 sec
+native (ubuntu-22.04)	Complete reports and adversarial imports	2026-09-15T15:52:13.5311047Z     Start 3: native_abi
+native (ubuntu-22.04)	Complete reports and adversarial imports	2026-09-15T15:52:13.6677307Z 3/8 Test #3: native_abi .......................   Passed    0.14 sec
+native (ubuntu-22.04)	Complete reports and adversarial imports	2026-09-15T15:52:13.6679420Z     Start 4: instruction_registry
+native (ubuntu-22.04)	Complete reports and adversarial imports	2026-09-15T15:52:13.7487312Z 4/8 Test #4: instruction_registry .............   Passed    0.08 sec
+native (ubuntu-22.04)	Complete reports and adversarial imports	2026-09-15T15:52:13.7489375Z     Start 5: mokytojas
+native (ubuntu-22.04)	Complete reports and adversarial imports	2026-09-15T15:52:13.8257653Z 5/8 Test #5: mokytojas ........................   Passed    0.08 sec
+native (ubuntu-22.04)	Complete reports and adversarial imports	2026-09-15T15:52:13.8259145Z     Start 6: mokytojas_ui
+native (ubuntu-22.04)	Complete reports and adversarial imports	2026-09-15T15:52:14.0362039Z 6/8 Test #6: mokytojas_ui .....................   Passed    0.21 sec
+native (ubuntu-22.04)	Complete reports and adversarial imports	2026-09-15T15:52:14.0363951Z     Start 7: ld5_grading
+native (ubuntu-22.04)	Complete reports and adversarial imports	2026-09-15T15:52:14.1505533Z 7/8 Test #7: ld5_grading ......................   Passed    0.11 sec
+native (ubuntu-22.04)	Complete reports and adversarial imports	2026-09-15T15:52:14.1506907Z     Start 8: ld6_sources
+native (ubuntu-22.04)	Complete reports and adversarial imports	2026-09-15T15:52:14.3133415Z 8/8 Test #8: ld6_sources ......................   Passed    0.16 sec
+native (ubuntu-22.04)	Complete reports and adversarial imports	2026-09-15T15:52:14.3137256Z 
+native (ubuntu-22.04)	Complete reports and adversarial imports	2026-09-15T15:52:14.3137448Z 100% tests passed, 0 tests failed out of 8
+native (ubuntu-22.04)	Complete reports and adversarial imports	2026-09-15T15:52:14.3138113Z 
+native (ubuntu-22.04)	Complete reports and adversarial imports	2026-09-15T15:52:14.3138266Z Total Test time (real) =   6.48 sec
+native (windows-2022)	Complete reports and adversarial imports	﻿2026-09-15T15:52:43.8397468Z ##[group]Run ctest --test-dir build -C Release --output-on-failure
+native (windows-2022)	Complete reports and adversarial imports	2026-09-15T15:52:43.8398046Z [36;1mctest --test-dir build -C Release --output-on-failure[0m
+native (windows-2022)	Complete reports and adversarial imports	2026-09-15T15:52:43.8431357Z shell: C:\Program Files\PowerShell\7\pwsh.EXE -command ". '{0}'"
+native (windows-2022)	Complete reports and adversarial imports	2026-09-15T15:52:43.8431709Z env:
+native (windows-2022)	Complete reports and adversarial imports	2026-09-15T15:52:43.8431978Z   pythonLocation: C:\hostedtoolcache\windows\Python\3.12.10\x64
+native (windows-2022)	Complete reports and adversarial imports	2026-09-15T15:52:43.8432451Z   PKG_CONFIG_PATH: C:\hostedtoolcache\windows\Python\3.12.10\x64/lib/pkgconfig
+native (windows-2022)	Complete reports and adversarial imports	2026-09-15T15:52:43.8432911Z   Python_ROOT_DIR: C:\hostedtoolcache\windows\Python\3.12.10\x64
+native (windows-2022)	Complete reports and adversarial imports	2026-09-15T15:52:43.8433316Z   Python2_ROOT_DIR: C:\hostedtoolcache\windows\Python\3.12.10\x64
+native (windows-2022)	Complete reports and adversarial imports	2026-09-15T15:52:43.8433709Z   Python3_ROOT_DIR: C:\hostedtoolcache\windows\Python\3.12.10\x64
+native (windows-2022)	Complete reports and adversarial imports	2026-09-15T15:52:43.8434016Z ##[endgroup]
+native (windows-2022)	Complete reports and adversarial imports	2026-09-15T15:52:44.4757286Z Internal ctest changing into directory: D:/a/Grandiniu_LD/Grandiniu_LD/build
+native (windows-2022)	Complete reports and adversarial imports	2026-09-15T15:52:44.5644383Z Test project D:/a/Grandiniu_LD/Grandiniu_LD/build
+native (windows-2022)	Complete reports and adversarial imports	2026-09-15T15:52:44.6116555Z     Start 1: layout_geometry
+native (windows-2022)	Complete reports and adversarial imports	2026-09-15T15:52:44.6249345Z 1/8 Test #1: layout_geometry ..................   Passed    0.01 sec
+native (windows-2022)	Complete reports and adversarial imports	2026-09-15T15:52:44.6336924Z     Start 2: grading
+native (windows-2022)	Complete reports and adversarial imports	2026-09-15T15:52:54.7057016Z 2/8 Test #2: grading ..........................   Passed   10.07 sec
+native (windows-2022)	Complete reports and adversarial imports	2026-09-15T15:52:54.7061025Z     Start 3: native_abi
+native (windows-2022)	Complete reports and adversarial imports	2026-09-15T15:52:55.3843049Z 3/8 Test #3: native_abi .......................   Passed    0.68 sec
+native (windows-2022)	Complete reports and adversarial imports	2026-09-15T15:52:55.3846500Z     Start 4: instruction_registry
+native (windows-2022)	Complete reports and adversarial imports	2026-09-15T15:52:55.4937988Z 4/8 Test #4: instruction_registry .............   Passed    0.11 sec
+native (windows-2022)	Complete reports and adversarial imports	2026-09-15T15:52:55.4942255Z     Start 5: mokytojas
+native (windows-2022)	Complete reports and adversarial imports	2026-09-15T15:52:55.6325828Z 5/8 Test #5: mokytojas ........................   Passed    0.14 sec
+native (windows-2022)	Complete reports and adversarial imports	2026-09-15T15:52:55.6328767Z     Start 6: mokytojas_ui
+native (windows-2022)	Complete reports and adversarial imports	2026-09-15T15:52:56.2858030Z 6/8 Test #6: mokytojas_ui .....................   Passed    0.65 sec
+native (windows-2022)	Complete reports and adversarial imports	2026-09-15T15:52:56.2860672Z     Start 7: ld5_grading
+native (windows-2022)	Complete reports and adversarial imports	2026-09-15T15:52:56.6072555Z 7/8 Test #7: ld5_grading ......................   Passed    0.32 sec
+native (windows-2022)	Complete reports and adversarial imports	2026-09-15T15:52:56.6075393Z     Start 8: ld6_sources
+native (windows-2022)	Complete reports and adversarial imports	2026-09-15T15:52:56.9983670Z 8/8 Test #8: ld6_sources ......................   Passed    0.39 sec
+native (windows-2022)	Complete reports and adversarial imports	2026-09-15T15:52:56.9991319Z 
+native (windows-2022)	Complete reports and adversarial imports	2026-09-15T15:52:56.9991552Z 100% tests passed, 0 tests failed out of 8
+native (windows-2022)	Complete reports and adversarial imports	2026-09-15T15:52:56.9991764Z 
+native (windows-2022)	Complete reports and adversarial imports	2026-09-15T15:52:56.9991857Z Total Test time (real) =  12.43 sec
