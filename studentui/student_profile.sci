@@ -1,6 +1,7 @@
 // Shared registration and immutable variant identity for both laboratories.
 function st=student_empty(lab)
     st=struct("number",0,"name","","group","","variant_id","", "bank",lab+"-64-A-2026");
+    if lab=="LD6" then st.bank="LD6-64-B-2026"; end
 endfunction
 
 function st=student_profile(number,name,group,lab)
@@ -19,6 +20,7 @@ function st=student_profile(number,name,group,lab)
     if group=="" then error("Įveskite grupę."); end
     st=struct("number",number,"name",name,"group",group, ...
         "variant_id",msprintf("%s-V%02d",lab,number),"bank",lab+"-64-A-2026");
+    if lab=="LD6" then st.bank="LD6-64-B-2026"; end
 endfunction
 
 function lines=student_parameter_lines(lab,cfg)
@@ -37,7 +39,9 @@ function lines=student_parameter_lines(lab,cfg)
             msprintf("Potenciometro padėtys: %d %%, %d %%, %d %%.",cfg.P1,cfg.P2,cfg.P3)];
     elseif lab=="LD6" then
         lines=[msprintf("E1 = %.0f V (fiksuotas); E2 = %.0f V (pagal variantą).",cfg.E1,cfg.E2); ...
-            msprintf("Krovinys R = %.1f Ω (nom. %.0f Ω ±5%%).",cfg.R,cfg.Rnom)];
+            msprintf("Apkrova R = %.1f Ω (nom. %.0f Ω ±5%%).",cfg.R,cfg.Rnom); ...
+            msprintf("Šaltinių vidinės varžos: r1 = %g Ω; r2 = %g Ω.",cfg.r1,cfg.r2); ...
+            "Tiriami vienas E1, abu nuosekliai, priešpriešiais ir lygiagrečiai."];
     else
         lines=[msprintf("RC: %.1f V RMS; %.1f Hz; R8 = %.0f Ω; C2 = %.2f µF.",cfg.E_RC,cfg.F_RC,cfg.R8,cfg.C2*1e6); ...
             msprintf("RL: %.1f V RMS; %.1f Hz; R9 = %.0f Ω; L1 = %.3f H.",cfg.E_RL,cfg.F_RL,cfg.R9,cfg.L1); ...

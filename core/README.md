@@ -1,6 +1,6 @@
 # Bendras C++ branduolys ir automatinis vertinimas
 
-Versija 0.2.0. Įgyvendinti **LD1, LD2 ir LD3**, kiekvienam po 64 pastovius variantus. Kitų 10 darbų ši versija dar nevertina. [2026-09-13 patikros protokolas](../audits/closure-2026-09-13/README.md). Tai vidiniams priėmimo bandymams skirtas leidimas, ne išorinė aprobacija.
+Versija 0.2.0. Įgyvendintas **LD1–LD6** ataskaitų vertinimas, kiekvienam po 64 pastovius variantus. Kitų 7 darbų ši versija dar nevertina. [Ankstesnis 2026-09-13 patikros protokolas](../audits/closure-2026-09-13/README.md). Tai vidiniams priėmimo bandymams skirtas leidimas, ne išorinė aprobacija.
 
 Studentas atveria `STENDAS.sce`, įveda vardą, grupę ir eilės numerį. Atsiskaitymo režime mygtukas **Įrašyti ir toliau** išsaugo ir klaidingus atsakymus. Pabaigoje **Išsaugoti ataskaitą** sukuria vieną HTML failą naudotojo aplanke `Grandiniu_LD_darbai`. Tą failą studentas persiunčia dėstytojui. Ataskaitą galima sukurti ir nebaigus darbo, per Pagalbą. Mokymosi režimas, pavyzdžiai ir juodraščio atvėrimas yra Pagalboje.
 
@@ -13,6 +13,8 @@ Dėstytojas atveria **DESTYTOJUI.sce** arba pasirenka dėstytojo punktą paleidi
 Originalūs failai nekeičiami. Po kiekvienų 25 failų įrašomas tarpinis rezultatas. Sustabdžius išsaugomi jau įvertinti darbai ir likusių failų sąrašas. Pakartotinis paleidimas sukuria naują rezultatų aplanką ir perskaičiuoja paketą iš pradžių. Tai sąmoningai paprasta atkūrimo eiga, ne slaptas ankstesnio vertinimo pakeitimas.
 
 ## Pradinė skaitinė rubrika
+
+LD6 revizija 2, bankas `LD6-64-B-2026`, rubrika `LD6-2`: 25 vienodo svorio kriterijai – 11 atsakymų, 10 matavimo reikšmių ir keturių režimų laidų įrodymai. MNA skaičiuoja E1, nuoseklų, priešpriešinį ir lygiagretų jungimą su r1 = r2 = 10 Ω. Apkrovos įtampos ir srovės ženklas išlaikomas, šaltinio srovė teigiama atiduodant energiją. LD6 atsakymų tolerancijos: 1 % įtampai ir E1 srovei, 2 % kitoms srovėms, papildomai 1e-9 atsakymo vienetais; pasirinkimai tikslūs. Ankstesnis LD6 bankas A ir revizija 1 toliau vertinami pagal seną 14 kriterijų rubriką.
 
 `LD1-1`: 22 vienodo svorio kriterijai — 8 skaičiavimai, 2 grandinių tipai, 5 matavimai, 5 palyginimai, 2 sujungimai. `LD2-1`: 50 kriterijų — 33 skaitiniai atsakymai, 8 baziniai matavimai, 3 sujungimai, rezonanso paieška, 3 ekstremumų tyrimai, pusės galios tyrimas ir dažninė lentelė. LD3-1 turi 15 kriterijų (Omo dėsnio darbas). Instrukcijos / įvadinis etapas taškų neduoda.
 
@@ -45,4 +47,4 @@ python tools/test_automatic_reports.py --scilab /path/to/scilab --runtime studen
 
 Komandinė dėstytojo versija: `ldcheck STUDENTU_APLANKAS NAUJAS_REZULTATU_APLANKAS`. Windows naudoja Unicode `wmain`, Scilab siunčia UTF-8 baitus tiesiai į C++ ir nekviečia komandinio interpretatoriaus. GitHub Actions surenka ir tikrina Windows Server 2022 / MSVC bei Ubuntu 22.04. CI neatstoja Windows 10/11 GUI / DPI patikros su tikrais naudotojais.
 
-Atviri viso projekto priėmimo klausimai: 10 likusių metodikų ir jų testai, trifazio darbo pilna studento eiga, Windows 10/11 naudotojo sąsajos / DPI patikra, dėstytojo rankinių pažymio pataisų istorija, projekto licencijos pasirinkimas ir dalykinė / išorinė aprobacija. Jie nepristatomi kaip jau atlikti.
+Atviri viso projekto priėmimo klausimai: 7 likusios metodikos ir jų testai, trifazio darbo pilna studento eiga, Windows 10/11 naudotojo sąsajos / DPI patikra, dėstytojo rankinių pažymio pataisų istorija, projekto licencijos pasirinkimas ir dalykinė / išorinė aprobacija. Jie nepristatomi kaip jau atlikti.

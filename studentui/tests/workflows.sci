@@ -570,64 +570,70 @@ function bench_ld6_primary()
     else bench_button(LD6.ui.studentPrimary); end
 endfunction
 
+
 function bench_ld6_answers(step,values)
     global LD6;
     if LD6.ui.headless then ld6_test_answers(step,values); return; end
-    vi=1;
-    for k=1:7
-        mapa=[2 1;4 1;4 2;4 3;4 4;6 1;6 2];
-        st=mapa(k,1);
-        if st==step & vi<=size(values,"*") then
-            LD6.ui.answerEdits(k).string=msprintf("%.12g",values(vi));
-            execstr(LD6.ui.answerEdits(k).callback);
-            vi=vi+1;
+    value_index=1;
+    for index=1:11
+        [answer_step,slot]=ld6_answer_slot(index);
+        if answer_step==step then
+            LD6.ui.answerEdits(index).string=msprintf("%.17g",values(value_index));
+            value_index=value_index+1;
         end
     end
 endfunction
 
-function bench_ld6_workflow(n,root,gui)
+function bench_ld6_connect(mode)
+    global LD6;
+    wires=["E1_P" "K1";"K2" "A_P";"A_N" "R_A";"V_P" "R_A";"V_N" "R_B"];
+    select mode
+    case 1 then wires=[wires;"R_B" "E1_N"];
+    case 2 then wires=[wires;"R_B" "E2_N";"E2_P" "E1_N"];
+    case 3 then wires=[wires;"R_B" "E2_P";"E2_N" "E1_N"];
+    case 4 then wires=[wires;"R_B" "E1_N";"E1_P" "E2_P";"E1_N" "E2_N"];
+    end
+    assert_checkequal(size(LD6.wires,1),0);
+    for index=1:size(wires,1)
+        bench_ld6_click(wires(index,1)); bench_ld6_click(wires(index,2));
+    end
+    bench_ld6_click(wires($,1)); bench_ld6_click(wires($,2));
+    [valid,message]=ld6_wiring_valid(LD6.wires); assert_checkfalse(valid);
+    bench_ld6_click(wires($,2)); bench_ld6_click(wires($,1));
+    [valid,message]=ld6_wiring_valid(LD6.wires); assert_checktrue(valid);
+endfunction
+
+function bench_ld6_workflow(number,root,gui)
     global LD6;
     if argn(2)<3 then gui=%f; end
-    cfg=ld6_variant_config(n);
-    [valid,why]=ld6_validate_config(cfg);
-    assert_checktrue(valid);
-    LD6=struct("cfg",cfg,"student",student_profile(n,"Automatinė Patikra","TEST","LD6"), ...
-        "ui",struct("headless",~gui));
+    cfg=ld6_variant_config(number); [valid,message]=ld6_validate_config(cfg); assert_checktrue(valid);
+    LD6=struct("cfg",cfg,"student",student_profile(number,"Automatinė Patikra","TEST","LD6"),"ui",struct("headless",~gui));
     ld6_start();
-    if LD6.step==0 then LD6.step=1; end
-    if gui then
-        if isfield(LD6,"fig") then LD6.fig.figure_name="PATIKRA · LD6 · variantas "+string(n); end
-    end
-    W=["E1_P" "K1";"K2" "A_P";"A_N" "R_A";"R_B" "E1_N";"V_P" "R_A";"V_N" "R_B"];
+    series=(cfg.E1+cfg.E2)/(cfg.R+cfg.r1+cfg.r2);
+    opposing=(cfg.E1-cfg.E2)/(cfg.R+cfg.r1+cfg.r2);
+    parallel=(cfg.E1/cfg.r1+cfg.E2/cfg.r2)/(1/cfg.R+1/cfg.r1+1/cfg.r2);
     for step=1:6
         assert_checkequal(LD6.step,step);
+        if or(step==[1 3 4 5]) then bench_ld6_connect(ld6_stage_mode(step)); end
+        if or(step==[2 3 4 5]) then
+            bench_ld6_action("ld6_toggle_power()"); bench_ld6_action("ld6_toggle_switch()"); bench_ld6_action("ld6_measure()");
+        end
         select step
-        case 1 then
-            for k=1:size(W,1); bench_ld6_click(W(k,1)); bench_ld6_click(W(k,2)); end
-        case 2 then
-            bench_ld6_answers(step,cfg.E1/cfg.R*1000);
-            bench_ld6_action("ld6_toggle_power()"); bench_ld6_action("ld6_toggle_switch()");
-            bench_ld6_action("ld6_set_mode(1)"); bench_ld6_action("ld6_measure()");
-        case 3 then
-            bench_ld6_action("ld6_set_mode(2)"); bench_ld6_action("ld6_measure()");
-        case 4 then
-            bench_ld6_action("ld6_set_mode(3)"); bench_ld6_action("ld6_measure()");
-            bench_ld6_answers(step,[cfg.E1+cfg.E2 (cfg.E1+cfg.E2)/cfg.R*1000 cfg.E1-cfg.E2 (cfg.E1-cfg.E2)/cfg.R*1000]);
-        case 6 then
-            bench_ld6_answers(step,[1 1]);
+        case 2 then bench_ld6_answers(step,cfg.E1/(cfg.R+cfg.r1)*1000);
+        case 4 then bench_ld6_answers(step,[series*cfg.R series*1000 opposing*cfg.R opposing*1000]);
+        case 5 then bench_ld6_answers(step,[parallel parallel/cfg.R*1000 (cfg.E1-parallel)/cfg.r1*1000 (cfg.E2-parallel)/cfg.r2*1000]);
+        case 6 then bench_ld6_answers(step,[1 2]);
         end
         bench_ld6_primary();
-        if ~LD6.done(step) then
-            detail="";
-            if isfield(LD6.ui,"statusMain") then detail=": "+LD6.ui.statusMain.string; end
-            error("LD6 V"+string(n)+" etapas "+string(step)+detail);
-        end
-        if step==4 then assert_checkequal(size(LD6.journal,1),3); end
-        if gui then mprintf("PASS LD6 V%02d: etapas %d\n",n,step); end
+        if ~LD6.done(step) then error("LD6 variantas "+string(number)+", etapas "+string(step)); end
+        if gui then mprintf("PASS LD6 V%02d: etapas %d\n",number,step); end
     end
-    assert_checktrue(and(LD6.done));
+    assert_checktrue(and(LD6.done)); assert_checkequal(size(LD6.journal,1),4);
     if gui then
-        bench_export_report("LD6",root+"tests/results/");
-        if isfield(LD6,"fig") then delete(LD6.fig); end
+        before=size(listfiles(bench_documents()+"/*.html"),"*");
+        bench_ld6_primary();
+        assert_checkequal(size(listfiles(bench_documents()+"/*.html"),"*"),before+1);
+        assert_checktrue(strindex(LD6.ui.statusMain.string,"Ataskaita išsaugota")<>[]);
+        delete(LD6.fig);
     end
 endfunction

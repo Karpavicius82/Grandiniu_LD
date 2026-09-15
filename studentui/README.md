@@ -21,6 +21,18 @@ Pavyzdžio peržiūra nekeičia jūsų matavimų ir jos negalima pateikti kaip a
 LD5 skaičiavimams ir ataskaitų vertinimui naudojamas bendras C++ branduolys.
 LD5 turi 64 pastovius variantus: `LD5/VARIANTAI.csv`.
 
+**LD6 – nuoseklus ir lygiagretus šaltinių jungimas:** šeši etapai, keturios
+studento jungiamos schemos: E1, nuosekliai, priešpriešiais ir lygiagrečiai.
+Režimo mygtukas išsaugo jūsų tos schemos laidus. Jungdami išjunkite maitinimą;
+matavimui įjunkite maitinimą, uždarykite jungiklį ir spauskite **Matuoti**.
+Kiekvieno šaltinio vidinė varža – 10 Ω. Neigiama šaltinio srovė reiškia, kad
+srovė teka į šaltinį. Srovę įrašykite mA, įtampą V; tinka kablelis arba taškas.
+**Tikrinti** patikrina ir perkelia į kitą etapą, pabaigoje – **Įrašyti ataskaitą**.
+C++ branduolys sprendžia grandinę ir vertina ataskaitą: 25 taškai už atsakymus,
+matavimus ir keturių schemų jungimus. 64 variantai: `LD6/VARIANTAI.csv`,
+bankas `LD6-64-B-2026`, ataskaitos revizija 2. Ankstesnės revizijos ataskaitos
+vertinamos pagal ankstesnę rubriką.
+
 Pabaigoje spauskite **Išsaugoti ataskaitą**. Sukurtą vieną HTML failą iš
 naudotojo aplanko `Grandiniu_LD_darbai` persiųskite dėstytojui. Nebaigtą
 ataskaitą taip pat galima išsaugoti per Pagalbą. LD1 ir LD2 juodraščiai saugomi automatiškai
@@ -35,7 +47,7 @@ Reikia Scilab 2026.1.0 ir jūsų OS atitinkančio paketo su `bin/ldcore.dll`
 (Windows) arba `bin/ldcore.so` (Linux). Kompiliatorius studentui nereikalingas.
 
 Linux: `./PALEISTI.sh`. Scilab aplinkoje: vykdykite `STENDAS.sce` ir pasirinkite darbą.
-Atskirai galima vykdyti atitinkamą `LD1/LD1.sce`–`LD5/LD5.sce` failą.
+Atskirai galima vykdyti atitinkamą `LD1/LD1.sce`–`LD6/LD6.sce` failą.
 Paleidiklis ieško įdiegto Scilab; prireikus nurodykite `SCILAB_BIN=/visas/kelias/bin/scilab`.
 
 Prieš pradedant studentas įveda **eilės numerį sąraše (1–64), vardą ir pavardę,

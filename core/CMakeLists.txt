@@ -17,7 +17,7 @@ file(SHA256 "${LD_DEPS}/eigen-5.0.0.tar.gz" EIGEN_SHA)
 if(NOT JSON_SHA STREQUAL "aaf127c04cb31c406e5b04a63f1ae89369fccde6d8fa7cdda1ed4f32dfc5de63" OR NOT EIGEN_SHA STREQUAL "315c881e19e17542a7d428c5aa37d113c89b9500d350c433797b730cd449c056")
   message(FATAL_ERROR "Dependency checksum mismatch")
 endif()
-add_library(ldcore SHARED src/mna.cpp src/model.cpp src/grader.cpp src/batch.cpp)
+add_library(ldcore SHARED src/mna.cpp src/model.cpp src/sources.cpp src/grader.cpp src/batch.cpp)
 file(ARCHIVE_EXTRACT INPUT "${LD_DEPS}/eigen-5.0.0.tar.gz" DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/verified-deps")
 target_include_directories(ldcore PUBLIC include)
 target_include_directories(ldcore SYSTEM PRIVATE "${LD_DEPS}" "${CMAKE_CURRENT_BINARY_DIR}/verified-deps/eigen-5.0.0")
@@ -62,3 +62,4 @@ add_test(NAME mokytojas COMMAND "${Python3_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_
 add_test(NAME mokytojas_ui COMMAND "${Python3_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/tests/test_mokytojas_ui.py" "$<TARGET_FILE:mokytojas>")
 
 add_test(NAME ld5_grading COMMAND "${Python3_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/tests/test_ld5_grading.py" "$<TARGET_FILE:ldcheck>")
+add_test(NAME ld6_sources COMMAND "${Python3_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/tests/test_ld6_grading.py" "$<TARGET_FILE:ldcheck>" "$<TARGET_FILE:ldcore>")

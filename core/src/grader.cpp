@@ -400,15 +400,19 @@ void grade_ld5(Grader& g,const Json& r,const Bank& b) {
     g.add("s1.wiring","1 etapas (įtampos daliklio stendas): sujungimas — E → jungiklis → ampermetras → R1 → RV, voltmetras prie RV",w1,
           ok1?"Patikrinkite seką: E → K → A → R1 → RV → grįžimas; zondai prie RV galų.":"Sujungimo įrodymo duomenys sugadinti.",ok1?"":"missing_evidence");
 }
-bool ld6_wiring(const Json& pairs,bool& valid) {
-    static const char* c1[][2]={{"E1_P","K1"},{"K2","A_P"},{"A_N","R_A"},{"R_B","E1_N"},{"V_P","R_A"},{"V_N","R_B"}};
+bool ld6_wiring(const Json& pairs,bool& valid,int mode=1) {
+    std::vector<std::pair<std::string,std::string>> required={{"E1_P","K1"},{"K2","A_P"},{"A_N","R_A"},{"V_P","R_A"},{"V_N","R_B"}};
+    if(mode==1||mode==4) required.push_back({"R_B","E1_N"});
+    if(mode==2) {required.push_back({"R_B","E2_N"});required.push_back({"E2_P","E1_N"});}
+    if(mode==3) {required.push_back({"R_B","E2_P"});required.push_back({"E2_N","E1_N"});}
+    if(mode==4) {required.push_back({"E1_P","E2_P"});required.push_back({"E1_N","E2_N"});}
     try {
         if(!pairs.is_array()) {valid=false;return false;}
-        if(pairs.size()!=6) return false;
+        if(pairs.size()!=required.size()) return false;
         std::set<std::pair<std::string,std::string>> unique,canonical;
-        for(int k=0;k<6;++k) canonical.insert({std::min(std::string(c1[k][0]),std::string(c1[k][1])),
-                                               std::max(std::string(c1[k][0]),std::string(c1[k][1]))});
+        for(const auto& wire:required) canonical.insert({std::min(wire.first,wire.second),std::max(wire.first,wire.second)});
         for(auto& w:pairs) {
+            if(!w.is_array()||w.size()!=2) {valid=false;return false;}
             const auto a=text(w.at(0)),b2=text(w.at(1));
             if(a.empty()||b2.empty()) {valid=false;return false;}
             if(!unique.insert({std::min(a,b2),std::max(a,b2)}).second) return false;
@@ -436,6 +440,41 @@ void grade_ld6(Grader& g,const Json& r,const Bank& b) {
     bool w1=ld6_wiring(r.at("evidence").at("wiring").at("s1").at("pairs"),ok1);
     g.add("s1.wiring","1 etapas (šaltinių jungimo stendas): sujungimas — E1 → jungiklis → ampermetras → R",w1,
           ok1?"Patikrinkite: E1 → K → A → R → grįžimas; zondai prie R.":"Sujungimo duomenys sugadinti.",ok1?"":"missing_evidence");
+}
+void grade_ld6_sources(Grader& grader,const Json& report,const Bank& variant) {
+    parameters(report,{{"E1",9},{"E2",variant.e2},{"R",variant.r1a},{"Rnom",variant.r6n},{"r1",10},{"r2",10}});
+    const double load=variant.r1a;
+    const double currents[]={9000/(load+10),(9+variant.e2)*1000/(load+20),
+        (9-variant.e2)*1000/(load+20),(9+variant.e2)/2*1000/(load+5)};
+    double volts[4];
+    for(int mode=0;mode<4;++mode) {
+        volts[mode]=currents[mode]*load/1000;
+        grader.measured("u"+std::to_string(mode+1),"Matavimas: U, režimas "+std::to_string(mode+1),volts[mode],"V",0,.005);
+        grader.measured("i"+std::to_string(mode+1),"Matavimas: I, režimas "+std::to_string(mode+1),currents[mode],"mA",.02);
+    }
+    const double first=(9-volts[3])/10*1000,second=(variant.e2-volts[3])/10*1000;
+    grader.measured("parallel_i1","Lygiagrečiai: E1 atiduodama srovė",first,"mA",.02);
+    grader.measured("parallel_i2","Lygiagrečiai: E2 atiduodama srovė",second,"mA",.02);
+    grader.answer("s2.q1","E1: apkrovos srovė",currents[0],"mA","I = E1/(R+r1), mA.",.01,1e-9);
+    grader.answer("s4.q1","Nuosekliai: apkrovos įtampa",volts[1],"V","U = (E1+E2)·R/(R+r1+r2).",.01,1e-9);
+    grader.answer("s4.q2","Nuosekliai: apkrovos srovė",currents[1],"mA","I = (E1+E2)/(R+r1+r2), mA.",.02,1e-9);
+    grader.answer("s4.q3","Priešpriešiais: apkrovos įtampa",volts[2],"V","U = (E1−E2)·R/(R+r1+r2). Išlaikykite ženklą.",.01,1e-9);
+    grader.answer("s4.q4","Priešpriešiais: apkrovos srovė",currents[2],"mA","I = (E1−E2)/(R+r1+r2), mA. Išlaikykite ženklą.",.02,1e-9);
+    grader.answer("s5.q1","Lygiagrečiai: apkrovos įtampa",volts[3],"V","U = (E1/r1+E2/r2)/(1/R+1/r1+1/r2).",.01,1e-9);
+    grader.answer("s5.q2","Lygiagrečiai: apkrovos srovė",currents[3],"mA","I = U/R, mA.",.02,1e-9);
+    grader.answer("s5.q3","Lygiagrečiai: E1 srovė",first,"mA","I1 = (E1−U)/r1, mA.",.02,1e-9);
+    grader.answer("s5.q4","Lygiagrečiai: E2 srovė",second,"mA","I2 = (E2−U)/r2, mA. Neigiama srovė teka į šaltinį.",.02,1e-9);
+    grader.answer("s6.q1","Ar nuosekliai EV sudedamos su ženklais?",1,"choice","1 – Taip, 2 – Ne.",0,0);
+    grader.answer("s6.q2","Ar lygiagrečiai E1 ir E2 įtampos sudedamos?",2,"choice","Lygiagretaus jungimo įtampa nėra E1+E2.",0,0);
+    const int stages[]={1,3,4,5};
+    for(int mode=1;mode<=4;++mode) {
+        const auto stage="s"+std::to_string(stages[mode-1]);
+        bool valid=true,correct=false;
+        try {correct=ld6_wiring(report.at("evidence").at("wiring").at(stage).at("pairs"),valid,mode);}
+        catch(const std::exception&) {valid=false;}
+        grader.add(stage+".wiring","Patikrintas sujungimas: režimas "+std::to_string(mode),correct,
+            valid?"Patikrinkite šaltinių poliškumą ir zondus prie R.":"Trūksta tinkamo sujungimo įrodymo.",valid?"":"missing_evidence");
+    }
 }
 void grade_ld3(Grader& g,const Json& r,const Bank& b) {
     parameters(r,{{"R",b.r},{"U1",b.u1},{"U2",b.u2},{"U3",b.u3}});
@@ -491,7 +530,8 @@ Json read_report(const std::filesystem::path& path) {
 Json grade(const Json& r) {
     require(r.at("schema_version").is_number_integer()&&r.at("schema_version")==1,"unsupported_schema");
     auto lab=text(r.at("lab_id"));require(lab=="LD1"||lab=="LD2"||lab=="LD3"||lab=="LD4"||lab=="LD5"||lab=="LD6","unsupported_lab");
-    require(r.at("lab_revision")=="1"&&r.at("rubric_version")==lab+"-1"&&r.at("bank_id")==lab+"-64-A-2026","unsupported_version");
+    const bool sources_revision=lab=="LD6"&&r.at("lab_revision")=="2"&&r.at("rubric_version")=="LD6-2"&&r.at("bank_id")=="LD6-64-B-2026";
+    require(sources_revision||(r.at("lab_revision")=="1"&&r.at("rubric_version")==lab+"-1"&&r.at("bank_id")==lab+"-64-A-2026"),"unsupported_version");
     require(r.at("variant").is_number_integer(),"variant_type");
     require(r.at("variant")>=1 && r.at("variant")<=64,"variant_range");
     int variant=r.at("variant").get<int>();auto b=bank(variant);
@@ -501,10 +541,10 @@ Json grade(const Json& r) {
     auto id=text(r.at("submission_id"),128);require(!id.empty(),"submission_identity");
     require(r.at("mode")=="learning"||r.at("mode")=="assessment","mode");
     text(r.at("note"),32000);
-    Grader g(r);if(lab=="LD1") grade_dc(g,r,b);else if(lab=="LD2") grade_ac(g,r,b);else if(lab=="LD3") grade_ld3(g,r,b);else if(lab=="LD4") grade_ld4(g,r,b);else if(lab=="LD5") grade_ld5(g,r,b);else grade_ld6(g,r,b);g.finish();
+    Grader g(r);if(lab=="LD1") grade_dc(g,r,b);else if(lab=="LD2") grade_ac(g,r,b);else if(lab=="LD3") grade_ld3(g,r,b);else if(lab=="LD4") grade_ld4(g,r,b);else if(lab=="LD5") grade_ld5(g,r,b);else if(sources_revision) grade_ld6_sources(g,r,b);else grade_ld6(g,r,b);g.finish();
     int points=0;for(auto& item:g.items) points+=item.at("points").get<int>();
     return {{"status","graded"},{"submission_id",id},{"student",s},{"lab_id",lab},{"variant",variant},
-            {"mode",r.at("mode")},{"bank_id",r.at("bank_id")},{"lab_revision","1"},{"rubric_version",lab+"-1"},
+            {"mode",r.at("mode")},{"bank_id",r.at("bank_id")},{"lab_revision",r.at("lab_revision")},{"rubric_version",r.at("rubric_version")},
             {"core_version","0.2.0"},{"points",points},{"max_points",g.items.size()},
             {"grade_10",std::round(100.0*points/g.items.size())/10.0},{"items",g.items},
             {"note",r.at("note")},{"note_policy","Laisvas tekstas išsaugomas; už jo turinį ši skaitinė rubrika balų neskiria."}};

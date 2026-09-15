@@ -60,12 +60,21 @@ jobs:
         if: runner.os == 'Windows'
         shell: pwsh
         run: python tools/test_ld5.py --scilab "$env:SCILAB_BIN" --checker build/Release/layoutcheck.exe --grader build/Release/ldcheck.exe --output "$env:RUNNER_TEMP/ld5-ui"
-      - name: Actual Linux bench geometry
+      - name: Actual Linux LD6 interface and grading
         if: runner.os == 'Linux'
         shell: bash
         run: |
           sudo apt-get update
           sudo apt-get install -y xvfb x11-utils python3-gi gir1.2-gtk-3.0
+          xvfb-run --auto-servernum --server-args="-screen 0 1920x1080x24" python tools/test_ld6.py --scilab "$SCILAB_BIN" --checker build/layoutcheck --grader build/ldcheck --output "$RUNNER_TEMP/ld6-ui"
+      - name: Actual Windows LD6 interface and grading
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: python tools/test_ld6.py --scilab "$env:SCILAB_BIN" --checker build/Release/layoutcheck.exe --grader build/Release/ldcheck.exe --output "$env:RUNNER_TEMP/ld6-ui"
+      - name: Existing Linux bench geometry
+        if: runner.os == 'Linux'
+        shell: bash
+        run: |
           xvfb-run --auto-servernum --server-args="-screen 0 1920x1080x24" python tools/test_ld5.py --scilab "$SCILAB_BIN" --checker build/layoutcheck --grader build/ldcheck --output "$RUNNER_TEMP/ld5-ui"
           xvfb-run --auto-servernum --server-args="-screen 0 1920x1080x24" python tools/test_ld4.py --scilab "$SCILAB_BIN" --checker build/layoutcheck --output "$RUNNER_TEMP/ld4-ui"
           xvfb-run --auto-servernum --server-args="-screen 0 1920x1080x24" python tools/test_ergonomics.py --scilab "$SCILAB_BIN" --output "$RUNNER_TEMP/ld-ergonomics"
@@ -94,6 +103,15 @@ jobs:
             ${{ runner.temp }}/ld5-ui/*.tsv
             ${{ runner.temp }}/ld5-ui/*.png
             ${{ runner.temp }}/ld5-ui/acceptance.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: LD6-interface-${{ runner.os }}
+          path: |
+            ${{ runner.temp }}/ld6-ui/*.log
+            ${{ runner.temp }}/ld6-ui/*.tsv
+            ${{ runner.temp }}/ld6-ui/*.png
+            ${{ runner.temp }}/ld6-ui/acceptance.json
       - name: Portable student and teacher package
         run: python tools/package_native.py --platform "${{ runner.os }}"
       - uses: actions/upload-artifact@v4

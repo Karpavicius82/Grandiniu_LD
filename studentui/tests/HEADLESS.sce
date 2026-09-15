@@ -93,11 +93,11 @@ try
         table5($+1)=msprintf("LD5-V%02d;%g;%g;%g;%g;%g;%g;%g;%g",n,c.R1nom,c.R1,c.RVnom,c.RV,c.E,c.P1,c.P2,c.P3);
     end
     mputl(table5,root+"LD5/VARIANTAI.csv");
-    table6="Variantas;E1;E2;R;Rnom";
+    table6="Variantas;E1;E2;R;Rnom;r1;r2";
     for n=1:64
         c=ld6_variant_config(n); [v6,w6]=ld6_validate_config(c);
         assert_checktrue(v6);
-        table6($+1)=msprintf("LD6-V%02d;%g;%g;%g;%g",n,c.E1,c.E2,c.R,c.Rnom);
+        table6($+1)=msprintf("LD6-V%02d;%g;%g;%g;%g;%g;%g",n,c.E1,c.E2,c.R,c.Rnom,c.r1,c.r2);
     end
     mputl(table6,root+"LD6/VARIANTAI.csv");
     // Instrukcijų <-> registrų konsistencija (analogas: tools/check_instruction_registry.py).

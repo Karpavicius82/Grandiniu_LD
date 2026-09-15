@@ -51,6 +51,8 @@ function ld6_student_primary()
     end
     if LD6.done(LD6.step) & LD6.step < 6 then
         ld6_next_step();
+    elseif LD6.step==6 & LD6.done(6) & ~and(LD6.done) then
+        pending=find(~LD6.done); ld6_set_step(pending(1));
     end
     ld6_student_sync();
 endfunction
@@ -74,6 +76,8 @@ function ld6_student_sync()
             LD6.ui.studentPrimary.string="GRĮŽTI Į SAVO DARBĄ";
         elseif LD6.step == 6 & and(LD6.done) then
             LD6.ui.studentPrimary.string = "ĮRAŠYTI ATASKAITĄ";
+        elseif LD6.step==6 & LD6.done(6) then
+            LD6.ui.studentPrimary.string = "UŽBAIGTI PRALEISTĄ ETAPĄ";
         elseif LD6.done(LD6.step) then
             LD6.ui.studentPrimary.string = "TOLIAU →";
         else

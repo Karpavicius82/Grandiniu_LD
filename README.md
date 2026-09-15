@@ -1,6 +1,8 @@
 # Grandinių virtualūs laboratoriniai darbai (Scilab)
 
-Interaktyvūs elektros grandinių laboratoriniai darbai: Scilab sąsaja, bendras C++ branduolys ir automatinis LD1–LD5 ataskaitų vertinimas.
+Interaktyvūs elektros grandinių laboratoriniai darbai: Scilab sąsaja, bendras C++ branduolys ir automatinis LD1–LD6 ataskaitų vertinimas.
+
+LD6: E1, nuoseklus, priešpriešinis ir lygiagretus šaltinių jungimas; 64 variantai, šeši etapai ir automatinis 25 kriterijų vertinimas. [Studento eiga](studentui/README.md).
 
 [LD5 pataisos ir Windows/Linux patikra](audits/ld5-c9b18f3-fixes/README.md): gnybtai, gyvi rodmenys, studento eiga ir automatinis ataskaitų vertinimas.
 

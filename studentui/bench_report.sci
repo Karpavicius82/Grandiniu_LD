@@ -119,22 +119,30 @@ function r=bench_report_data(lab)
         st=LD6.student; cfg=LD6.cfg;
         if isfield(LD6,"assessment") then if LD6.assessment then mode="assessment"; end; end
         if isfield(LD6,"practice_used") then practice=LD6.practice_used; end
-        specs=["2" "1" "mA";"4" "1" "V";"4" "2" "mA";"4" "3" "V";"4" "4" "mA";"6" "1" "choice";"6" "2" "choice"];
+        specs=["2" "1" "mA";"4" "1" "V";"4" "2" "mA";"4" "3" "V";"4" "4" "mA"; ...
+            "5" "1" "V";"5" "2" "mA";"5" "3" "mA";"5" "4" "mA";"6" "1" "choice";"6" "2" "choice"];
         for k=1:size(specs,1)
             step=bench_safe_number(specs(k,1)); q=bench_safe_number(specs(k,2));
             answers($+1)=bench_answer(msprintf("s%d.q%d",step,q),LD6.answers(step,q),specs(k,3));
         end
-        if isfield(LD6,"journal") then
-            for tag=1:3
+        if isfield(LD6,"journal") & LD6.journal<>[] then
+            for tag=1:4
                 row=find(LD6.journal(:,3)==tag);
                 if row<>[] then
                     observations($+1)=bench_observation(msprintf("u%d",tag),LD6.journal(row(1),1),"V");
                     observations($+1)=bench_observation(msprintf("i%d",tag),LD6.journal(row(1),2),"mA");
+                    if tag==4 then
+                        observations($+1)=bench_observation("parallel_i1",LD6.journal(row(1),4),"mA");
+                        observations($+1)=bench_observation("parallel_i2",LD6.journal(row(1),5),"mA");
+                    end
                 end
             end
         end
-        params=struct("E1",cfg.E1,"E2",cfg.E2,"R",cfg.R,"Rnom",cfg.Rnom);
-        evidence.wiring=struct("s1",struct("pairs",bench_pairs(LD6.wires),"meter","DC"));
+        params=struct("E1",cfg.E1,"E2",cfg.E2,"R",cfg.R,"Rnom",cfg.Rnom,"r1",cfg.r1,"r2",cfg.r2);
+        evidence.wiring=struct(); stages=[1 3 4 5];
+        for mode_index=1:4
+            evidence.wiring("s"+string(stages(mode_index)))=struct("pairs",bench_pairs(LD6.report_wires(mode_index)),"meter","DC");
+        end
         note="";
     else
         if LD2.example_active then error("Grįžkite iš pavyzdžio į savo darbą prieš išsaugodami ataskaitą."); end
@@ -174,6 +182,7 @@ function r=bench_report_data(lab)
         "bank_id",st.bank,"variant",st.number,"submission_id",bench_id(),"mode",mode, ...
         "student",struct("number",st.number,"name",st.name,"group",st.group), ...
         "parameters",params,"answers",answers,"observations",observations,"evidence",evidence,"note",note,"practice_used",practice);
+    if lab=="LD6" then r.lab_revision="2"; r.rubric_version="LD6-2"; end
 endfunction
 
 function path=bench_export_report(lab,folder)
@@ -218,6 +227,7 @@ function path=bench_export_current(lab)
         elseif lab=="LD3" then ld3_set_status("Ataskaita išsaugota: "+path,"ok","Persiųskite šį HTML failą dėstytojui.");
         elseif lab=="LD4" then ld4_set_status("Ataskaita išsaugota: "+path,"ok","Persiųskite šį HTML failą dėstytojui.");
         elseif lab=="LD5" then ld5_set_status("Ataskaita išsaugota: "+path,"ok","Persiūskite šį HTML failą dėstytojui.");
+        elseif lab=="LD6" then ld6_set_status("Ataskaita išsaugota: "+path,"ok","Persiųskite šį HTML failą dėstytojui.");
         else ld2_set_status("Ataskaita išsaugota: "+path+". Persiųskite šį HTML failą dėstytojui.","ok"); end
     catch
         if lab=="LD1" then ld1_set_status(strcat(lasterror()," "),"error","");

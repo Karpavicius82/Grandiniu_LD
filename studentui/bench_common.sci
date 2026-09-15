@@ -23,7 +23,7 @@ function bench_core_require()
     root=BENCH_RUNTIME_ROOT;
     path=getenv("LD_CORE_LIBRARY",root+"bin/ldcore"+getdynlibext());
     if ~isfile(path) then error("Trūksta C++ branduolio: "+path+". Naudokite pilną Windows arba Linux paketą."); end
-    BENCH_CORE_LIBRARY=link(path,["ld_ac" "ld_mna" "ld_batch" "ld_write_new"],"c");
+    BENCH_CORE_LIBRARY=link(path,["ld_ac" "ld_mna" "ld_batch" "ld_write_new" "ld_sources"],"c");
     BENCH_CORE_READY=%t;
 endfunction
 

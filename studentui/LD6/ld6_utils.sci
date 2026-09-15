@@ -30,6 +30,9 @@ function s = ld6_trim(s)
     s = stripblanks(s);
 end
 
-function ok = ld6_valid_index(n, max)
-    ok = (n >= 1 & n <= max);
+function ok = ld6_valid_index(value, maximum)
+    ok=%f;
+    if type(value)<>1 | size(value,"*")<>1 then return; end
+    if ~isreal(value) | isnan(value) | isinf(value) then return; end
+    ok=value>=1 & value<=maximum & value==floor(value);
 endfunction
