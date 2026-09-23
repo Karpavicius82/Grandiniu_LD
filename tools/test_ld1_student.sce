@@ -92,6 +92,9 @@ try
         end
         ui_primary(); assert_checktrue(size(strindex(LD1.ui.statusMain.string,"Ataskaita išsaugota"),"*")>0);
         report=bench_report_data("LD1"); assert_checktrue(report.evidence.automatic_setup);
+        summary_snapshot=bench_snapshot("LD1"); bench_restore_snapshot(summary_snapshot);
+        assert_checkequal(LD1.step,9); assert_checkequal(length(LD1.ui.resultCards),4);
+        for h=LD1.ui.resultCards; assert_checktrue(is_handle_valid(h)); assert_checkequal(h.visible,"on"); end
         ld1_set_step(2); LD1.ui.qEdit(1).string="99999,0"; ui_primary(); assert_checkequal(LD1.step,3);
         assert_checkequal(LD1.stepQ(2,1),"99999,0"); // Wrong answers are not replaced by a solution.
         report=bench_report_data("LD1"); mputl(toJSON(report),out+msprintf("wrong-V%02d.json",number));

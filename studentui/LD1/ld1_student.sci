@@ -373,6 +373,9 @@ endfunction
 
 function ld1_redraw_panel()
     global LD1;
+    if LD1.step==9 then
+        ld1_update_results_table(LD1.demoMode); ld1_student_sync(); return;
+    end
     drawing=LD1.fig.immediate_drawing; LD1.fig.immediate_drawing="off";
     ld1_redraw_panel_classic();
     if ~ld1_guided() & (LD1.step==1 | LD1.step==5 | LD1.step==8) then
