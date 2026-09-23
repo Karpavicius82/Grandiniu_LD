@@ -10,7 +10,7 @@ LD6: E1, nuoseklus, priešpriešinis ir lygiagretus šaltinių jungimas; 64 vari
 
 **Studentas pateikia vieną HTML ataskaitą. Dėstytojas pasirenka darbų aplanką ir gauna balus, klaidų komentarus bei CSV suvestinę.** [Naudojimas, rubrika ir surinkimas](core/README.md). [Naujausia automatinio vertinimo patikra](audits/closure-2026-09-13/README.md).
 
-Windows / Linux paketai su C++ branduoliu kuriami [GitHub Actions](https://github.com/Karpavicius82/Grandiniu_LD/actions/workflows/native.yml). Šaltinių kopijai pirmiausia reikia surinkti branduolį pagal `core/README.md`.
+Windows / Linux paketai su C++ branduoliu kuriami [GitHub Actions](https://github.com/Karpavicius82/Grandiniu_LD/actions/workflows/native.yml). macOS Intel ir Apple Silicon tikrinami [atskiroje patikroje](https://github.com/Karpavicius82/Grandiniu_LD/actions/workflows/macos.yml). Šaltinių kopijai pirmiausia reikia surinkti branduolį pagal `core/README.md`.
 
 [Stendų ergonomikos auditas](audits/ergonomics-2026-09-13/README.md): LD1–LD3 kontaktų koordinatės, 36 × 40 px paspaudimo zonos, bent 8 px tarpai, laidų sankirtos, langų vaizdai ir C++ patikra. Linux CI tikrina tikrus Scilab langus.
 
@@ -32,6 +32,10 @@ LD1 turi naujus 64 pastovius virtualius variantus. LD2 išlaiko originalų
 LD2 juos išlaiko ir išsaugotame darbe. Pakeitus tik vardą ar grupę atliktas darbas išlieka.
 
 [Naudojimas ir variantai](studentui/README.md) · [Windows ir Linux paketas su C++ branduoliu](dist/Grandiniu_LD-studentui.zip)
+
+Mac: [Apple Silicon paketas](dist/Grandiniu_LD-macOS-arm64.zip) · [Intel paketas](dist/Grandiniu_LD-macOS-x86_64.zip). Pasirinkite savo Scilab architektūrą.
+
+[Naujausia keturių platformų patikra](audits/student-delivery-2026-09-23/README.md): vienodi LD1–LD7 langai, suprantamos ataskaitos ir automatinis vertinimas.
 
 ## Automatinė patikra
 

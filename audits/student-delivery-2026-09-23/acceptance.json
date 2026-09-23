@@ -1,0 +1,48 @@
+{
+  "source_commit": "34eb59cef922a1b91b10edf4e753145058f2e839",
+  "status": "PASS",
+  "native_ci": "https://github.com/Karpavicius82/Grandiniu_LD/actions/runs/35854144025",
+  "macos_ci": "https://github.com/Karpavicius82/Grandiniu_LD/actions/runs/35854144069",
+  "platforms": [
+    "Windows Server 2022",
+    "Ubuntu 22.04",
+    "macOS 15 arm64",
+    "macOS 15 x86_64"
+  ],
+  "ctest_suites_per_platform": 10,
+  "actual_reports_per_platform": 449,
+  "packages": {
+    "Windows": {
+      "sha256": "dffb0aaded69ffa803884b7ddeac63b4c0e487218fbf0163bf4e61105eb4d0a4",
+      "native_sha256": {
+        "ldcheck.exe": "e40f5eed5049600a05155e58d435a61b39bb0edcc32392759fe843caa19a02d7",
+        "ldcore.dll": "a0f9f9297de003d315cc78ffaf4ef8b453bfd83a691081d451e35f7118f29218",
+        "mokytojas.exe": "41004e96e9d0dde716df6ad16df6f6f47daedbd6139970655fb6cee72088c4ec"
+      }
+    },
+    "Linux": {
+      "sha256": "e1d099391e019243823d23dec9e04e1e20814ddc42f4ddddf826e08ee6783d82",
+      "native_sha256": {
+        "ldcheck": "023479d1d8ef2bd7667bd2bf00c402610b6bad55df120ce798c4d867bbedb774",
+        "ldcore.so": "068dfa1027462d96e1c834dfe70da327a2be34340bc30e66867cf9c0e5614cc2",
+        "mokytojas": "059b7dfdaff25b505acc1d42b29726c553e4d788e613c35284c1c0a86cd92411"
+      }
+    },
+    "macOS-arm64": {
+      "sha256": "b757912c1ccdd4bd0954948dd71800ee1adf62955f3414a1270bf35f849178ba",
+      "native_sha256": {
+        "ldcheck": "e5e8595cdb045308dcdc847323f42365d390a0eefaf814e53825ce3b363cff2d",
+        "ldcore.dylib": "c877ad4d792fe9f4b5b1226b030af881a7c73e2b9c0652b456b42d9fc361a19c",
+        "mokytojas": "096c1a926398a4707408eb518897b9a6e0e4eda24ed2d7faabd6b13a8fe5c5dc"
+      }
+    },
+    "macOS-x86_64": {
+      "sha256": "8428fd4f863d24bf6424b91075ac0e82b67e4c8ed8778f1428c0aa3f72f158c8",
+      "native_sha256": {
+        "ldcheck": "96a1d7c6916009b17b118a0755211c19d0bd0578cf976bbc5645662c352e25f2",
+        "ldcore.dylib": "784101f2ca1d5c154b11a07d1ab2e0fb8d36beab9059a5b7b2c848b0faf93dd5",
+        "mokytojas": "25f9b84343ae77fa8ac8a846d868018c0b8bacefd0acc476c96af17d33ac0e65"
+      }
+    }
+  }
+}

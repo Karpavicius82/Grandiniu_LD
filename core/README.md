@@ -1,6 +1,6 @@
 # Bendras C++ branduolys ir automatinis vertinimas
 
-Versija 0.2.0. Įgyvendintas **LD1–LD7** ataskaitų vertinimas, kiekvienam po 64 pastovius variantus. Kitų 6 darbų ši versija dar nevertina. [Ankstesnis 2026-09-13 patikros protokolas](../audits/closure-2026-09-13/README.md). Tai vidiniams priėmimo bandymams skirtas leidimas, ne išorinė aprobacija.
+Versija 0.3.0. Įgyvendintas **LD1–LD7** ataskaitų vertinimas, kiekvienam po 64 pastovius variantus. Kitų 6 darbų ši versija dar nevertina. [Ankstesnis 2026-09-13 patikros protokolas](../audits/closure-2026-09-13/README.md). Tai vidiniams priėmimo bandymams skirtas leidimas, ne išorinė aprobacija.
 
 Studentas atveria `STENDAS.sce`, įveda vardą, grupę ir eilės numerį. Atsiskaitymo režime mygtukas **Įrašyti ir toliau** išsaugo ir klaidingus atsakymus. Pabaigoje **Išsaugoti ataskaitą** sukuria vieną HTML failą naudotojo aplanke `Grandiniu_LD_darbai`. Tą failą studentas persiunčia dėstytojui. Ataskaitą galima sukurti ir nebaigus darbo, per Pagalbą. Mokymosi režimas, pavyzdžiai ir juodraščio atvėrimas yra Pagalboje.
 
@@ -18,13 +18,15 @@ LD6 revizija 2, bankas `LD6-64-B-2026`, rubrika `LD6-2`: 25 vienodo svorio krite
 
 LD7, bankas `LD7-64-A-2026`, rubrika `LD7-1`: 27 vienodo svorio kriterijai – 12 atsakymų, 12 matavimo reikšmių (penkios padėtys U ir I, tuščiosios eigos U0, trumpojo jungimo Ik) ir trijų sujungimų laidų įrodymai. MNA skaičiuoja tą pačią išorinę charakteristiką U = E − r·I per visą padėčių diapazoną; tuščioji eiga modeliuojama 1 MΩ, trumpasis jungimas – 1 µΩ apkrova. LD7 atsakymų tolerancijos: 3 % vidinei varžai r (du taškai), 1 % įtampai ir E patikrai, 2 % galiai bei srovei, pasirinkimai tikslūs.
 
+`LD1-2` (automatinis stendo paruošimas): 15 studento atsakymų kriterijų. Penki matavimai ir du sujungimai išlieka diagnostikoje, tačiau turi 0 balų svorį.
+
 `LD1-1`: 22 vienodo svorio kriterijai — 8 skaičiavimai, 2 grandinių tipai, 5 matavimai, 5 palyginimai, 2 sujungimai. `LD2-1`: 50 kriterijų — 33 skaitiniai atsakymai, 8 baziniai matavimai, 3 sujungimai, rezonanso paieška, 3 ekstremumų tyrimai, pusės galios tyrimas ir dažninė lentelė. LD3-1 turi 15 kriterijų (Omo dėsnio darbas). Instrukcijos / įvadinis etapas taškų neduoda.
 
 Balas: `round(100 * points / max_points) / 10`, nuo 0 iki 10. Nepateiktas arba klaidingas atsakymas gauna 0 tik už konkretų kriterijų. Palyginimo / duomenų apdorojimo užduotis vertinama pagal studento užfiksuotus matavimus; atskiras matavimo kriterijus tikrina jų atitikimą grandinei. Rezonanso paieškai būtini tinkami matavimo taškai abipus ekstremumo. Laisvos išvados išsaugomos ir parodomos, bet jų turinys automatiškai semantiškai nevertinamas ir balų neturi. Rubrikos svorius bei šią laisvo teksto politiką turi peržiūrėti dalyko vertintojas prieš oficialų naudojimą.
 
 LD1 skaičiavimams naudojama 1 % santykinė tolerancija ir 1e-9 absoliuti atsakymo vienetais. LD2 paprastiems atsakymams — 1,5 % ir 0,005 atsakymo vienetais, kaip esamame stende; rezonanso etapų tolerancijos atskiros ir išsaugomos kiekvieno kriterijaus rezultate. Modelio skaitinis tikslumas tikrinamas atskirai nuo vertinimo tolerancijų. SI naudojamas branduolyje; ataskaitos laukų vienetai fiksuoti (`A`, `mA`, `V`, `mW`, `Ohm`, `Hz`, `ms`, `deg`, `1`, `choice`).
 
-Visi bandymai išlieka. Suvestinei `selected_for_summary=true` gauna daugiausia taškų surinkęs tos pačios deklaruotos studento tapatybės ir darbo bandymas; lygių balų atveju — pirmas failas leksikografine tvarka. Tiksli to paties ID kopija pažymima `duplicate`. Skirtingi duomenys tuo pačiu ID sustabdo abiejų automatinį pažymį (`conflict`). Nežinoma versija / sugadintas failas gauna `review` ir paaiškinimą, be pažymio. Vietinė ataskaita nepatvirtina studento autorystės.
+Visi bandymai išlieka. `mode=learning` ir `practice_used=true` gauna grįžtamąjį ryšį, tačiau neįtraukiami į atsiskaitymų suvestinę ar MOKYTOJAS pažymių žurnalą. Suvestinei `selected_for_summary=true` gauna didžiausią pažymį iš 10 gavęs tos pačios deklaruotos studento tapatybės ir darbo atsiskaitymas; lygių balų atveju — pirmas failas leksikografine tvarka. Tiksli to paties ID kopija pažymima `duplicate`. Skirtingi duomenys tuo pačiu ID sustabdo abiejų automatinį pažymį (`conflict`). Nežinoma versija / sugadintas failas gauna `review` ir paaiškinimą, be pažymio. Vietinė ataskaita nepatvirtina studento autorystės.
 
 ## Bendras šablonas kitiems darbams
 
@@ -36,7 +38,7 @@ Skaičiavimai: C++17 / Eigen, kompleksinis modifikuotų mazgų metodas, neprikla
 
 ## Surinkimas ir patikra kūrėjui
 
-Studentui ir dėstytojui reikia Scilab 2026.1.0 ir OS atitinkančio paketo su `bin/ldcore.dll` arba `bin/ldcore.so`. Kompiliatoriaus, Python, serverio ar mokamos API jų kompiuteriuose nereikia. CMake naudoja tik užfiksuotas priklausomybes su SHA256; jų šaltinių ir licencijų pranešimai pateikti `third_party`.
+Studentui ir dėstytojui reikia Scilab 2026.1.0 ir OS atitinkančio paketo su `bin/ldcore.dll`, `bin/ldcore.so` arba `bin/ldcore.dylib`. Kompiliatoriaus, Python, serverio ar mokamos API jų kompiuteriuose nereikia. CMake naudoja tik užfiksuotas priklausomybes su SHA256; jų šaltinių ir licencijų pranešimai pateikti `third_party`.
 
 ```sh
 python tools/fetch_core_deps.py /tmp/ld-deps

@@ -1,0 +1,20 @@
+{
+  "status": "PASS",
+  "platform": "nt",
+  "gui_variants": [
+    1,
+    17,
+    64
+  ],
+  "gui_stages": 9,
+  "geometry_cases": 9,
+  "client_size": [
+    1280,
+    720
+  ],
+  "fixed_window": true,
+  "actual_reports": 4,
+  "incorrect_answers_preserved": 3,
+  "manual_regression": true,
+  "os_mouse_injection": false
+}
