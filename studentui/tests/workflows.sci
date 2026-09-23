@@ -199,6 +199,8 @@ function bench_ld2_workflow(n,root,gui)
         bench_ld2_primary(); assert_checkfalse(LD2.example_active);
         assert_checkequal(LD2.state.student,before.student);
         assert_checkequal(LD2.state.answers_text,before.answers_text);
+        bench_ld2_primary(); // Student report button at the completed final stage.
+        assert_checktrue(strindex(LD2.ui.status.string,"Ataskaita išsaugota")<>[]);
         ld2_write_exports(root+"tests/results/");
         ld2_write_session(root+"tests/results/LD2-test.sod");
         session=ld2_read_session(root+"tests/results/LD2-test.sod");
@@ -322,7 +324,8 @@ function bench_ld3_workflow(n,root,gui)
     assert_checktrue(and(LD3.done));
     assert_checkequal(LD3.student.number,n);
     if gui then
-        bench_export_report("LD3",root+"tests/results/");
+        bench_ld3_primary();
+        assert_checktrue(strindex(LD3.ui.statusMain.string,"Ataskaita išsaugota")<>[]);
         if isfield(LD3.ui,"figure") then delete(LD3.ui.figure);
         elseif isfield(LD3,"fig") then delete(LD3.fig); end
     end

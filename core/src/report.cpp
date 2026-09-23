@@ -2,6 +2,8 @@
 #include <map>
 #include <cerrno>
 #include <stdexcept>
+#include <iomanip>
+#include <sstream>
 #ifdef _WIN32
 #define NOMINMAX
 #include <windows.h>
@@ -25,6 +27,20 @@ std::string unit(std::string u) {
     if(u=="choice"||u=="1") return "";
     return u;
 }
+std::string parameter_unit(const std::string& key) {
+    if(key.empty()) return "";
+    if(key[0]=='R'||key=="r") return "Ω";
+    if(key[0]=='E'||key[0]=='U') return "V";
+    if(key[0]=='F') return "Hz";
+    if(key[0]=='C') return "F";
+    if(key[0]=='L') return "H";
+    if(key[0]=='P') return "%";
+    return "";
+}
+std::string numeric(const ld::Json& value) {
+    if(!value.is_number()) return value.dump();
+    std::ostringstream out; out << std::setprecision(8) << value.get<double>();return out.str();
+}
 std::string answer_text(const ld::Json& a) {
     auto raw=a.at("raw").get<std::string>(); if(raw.empty()) return "Neįvesta";
     if(a.at("unit")=="choice") {
@@ -44,6 +60,8 @@ std::string report_html(const Json& r) {
     // into the student's submitted report.
     auto verdict=grade(r);std::map<std::string,std::string> labels;
     for(auto& item:verdict.at("items")) labels[item.at("id")]=item.at("label");
+    labels["f1_meas"]="Apatinis ribinis dažnis"; labels["f2_meas"]="Viršutinis ribinis dažnis";
+    labels["f1_u"]="Įtampa ties apatiniu ribiniu dažniu"; labels["f2_u"]="Įtampa ties viršutiniu ribiniu dažniu";
     auto esc=[](const std::string& s){return html_escape(s);};
     auto label=[&](const std::string& id){auto i=labels.find(id);return i==labels.end()?id:i->second;};
     std::string doc="<!doctype html><html lang=\"lt\"><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width\"><title>"+esc(r.at("lab_id"))+" ataskaita</title><style>body{font:16px system-ui;max-width:960px;margin:2rem auto;padding:1rem;color:#203237}table{border-collapse:collapse;width:100%}td,th{padding:.6rem;border-bottom:1px solid #ddd;text-align:left}pre{white-space:pre-wrap}h1,h2{color:#17645a}</style>";
@@ -52,11 +70,11 @@ std::string report_html(const Json& r) {
     if(r.value("practice_used",false)) doc+="Naudota mokymosi pagalba; dėstytojui reikalinga atskira peržiūra. ";
     if(r.at("rubric_version")=="LD1-2") doc+="Vertinami 15 studento atsakymų. Už automatinius matavimus ir jungimus balai neskiriami. ";
     doc+="</p><h2>Priskirtos reikšmės</h2><table><tr><th>Dydis</th><th>Reikšmė</th></tr>";
-    for(auto it=r.at("parameters").begin();it!=r.at("parameters").end();++it) doc+="<tr><td>"+esc(it.key())+"</td><td>"+esc(it.value().dump())+"</td></tr>";
+    for(auto it=r.at("parameters").begin();it!=r.at("parameters").end();++it) doc+="<tr><td>"+esc(it.key())+"</td><td>"+esc(numeric(it.value()))+" "+parameter_unit(it.key())+"</td></tr>";
     doc+="</table><h2>Jūsų atsakymai</h2><table><tr><th>Užduotis</th><th>Atsakymas</th><th>Vienetas</th></tr>";
     for(auto& a:r.at("answers")) doc+="<tr><td>"+esc(label(a.at("id")))+"</td><td>"+esc(answer_text(a))+"</td><td>"+esc(unit(a.at("unit")))+"</td></tr>";
     doc+="</table><h2>Matavimai</h2><table><tr><th>Matavimas</th><th>Rodmuo</th><th>Vienetas</th></tr>";
-    for(auto& a:r.at("observations")) doc+="<tr><td>"+esc(label(a.at("id")))+"</td><td>"+(a.at("value").is_null()?"Neišmatuota":esc(a.at("value").dump()))+"</td><td>"+esc(unit(a.at("unit")))+"</td></tr>";
+    for(auto& a:r.at("observations")) doc+="<tr><td>"+esc(label(a.at("id")))+"</td><td>"+(a.at("value").is_null()?"Neišmatuota":esc(numeric(a.at("value"))))+"</td><td>"+esc(unit(a.at("unit")))+"</td></tr>";
     doc+="</table><h2>Pastabos</h2><pre>"+esc(r.at("note"))+"</pre><p>Persiųskite šį vieną HTML failą dėstytojui. Juodraščio siųsti nereikia.</p>";
     std::string payload=r.dump(),safe;
     for(char c:payload) {if(c=='<') safe+="\\u003c";else safe+=c;}

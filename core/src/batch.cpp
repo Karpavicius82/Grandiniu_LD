@@ -80,7 +80,7 @@ public:
         checkpoint();
     }
     void checkpoint() {
-        Json state={{"core_version","0.2.0"},{"complete",cursor==files.size()&&!cancelled},{"cancelled",cancelled},
+        Json state={{"core_version","0.3.0"},{"complete",cursor==files.size()&&!cancelled},{"cancelled",cancelled},
                     {"processed",cursor},{"total",files.size()},{"results",results}};
         Json pending=Json::array();for(size_t k=cursor;k<files.size();++k) pending.push_back(files[k].lexically_relative(input).generic_u8string());
         state["unprocessed"]=pending;
