@@ -11,7 +11,7 @@ function selected=messagebox(varargin)
 endfunction
 function capture_ld6(name)
     global LD6;
-    if getos()=="Windows" then return; end
+    if getos()<>"Linux" then return; end
     LD6.fig.figure_name="LD6 PATIKRA "+name; show_window(LD6.fig); sleep(250);
     command="/usr/bin/python3 """+getenv("LD6_TEST_RUNTIME")+"/capture_window.py"" ""LD6 PATIKRA "+name+""" """+getenv("LD6_TEST_OUT")+"/"+name+".png""";
     assert_checkequal(host(command),0);

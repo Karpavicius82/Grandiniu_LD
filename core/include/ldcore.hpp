@@ -18,6 +18,8 @@ LD_API void ld_ac(const int*,const double*,double*,int*) noexcept;
 // progress [processed,total,graded,review]; status 0=more, 1=done, negative=error.
 LD_API void ld_batch(const int*,const int*,const int*,const int*,const int*,double*,int*) noexcept;
 LD_API void ld_write_new(const int*,const int*,const int*,const int*,int*) noexcept;
+LD_API void ld_export_report(const int*,const int*,const int*,const int*,int*) noexcept;
+LD_API void ld_open_local(const int*,const int*,int*) noexcept;
 LD_API void ld_sources(const int*,const double*,double*,int*) noexcept;
 namespace ld {
 using Values=std::array<double,10>;

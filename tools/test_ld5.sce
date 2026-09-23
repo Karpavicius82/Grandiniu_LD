@@ -13,7 +13,7 @@ function n=messagebox(varargin)
 endfunction
 function capture_ld5(name)
     global LD5;
-    if getos()=="Windows" then return; end
+    if getos()<>"Linux" then return; end
     LD5.fig.figure_name="LD5 PATIKRA "+name; show_window(LD5.fig); sleep(250);
     cmd="/usr/bin/python3 """+getenv("LD5_TEST_RUNTIME")+"/capture_window.py"" ""LD5 PATIKRA "+name+""" """+getenv("LD5_TEST_OUT")+"/"+name+".png""";
     assert_checkequal(host(cmd),0);

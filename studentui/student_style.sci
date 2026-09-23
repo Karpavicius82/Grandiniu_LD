@@ -1,4 +1,37 @@
 // Shared native Scilab styling for both student benches.
+function student_finish_window(f,screen)
+    // One fixed canvas in every lab. A smaller screen scrolls the canvas;
+    // stage transitions never move controls or shrink contact targets.
+    if argn(2)<2 then s=get(0,"screensize_px"); screen=s(3:4); end
+    f.resize="off";
+    design=[1280 720]; available=max([320 240],screen-[40 120]);
+    viewport=min(design,available); f.figure_position=[10 10];
+    if or(viewport<design) then
+        roots=f.children;
+        f.axes_size=viewport;
+        scroll=uicontrol(f,"style","frame","scrollable",%t,"units","normalized","position",[0 0 1 1],"tag","student-scroll");
+        canvas=uicontrol(scroll,"style","frame","units","pixels","position",[0 0 design],"tag","student-canvas");
+        for h=matrix(roots,1,-1)
+            if h.type=="uicontrol" then r=h.position;h.parent=canvas;h.position=r;end
+        end
+        student_reflow(canvas,design);
+    else
+        f.axes_size=design; student_reflow(f,design);
+    end
+endfunction
+
+function student_reflow(parent,sz)
+    for h=matrix(parent.children,1,-1)
+        if h.type<>"uicontrol" then continue; end
+        r=h.position;
+        if h.units=="normalized" then
+            h.units="pixels";h.position=r.*[sz sz];h.units="normalized";h.position=r;
+            child_size=r(3:4).*sz;
+        else child_size=r(3:4); end
+        student_reflow(h,child_size);
+    end
+endfunction
+
 function h=student_text(p,pos,txt,fs,bold,bg)
     if argn(2)<6 then bg=[1 1 1]; end
     if size(strindex(txt,ascii(10)),"*")>0 then txt="<html>"+strsubst(txt,ascii(10),"<br>")+"</html>"; end

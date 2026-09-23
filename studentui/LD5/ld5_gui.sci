@@ -185,8 +185,8 @@ endfunction
 
 function ld5_build_gui()
     global LD5;
-    f=figure("default_axes","off","dockable","off","menubar","none","toolbar","none","visible","off");
-    f.axes_size=[1280 800]; f.figure_position=[35 35]; f.infobar_visible="off";
+    f=figure("resize","off","default_axes","off","dockable","off","menubar","none","toolbar","none","visible","off");
+    f.axes_size=[1280 720]; f.figure_position=[10 10]; f.infobar_visible="off";
     f.figure_name="LD5 · Įtampos daliklis"; f.background=color(246,248,249); LD5.fig=f;
     LD5.ui=struct("headless",%f,"boardHandles",list(),"dynamic",[],"controls",[]);
     LD5.term=struct("handles",list(),"handleIds",emptystr(0,1));
@@ -229,7 +229,7 @@ function ld5_build_gui()
     LD5.ui.controls=controls; LD5.ui.dynamic=controls;
     LD5.ui.statusMain=student_text(f,[0.025 0.055 0.95 0.035],"",13,%t,[0.94 0.96 0.96]);
     LD5.ui.statusFix=student_text(f,[0.025 0.020 0.95 0.035],"",12,%f,[0.94 0.96 0.96]);
-    ld5_font(f); f.visible="on"; ld5_render_stage();
+    ld5_font(f); student_finish_window(f); f.visible="on"; ld5_render_stage();
 endfunction
 
 function ld5_show_actions()

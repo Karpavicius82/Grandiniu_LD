@@ -99,6 +99,19 @@ jobs:
             ${{ runner.temp }}/ld1-ui/*.tsv
             ${{ runner.temp }}/ld1-ui/*.png
             ${{ runner.temp }}/ld1-ui/acceptance.json
+      - name: Student delivery on Linux
+        if: runner.os == 'Linux'
+        run: xvfb-run --auto-servernum --server-args="-screen 0 1920x1080x24" python tools/test_student_delivery.py --scilab "$SCILAB_BIN" --grader build/ldcheck --output "$RUNNER_TEMP/delivery"
+      - name: Student delivery on Windows
+        if: runner.os == 'Windows'
+        run: python tools/test_student_delivery.py --scilab "${{ env.SCILAB_BIN }}" --grader build/Release/ldcheck.exe --output "${{ runner.temp }}/delivery"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: Student-delivery-${{ runner.os }}
+          path: |
+            ${{ runner.temp }}/delivery/*.log
+            ${{ runner.temp }}/delivery/*.json
       - name: Existing Linux bench geometry
         if: runner.os == 'Linux'
         shell: bash

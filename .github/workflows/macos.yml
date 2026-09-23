@@ -1,0 +1,66 @@
+name: macOS Intel and Apple Silicon acceptance
+on: [push, pull_request, workflow_dispatch]
+permissions:
+  contents: read
+jobs:
+  mac:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: macos-15
+            arch: arm64
+          - os: macos-15-intel
+            arch: x86_64
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Build and verify native C++ core
+        run: |
+          python tools/fetch_core_deps.py "$RUNNER_TEMP/deps"
+          cmake -S core -B build -DLD_DEPS="$RUNNER_TEMP/deps" -DCMAKE_BUILD_TYPE=Release -DCMAKE_OSX_DEPLOYMENT_TARGET=11.0
+          cmake --build build --parallel 2
+          ctest --test-dir build --output-on-failure
+          cmake --install build --prefix studentui
+      - name: Install matching Scilab
+        run: |
+          curl --fail --location --retry 3 "https://www.utc.fr/~mottelet/scilab/download/2026.1.0/scilab-2026.1.0-${{ matrix.arch }}.dmg" -o "$RUNNER_TEMP/scilab.dmg"
+          mkdir "$RUNNER_TEMP/scilab-volume"
+          hdiutil attach "$RUNNER_TEMP/scilab.dmg" -nobrowse -readonly -mountpoint "$RUNNER_TEMP/scilab-volume"
+          app=$(find "$RUNNER_TEMP/scilab-volume" -maxdepth 2 -name '*.app' -type d -print -quit)
+          test -n "$app"
+          ditto "$app" "$RUNNER_TEMP/Scilab.app"
+          hdiutil detach "$RUNNER_TEMP/scilab-volume"
+          exe=$(find "$RUNNER_TEMP/Scilab.app/Contents" -type f -name scilab -print -quit)
+          test -x "$exe"
+          echo "SCILAB_BIN=$exe" >> "$GITHUB_ENV"
+      - name: Scilab native integration and real reports
+        run: python tools/test_automatic_reports.py --scilab "$SCILAB_BIN" --runtime studentui
+      - name: Actual student windows
+        run: |
+          python tools/test_ld1_student.py --scilab "$SCILAB_BIN" --checker build/layoutcheck --grader build/ldcheck --output "$RUNNER_TEMP/ld1-ui"
+          python tools/test_ld4.py --scilab "$SCILAB_BIN" --checker build/layoutcheck --output "$RUNNER_TEMP/ld4-ui"
+          python tools/test_ld5.py --scilab "$SCILAB_BIN" --checker build/layoutcheck --grader build/ldcheck --output "$RUNNER_TEMP/ld5-ui"
+          python tools/test_ld6.py --scilab "$SCILAB_BIN" --checker build/layoutcheck --grader build/ldcheck --output "$RUNNER_TEMP/ld6-ui"
+          python tools/test_ld7.py --scilab "$SCILAB_BIN" --checker build/layoutcheck --grader build/ldcheck --output "$RUNNER_TEMP/ld7-ui"
+          python tools/test_student_delivery.py --scilab "$SCILAB_BIN" --grader build/ldcheck --output "$RUNNER_TEMP/delivery"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: Student-interface-macOS-${{ matrix.arch }}
+          path: |
+            ${{ runner.temp }}/ld*-ui/*.log
+            ${{ runner.temp }}/ld*-ui/*.json
+            ${{ runner.temp }}/ld*-ui/*.tsv
+            ${{ runner.temp }}/delivery/*.log
+            ${{ runner.temp }}/delivery/*.json
+      - name: Portable macOS package
+        run: python tools/package_native.py --platform macOS-${{ matrix.arch }}
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Grandiniu-LD-macOS-${{ matrix.arch }}
+          path: dist/Grandiniu_LD-macOS-${{ matrix.arch }}.zip

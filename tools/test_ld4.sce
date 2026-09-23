@@ -13,7 +13,7 @@ function n=messagebox(varargin)
 endfunction
 function capture_ld4(name)
     global LD4;
-    if getos()=="Windows" then return; end
+    if getos()<>"Linux" then return; end
     LD4.fig.figure_name="LD4 PATIKRA "+name; show_window(LD4.fig); sleep(250);
     cmd="/usr/bin/python3 """+getenv("LD4_TEST_RUNTIME")+"/capture_window.py"" ""LD4 PATIKRA "+name+""" """+getenv("LD4_TEST_OUT")+"/"+name+".png""";
     assert_checkequal(host(cmd),0);

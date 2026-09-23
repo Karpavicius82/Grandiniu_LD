@@ -123,6 +123,26 @@ def main(exe):
         assert both[2] == "10.0", both  # geriausias iš dviejų bandymų
         assert len(rows(csv_path)) == 7, "žurnalas turi visus 6 pateikimus + antraštę"
 
+        # Different rubric maxima must be compared by grade; practice is excluded.
+        old = fixture("LD1", 17, "mixed-old")
+        old["student"]["name"] = "Rubrikų patikra"
+        old["answers"][0]["raw"] = "999"
+        write(src / "mixed-old.html", old)
+        guided = fixture("LD1", 17, "mixed-guided")
+        guided["student"]["name"] = old["student"]["name"]
+        guided.update(lab_revision="2", rubric_version="LD1-2")
+        guided["evidence"]["automatic_setup"] = True
+        write(src / "mixed-guided.html", guided)
+        practice = fixture("LD1", 17, "practice")
+        practice["practice_used"] = True
+        write(src / "practice.html", practice)
+        p = run(exe, src, cwd=work)
+        assert p.returncode == 0, p.stderr
+        matrix = {r[0]: r for r in rows(zpath)[1:]}
+        assert matrix[old["student"]["name"]][2] == "10.0", matrix
+        assert practice["student"]["name"] not in matrix
+        assert any(r[6] == "MOKYMASIS" for r in rows(csv_path)[1:])
+
         # 5) be rakto Drive nuoroda → exit 1 su aiškiu pranešimu
         p = run(exe, "https://drive.google.com/drive/folders/AbCdEfGhIjK123456789", cwd=work)
         assert p.returncode == 1, (p.returncode, p.stdout, p.stderr)

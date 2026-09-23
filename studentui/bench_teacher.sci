@@ -36,8 +36,7 @@ function bench_teacher()
         [p,status]=bench_batch_call(command,folder,destination);
         if status<0 then error("Nepavyko užbaigti rezultatų įrašymo."); end
         if is_handle_valid(f) then delete(f); end
-        messagebox([msprintf("Nuskaityta %d iš %d failų.",p(1),p(2)); ...
-            "Rezultatai: "+destination;"vertinimai.html – balai ir komentarai; suvestine.csv – pažymių lentelė."],"Vertinimas baigtas","info");
+        bench_report_saved(fullfile(destination,"vertinimai.html"),"Vertinimas baigtas");
     catch
         if is_handle_valid(f) then delete(f); end
         messagebox(lasterror(),"Vertinimo klaida","error");

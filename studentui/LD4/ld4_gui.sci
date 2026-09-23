@@ -174,8 +174,8 @@ endfunction
 
 function ld4_build_gui()
     global LD4;
-    f=figure("default_axes","off","dockable","off","menubar","none","toolbar","none","visible","off");
-    f.axes_size=[1280 800]; f.figure_position=[35 35]; f.infobar_visible="off";
+    f=figure("resize","off","default_axes","off","dockable","off","menubar","none","toolbar","none","visible","off");
+    f.axes_size=[1280 720]; f.figure_position=[10 10]; f.infobar_visible="off";
     f.figure_name="LD4 · Tiesinių rezistorių tyrimas"; f.background=color(246,248,249); LD4.fig=f;
     LD4.ui=struct("headless",%f,"boardHandles",list(),"dynamic",[],"controls",[]);
     LD4.term=struct("handles",list(),"handleIds",emptystr(0,1));
@@ -219,7 +219,7 @@ function ld4_build_gui()
     LD4.ui.controls=controls; LD4.ui.dynamic=controls;
     LD4.ui.statusMain=student_text(f,[0.025 0.055 0.95 0.035],"",13,%t,[0.94 0.96 0.96]);
     LD4.ui.statusFix=student_text(f,[0.025 0.020 0.95 0.035],"",12,%f,[0.94 0.96 0.96]);
-    ld4_font(f); f.visible="on"; ld4_render_stage();
+    ld4_font(f); student_finish_window(f); f.visible="on"; ld4_render_stage();
 endfunction
 
 function ld4_show_actions()

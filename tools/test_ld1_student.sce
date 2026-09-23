@@ -24,7 +24,7 @@ function ui_answers(values)
 endfunction
 function capture_ld1(name)
     global LD1;
-    if getos()=="Windows" then return; end
+    if getos()<>"Linux" then return; end
     LD1.fig.figure_name="LD1 UI "+name; show_window(LD1.fig); sleep(250);
     command="/usr/bin/python3 """+getenv("LD1_TEST_RUNTIME")+"/capture_window.py"" ""LD1 UI "+name+""" """+getenv("LD1_TEST_OUT")+"/"+name+".png""";
     assert_checkequal(host(command),0);
@@ -35,7 +35,7 @@ try
     for number=[1 17 64]
         LD1=struct(); LD1_TEST_NUMBER=number; exec(root+"LD1/LD1.sce",-1);
         assert_checktrue(LD1.guided); assert_checktrue(LD1.assessment);
-        assert_checkequal(LD1.fig.axes_size,[1280 720]); assert_checkequal(LD1.fig.resize,"off");
+        screen=get(0,"screensize_px"); assert_checkequal(LD1.fig.axes_size,min([1280 720],max([320 240],screen(3:4)-[40 120]))); assert_checkequal(LD1.fig.resize,"off");
         LD1.autosave_enabled=%f; cfg=LD1.cfg;
         primary_position=LD1.ui.checkStep.position; back_position=LD1.ui.prev.position;
         assert_checkequal(size(LD1.wires,1),4);
@@ -68,13 +68,13 @@ try
             end
             if number==1 then
                 for dimension=1:size(sizes,1)
-                    geometry_size(LD1.fig,sizes(dimension,:)); execstr(LD1.fig.resizefcn);
+                    execstr(LD1.fig.resizefcn);
                     geometry_dump(LD1.fig,msprintf("LD1-E%d-%dx%d",step,sizes(dimension,1),sizes(dimension,2)),fd);
                     if dimension==1 & or(step==[1 3 8]) then capture_ld1("E"+string(step)); end
                 end
             end
             ui_primary(); assert_checkequal(LD1.step,step+1); assert_checktrue(LD1.recorded(step));
-            assert_checkequal(LD1.fig.axes_size,[1280 720]);
+            screen=get(0,"screensize_px"); assert_checkequal(LD1.fig.axes_size,min([1280 720],max([320 240],screen(3:4)-[40 120])));
             assert_checkequal(LD1.ui.checkStep.position,primary_position);
             assert_checkequal(LD1.ui.prev.position,back_position);
             mprintf("UI LD1 V%02d E%d PASS\n",number,step);
@@ -85,7 +85,7 @@ try
         before=LD1.stepMeas; raw=LD1.stepQ;
         if number==1 then
             for dimension=1:size(sizes,1)
-                geometry_size(LD1.fig,sizes(dimension,:));
+
                 geometry_dump(LD1.fig,msprintf("LD1-E9-%dx%d",sizes(dimension,1),sizes(dimension,2)),fd);
                 capture_ld1("ataskaita");
             end

@@ -124,30 +124,31 @@ public:
         // for each reported name/group/lab; ties use lexically first input path.
         std::map<std::string,size_t> selected;
         for(size_t i=0;i<results.size();++i) {
-            auto& r=results[i];if(r.at("status")!="graded") continue;
+            auto& r=results[i];if(r.at("status")!="graded"||r.at("mode")=="learning"||r.value("practice_used",false)) continue;
             auto key=Json::array({r.at("student"),r.at("lab_id")}).dump();auto it=selected.find(key);
             if(it==selected.end()) selected[key]=i;
-            else if(r.at("points").get<int>()>results[it->second].at("points").get<int>()) it->second=i;
+            else if(r.at("grade_10").get<double>()>results[it->second].at("grade_10").get<double>()) it->second=i;
         }
         for(auto& r:results) r["selected_for_summary"]=false;
         for(auto& p:selected) results[p.second]["selected_for_summary"]=true;
         checkpoint();
         std::string table="\xef\xbb\xbf" "Failas;Statusas;Studentas;Grupė;Darbas;Variantas;Balai;Iš;Įvertinimas_10;Suvestinei;Komentaras\r\n";
         std::string html="<!doctype html><html lang=\"lt\"><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width\"><title>Laboratorinių vertinimas</title><style>body{font:16px system-ui;max-width:1100px;margin:2rem auto;padding:1rem}table{border-collapse:collapse;width:100%}th,td{text-align:left;padding:.5rem;border-bottom:1px solid #ddd}.bad{color:#963e16}details{margin:1rem 0}pre{white-space:pre-wrap}</style><h1>Laboratorinių darbų vertinimas</h1>";
-        html+="<p>Nuskaityta "+std::to_string(cursor)+" iš "+std::to_string(files.size())+" failų. "+(cancelled?"Vertinimas sustabdytas.":"Vertinimas baigtas.")+"</p><p>Rubrika: LD1-1 / LD2-1 / LD3-1 / LD4-1 / LD5-1 / LD6-1 / LD6-2 / LD7-1. Balas = 10 × surinkti taškai / visi taškai; apvalinama iki 0,1. Suvestinei parenkamas geriausias to paties studento to paties darbo bandymas. Visi bandymai pateikti žemiau.</p>";
+        html+="<p>Nuskaityta "+std::to_string(cursor)+" iš "+std::to_string(files.size())+" failų. "+(cancelled?"Vertinimas sustabdytas.":"Vertinimas baigtas.")+"</p><p>Rubrika: LD1-1 / LD1-2 / LD2-1 / LD3-1 / LD4-1 / LD5-1 / LD6-1 / LD6-2 / LD7-1. Balas = 10 × surinkti taškai / visi taškai; apvalinama iki 0,1. Suvestinei parenkamas geriausias to paties studento to paties darbo bandymas. Mokymosi bandymai ir darbai su naudota mokymosi pagalba į pažymių suvestinę neįtraukiami. Visi bandymai pateikti žemiau.</p>";
         for(auto& r:results) {
             auto get=[&](const char* k) {return r.contains(k)&&!r.at(k).is_null()?(r.at(k).is_string()?r.at(k).get<std::string>():r.at(k).dump()):"";};
             std::string name,group;if(r.contains("student")){name=r["student"]["name"];group=r["student"]["group"];}
             std::vector<std::string> row={get("file"),get("status"),name,group,get("lab_id"),get("variant"),get("points"),get("max_points"),get("grade_10"),get("selected_for_summary"),get("comment")};
             for(size_t k=0;k<row.size();++k) {if(k) table+=';';table+=csv(row[k]);}table+="\r\n";
             html+="<details><summary>"+html_escape(get("file"))+" · "+html_escape(name)+" · "+html_escape(get("status"))+" · "+html_escape(get("grade_10"))+"</summary>";
+            if(r.value("practice_used",false)||r.value("mode",std::string{})=="learning") html+="<p>Mokymosi bandymas: į galutinę pažymių suvestinę neįtrauktas.</p>";
             if(r.contains("comment")) html+="<p>"+html_escape(get("comment"))+"</p>";
             if(r.contains("items")) {
                 html+="<table><tr><th>Užduotis</th><th>Balai</th><th>Atsakymas / etalonas</th><th>Komentaras</th></tr>";
                 for(auto& item:r["items"]) {
                     std::string given=item.contains("raw")?item["raw"].get<std::string>():item.value("given",Json(nullptr)).dump();
                     std::string expected=item.value("expected",Json(nullptr)).dump();
-                    html+="<tr><td>"+html_escape(item["label"])+"</td><td>"+item["points"].dump()+" / 1</td><td>"+html_escape(given)+" / "+html_escape(expected)+" "+html_escape(item.value("unit",std::string{}))+"</td><td>"+html_escape(item["comment"])+"</td></tr>";
+                    html+="<tr><td>"+html_escape(item["label"])+"</td><td>"+item["points"].dump()+" / "+item["max_points"].dump()+"</td><td>"+html_escape(given)+" / "+html_escape(expected)+" "+html_escape(item.value("unit",std::string{}))+"</td><td>"+html_escape(item["comment"])+"</td></tr>";
                 }html+="</table><p>"+html_escape(get("note_policy"))+"</p><pre>"+html_escape(get("note"))+"</pre>";
             }html+="</details>";
         }

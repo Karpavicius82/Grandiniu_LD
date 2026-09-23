@@ -66,9 +66,9 @@ endfunction
 
 function ld2_build_gui()
     global LD2;
-    f=figure("default_axes","off","dockable","off","menubar","none","toolbar","none","visible","off");
-    f.figure_name="LD2 · Kintamosios srovės stendas"; f.axes_size=[1280 800];
-    f.figure_position=[35 35]; f.infobar_visible="off"; f.background=color(246,248,249);
+    f=figure("resize","off","default_axes","off","dockable","off","menubar","none","toolbar","none","visible","off");
+    f.figure_name="LD2 · Kintamosios srovės stendas"; f.axes_size=[1280 720];
+    f.figure_position=[10 10]; f.infobar_visible="off"; f.background=color(246,248,249);
     LD2.ui.figure=f; LD2.ui.dynamic=[]; LD2.ui.answer_edits=[]; LD2.ui.answer_step=0;
     LD2.ui.choice_yes=[]; LD2.ui.choice_no=[]; LD2.ui.term_handles=struct("dummy",0);
     student_text(f,[0.03 0.925 0.65 0.05],"LD2  /  Kintamosios srovės grandinės",22,%t,[0.965 0.973 0.977]);
@@ -85,7 +85,7 @@ function ld2_build_gui()
         LD2.ui.step_buttons=[LD2.ui.step_buttons h];
     end
     LD2.ui.teacher=uicontrol(nav,"style","checkbox","value",0,"string","Peržiūra");
-    f.visible="on";
+    student_finish_window(f); f.visible="on";
 endfunction
 
 function ld2_render_step()

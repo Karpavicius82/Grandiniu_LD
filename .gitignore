@@ -14,3 +14,4 @@ build/
 studentui/bin/
 dist/Grandiniu_LD-Linux.zip
 dist/Grandiniu_LD-Windows.zip
+dist/Grandiniu_LD-macOS-*.zip

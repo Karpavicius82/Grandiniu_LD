@@ -119,8 +119,7 @@ function ld1_create_gui()
     LD1.ui.studentReady=%t;
     LD1.ui.studentIdentity=student_text(LD1.fig,[0.03 0.895 0.94 0.025],"",12,%f,[0.965 0.973 0.977]);
     if isfield(LD1,"student") then LD1.ui.studentIdentity.string=student_caption(LD1.student); end
-    LD1.fig.visible="on";
-    ld1_reflow(LD1.fig,LD1.fig.axes_size);
+    student_finish_window(LD1.fig); LD1.fig.visible="on";
 endfunction
 
 function ld1_set_instruction(title,lines)
@@ -215,8 +214,22 @@ function ld1_student_help()
     global LD1;
     if ~is_handle_valid(LD1.fig) then return; end
     if LD1.demoMode then ld1_toggle_solution(); ld1_student_sync(); return; end
-    n=x_choose(["Kaip sujungti šį stendą";"Teorija";"Parodyti pavyzdį"; ...
-        "Atkurti šio etapo stendą";"Etapai";"Pradėti darbą iš naujo";"Studentas ir priskirtos reikšmės";"Išsaugoti ataskaitą dėstytojui";"Atverti juodraštį";"Atsiskaitymo / mokymosi režimas";"Automatinis / rankinis stendo valdymas"],"Pagalba");
+    if ld1_guided() then
+        selected=x_choose(["Paaiškinimas ir teorija";"Tęsti išsaugotą darbą";"Mano duomenys ir variantas";"Ataskaitos";"Daugiau veiksmų"],"Pagalba");
+        n=0;
+        if selected>0 & selected<4 then choices=[2 9 7];n=choices(selected);end
+        if selected==4 then
+            a=x_choose(["Išsaugoti ataskaitą";"Atverti ataskaitų aplanką"],"Ataskaitos");
+            if a==1 then n=8;elseif a==2 then bench_open_local(bench_documents());return;end
+        end
+        if selected==5 then
+            a=x_choose(["Pasirinkti pasiektą etapą";"Atkurti šio etapo stendą";"Mokymosi / atsiskaitymo režimas";"Parodyti pavyzdį";"Rankinis jungimas";"Pradėti darbą iš naujo"],"Daugiau veiksmų");
+            if a>0 then choices=[5 4 10 3 11 6];n=choices(a);end
+        end
+    else
+        n=x_choose(["Kaip sujungti šį stendą";"Teorija";"Parodyti pavyzdį"; ...
+            "Atkurti šio etapo stendą";"Etapai";"Pradėti darbą iš naujo";"Studentas ir priskirtos reikšmės";"Išsaugoti ataskaitą dėstytojui";"Atverti juodraštį";"Atsiskaitymo / mokymosi režimas";"Automatinis / rankinis stendo valdymas"],"Pagalba");
+    end
     select n
     case 1 then ld1_show_wiring_guide();
     case 2 then ld1_show_help();

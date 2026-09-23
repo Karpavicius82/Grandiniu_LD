@@ -201,8 +201,8 @@ endfunction
 
 function ld6_build_gui()
     global LD6;
-    f=figure("default_axes","off","dockable","off","menubar","none","toolbar","none","visible","off");
-    f.axes_size=[1280 800]; f.figure_position=[35 35]; f.infobar_visible="off";
+    f=figure("resize","off","default_axes","off","dockable","off","menubar","none","toolbar","none","visible","off");
+    f.axes_size=[1280 720]; f.figure_position=[10 10]; f.infobar_visible="off";
     f.figure_name="LD6 · Nuoseklus ir lygiagretus šaltinių jungimas"; f.background=color(246,248,249); LD6.fig=f;
     LD6.ui=struct("headless",%f,"boardHandles",list(),"dynamic",[],"controls",[]);
     LD6.term=struct("handles",list(),"handleIds",emptystr(0,1));
@@ -247,7 +247,7 @@ function ld6_build_gui()
     LD6.ui.controls=controls; LD6.ui.dynamic=controls;
     LD6.ui.statusMain=student_text(f,[0.025 0.055 0.95 0.035],"",13,%t,[0.94 0.96 0.96]);
     LD6.ui.statusFix=student_text(f,[0.025 0.020 0.95 0.035],"",12,%f,[0.94 0.96 0.96]);
-    ld6_font(f); f.visible="on"; ld6_render_stage();
+    ld6_font(f); student_finish_window(f); f.visible="on"; ld6_render_stage();
     f.resizefcn="ld6_resize("+string(f.figure_id)+")";
 endfunction
 

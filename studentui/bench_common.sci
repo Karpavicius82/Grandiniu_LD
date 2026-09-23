@@ -22,9 +22,33 @@ function bench_core_require()
     if BENCH_CORE_READY==%t then return; end
     root=BENCH_RUNTIME_ROOT;
     path=getenv("LD_CORE_LIBRARY",root+"bin/ldcore"+getdynlibext());
-    if ~isfile(path) then error("Trūksta C++ branduolio: "+path+". Naudokite pilną Windows arba Linux paketą."); end
-    BENCH_CORE_LIBRARY=link(path,["ld_ac" "ld_mna" "ld_batch" "ld_write_new" "ld_sources"],"c");
+    if ~isfile(path) then error("Trūksta C++ branduolio: "+path+". Naudokite savo sistemai ir procesoriui skirtą pilną paketą."); end
+    BENCH_CORE_LIBRARY=link(path,["ld_ac" "ld_mna" "ld_batch" "ld_write_new" "ld_sources" "ld_export_report" "ld_open_local"],"c");
     BENCH_CORE_READY=%t;
+endfunction
+
+function bench_open_local(path)
+    bench_core_require(); p=ascii(path);
+    status=call("ld_open_local",p,1,"i",size(p,"*"),2,"i","out",[1 1],3,"i");
+    if status<>0 then messagebox(["Nepavyko atverti. Failą rasite čia:";path],"Ataskaitos","error"); end
+endfunction
+
+function bench_report_saved(path,title)
+    if getscilabmode()=="NWNI" then return; end
+    global BENCH_REPORT_WINDOW BENCH_LAST_REPORT;
+    BENCH_LAST_REPORT=path;
+    if typeof(BENCH_REPORT_WINDOW)=="handle" then
+        if is_handle_valid(BENCH_REPORT_WINDOW) then delete(BENCH_REPORT_WINDOW); end
+    end
+    f=figure("default_axes","off","dockable","off","menubar","none","toolbar","none","axes_size",[680 260],"figure_name",title,"resize","off");
+    f.infobar_visible="off"; BENCH_REPORT_WINDOW=f;
+    instruction="Persiųskite dėstytojui vieną HTML failą.";
+    if title=="Vertinimas baigtas" then instruction="Pažymiai, komentarai ir CSV lentelė paruošti."; end
+    uicontrol(f,"style","text","units","normalized","position",[.05 .67 .9 .25],"string",[title;instruction],"fontunits","pixels","fontsize",16);
+    uicontrol(f,"style","edit","units","normalized","position",[.05 .39 .9 .21],"string",path,"max",2,"min",0,"fontunits","pixels","fontsize",13);
+    uicontrol(f,"style","pushbutton","units","normalized","position",[.05 .1 .27 .2],"string","Atverti ataskaitą","callback","bench_open_local(BENCH_LAST_REPORT)");
+    uicontrol(f,"style","pushbutton","units","normalized","position",[.35 .1 .35 .2],"string","Atverti ataskaitų aplanką","callback","bench_open_local(fileparts(BENCH_LAST_REPORT))");
+    uicontrol(f,"style","pushbutton","units","normalized","position",[.73 .1 .22 .2],"string","Grįžti į darbą","callback","delete(BENCH_REPORT_WINDOW)");
 endfunction
 
 function v=bench_cpp_ac(kind,E,f,R,L,C)

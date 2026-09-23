@@ -461,6 +461,8 @@ void write_feedback(int nr, const std::string& display, const ld::Json& v) {
     o << "Data: " << now_local() << " · Failas: " << display << "\n";
     o << "Įvertinimas: " << (v["grade_10"].is_null() ? std::string("NEVERTINTA") : v["grade_10"].dump())
       << " (balai " << v["points"].dump() << " iš " << v["max_points"].dump() << ")\n\n";
+    if (v["mode"] != "assessment" || v.value("practice_used", false))
+        o << "MOKYMASIS: šis rezultatas neįtraukiamas į pažymių žurnalą.\n\n";
     o << "UŽDUOTYS:\n";
     for (const auto& it : v["items"]) {
         std::string status = it.value("status", std::string());
@@ -504,15 +506,15 @@ void rebuild_zurnalas(const fs::path& journal) {
         std::string name, group;
         bool operator<(const Key& o) const { return name != o.name ? name < o.name : group < o.group; }
     };
-    std::map<Key, std::map<std::string, std::pair<int, std::string>>> best;
+    std::map<Key, std::map<std::string, std::pair<double, std::string>>> best;
     for (size_t k = 1; k < rows.size(); ++k) {
         const auto& r = rows[k];
         if (r.size() != HEADER.size()) continue;
-        if (r[2].empty() || r[4].empty() || r[6] == "NEVERTINTA") continue;
-        int points = 0;
-        try { points = std::stoi(r[7]); } catch (...) { continue; }
+        if (r[2].empty() || r[4].empty() || r[6] == "NEVERTINTA" || r[6] == "MOKYMASIS") continue;
+        double points = 0;
+        try { points = std::stod(r[6]); } catch (...) { continue; }
         auto& slot = best[{r[2], r[3]}][r[4]];
-        if (slot.first < points) slot = {points, r[6]};
+        if (slot.second.empty() || slot.first < points) slot = {points, r[6]};
     }
     std::ofstream f("ZURNALAS.csv", std::ios::binary | std::ios::trunc);
     f << "\xef\xbb\xbf";
@@ -604,6 +606,7 @@ int process(const std::vector<Source>& files, int skipped_other, int skipped_lar
             row[4] = v["lab_id"].get<std::string>();
             row[5] = std::to_string(v["variant"].get<int>());
             row[6] = v["grade_10"].is_null() ? std::string("NEVERTINTA") : v["grade_10"].dump();
+            if (v["mode"] != "assessment" || v.value("practice_used", false)) row[6] = "MOKYMASIS";
             row[7] = v["points"].dump();
             row[8] = v["max_points"].dump();
             std::string mistakes;

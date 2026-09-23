@@ -1,6 +1,6 @@
 # Laboratorinių darbų stendai studentui
 
-LD1, LD2 ir LD3 naudoja tą patį išdėstymą: kairėje grandinė ir prietaisai, dešinėje
+LD1–LD7 naudoja tą patį išdėstymą: kairėje grandinė ir prietaisai, dešinėje
 vieno etapo užduotis ir atsakymai. LD1 ir LD2 atsiskaitymo režime **Įrašyti ir toliau**
 išsaugo jūsų atsakymus. Mokymosi režime **Patikrinti** parodo klaidas.
 Papildomi veiksmai ir režimo pasirinkimas yra skiltyje **Pagalba**.
@@ -9,9 +9,13 @@ Papildomi veiksmai ir režimo pasirinkimas yra skiltyje **Pagalba**.
 Studentas pasirenka grandinės tipą, įrašo savo skaičiavimus ir palygina rodmenis.
 **Įrašyti ir toliau** išsaugo atsakymą ir perkelia į kitą etapą; **Atgal** leidžia
 jį pataisyti. Tuščias atsakymas nepraleidžiamas, neteisingas skaičius nepakeičiamas
-teisingu. Visuose devyniuose etapuose langas yra 1280 × 720 px, mygtukų vietos
-nekinta. Rankinį jungimą galima pasirinkti per **Pagalba → Automatinis / rankinis
+teisingu. Visuose darbuose darbo sritis yra 1280 × 720 px, mygtukų vietos
+etapuose nekinta. Mažesniame ekrane naudojamos slinkties juostos, kontaktai nemažinami.
+Rankinį jungimą galima pasirinkti per **Pagalba → Daugiau → Automatinis / rankinis
 stendo valdymas**. Ataskaitoje nurodoma, kad naudotas automatinis paruošimas.
+Automatinio LD1 vertinime skiriama iki **15 balų už studento atsakymus** (LD1-2);
+automatinis jungimas ir matavimai papildomų balų nesuteikia. Senos LD1-1 ataskaitos
+išlieka suderinamos su ankstesne 22 balų rubrika.
 
 LD3 užduotis tikrinama mygtuku **TIKRINTI**. Įtampą parinkite U1 / U2 / U3,
 maitinimą ir jungiklį valdykite stendo dešinėje. Papildomi veiksmai – viršutiniame
@@ -48,18 +52,25 @@ matavimus ir keturių schemų jungimus. 64 variantai: `LD6/VARIANTAI.csv`,
 bankas `LD6-64-B-2026`, ataskaitos revizija 2. Ankstesnės revizijos ataskaitos
 vertinamos pagal ankstesnę rubriką.
 
-Pabaigoje spauskite **Išsaugoti ataskaitą**. Sukurtą vieną HTML failą iš
+Pabaigoje spauskite **Išsaugoti ataskaitą**. Langas pasiūlo **Atverti ataskaitą** arba **Atverti ataskaitų aplanką**.
+Sukurtą vieną HTML failą iš
 naudotojo aplanko `Grandiniu_LD_darbai` persiųskite dėstytojui. Nebaigtą
 ataskaitą taip pat galima išsaugoti per Pagalbą. LD1 ir LD2 juodraščiai saugomi automatiškai
 įrašant atsakymus ir pereinant į kitą etapą; juos atverkite per Pagalbą.
 
 Dėstytojui: vykdykite `DESTYTOJUI.sce` ir pasirinkite aplanką su ataskaitomis.
 Programa sukuria `vertinimai.html`, `suvestine.csv` ir `vertinimai.json`.
+Mokymosi ar pavyzdžio pagalbą naudoję bandymai gauna komentarus, bet neįtraukiami
+į atsiskaitymų suvestinę. Skirtingų rubrikų bandymai lyginami pagal pažymį iš 10.
 
 ## Paleidimas
 
 Reikia Scilab 2026.1.0 ir jūsų OS atitinkančio paketo su `bin/ldcore.dll`
-(Windows) arba `bin/ldcore.so` (Linux). Kompiliatorius studentui nereikalingas.
+(Windows), `bin/ldcore.so` (Linux) arba `bin/ldcore.dylib` (macOS). Kompiliatorius studentui nereikalingas.
+
+macOS: pasirinkite paketą pagal Scilab architektūrą (`arm64` arba `x86_64`),
+paleiskite `PALEISTI.command` arba Scilab lange vykdykite `STENDAS.sce`.
+Paketai nėra pasirašyti Apple Developer sertifikatu ar notarizuoti.
 
 Linux: `./PALEISTI.sh`. Scilab aplinkoje: vykdykite `STENDAS.sce` ir pasirinkite darbą.
 Windows: dukart paspauskite `PALEISTI.bat` arba vykdykite `STENDAS.sce` grafiniame

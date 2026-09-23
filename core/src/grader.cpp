@@ -589,7 +589,9 @@ Json grade(const Json& r) {
     require(r.at("schema_version").is_number_integer()&&r.at("schema_version")==1,"unsupported_schema");
     auto lab=text(r.at("lab_id"));require(lab=="LD1"||lab=="LD2"||lab=="LD3"||lab=="LD4"||lab=="LD5"||lab=="LD6"||lab=="LD7","unsupported_lab");
     const bool sources_revision=lab=="LD6"&&r.at("lab_revision")=="2"&&r.at("rubric_version")=="LD6-2"&&r.at("bank_id")=="LD6-64-B-2026";
-    require(sources_revision||(r.at("lab_revision")=="1"&&r.at("rubric_version")==lab+"-1"&&r.at("bank_id")==lab+"-64-A-2026"),"unsupported_version");
+    const bool guided_revision=lab=="LD1"&&r.at("lab_revision")=="2"&&r.at("rubric_version")=="LD1-2"&&r.at("bank_id")=="LD1-64-A-2026";
+    require(sources_revision||guided_revision||(r.at("lab_revision")=="1"&&r.at("rubric_version")==lab+"-1"&&r.at("bank_id")==lab+"-64-A-2026"),"unsupported_version");
+    if(guided_revision) require(r.at("evidence").value("automatic_setup",false),"automatic_setup_required");
     require(r.at("variant").is_number_integer(),"variant_type");
     require(r.at("variant")>=1 && r.at("variant")<=64,"variant_range");
     int variant=r.at("variant").get<int>();auto b=bank(variant);
@@ -600,11 +602,20 @@ Json grade(const Json& r) {
     require(r.at("mode")=="learning"||r.at("mode")=="assessment","mode");
     text(r.at("note"),32000);
     Grader g(r);if(lab=="LD1") grade_dc(g,r,b);else if(lab=="LD2") grade_ac(g,r,b);else if(lab=="LD3") grade_ld3(g,r,b);else if(lab=="LD4") grade_ld4(g,r,b);else if(lab=="LD5") grade_ld5(g,r,b);else if(lab=="LD7") grade_ld7(g,r,b);else if(sources_revision) grade_ld6_sources(g,r,b);else grade_ld6(g,r,b);g.finish();
-    int points=0;for(auto& item:g.items) points+=item.at("points").get<int>();
+    int points=0,maximum=0;
+    for(auto& item:g.items) {
+        auto key=item.at("id").get<std::string>();
+        if(guided_revision&&(key.find(".measure")!=std::string::npos||key.find(".wiring")!=std::string::npos)) {
+            item["points"]=0;item["max_points"]=0;item["automatic"]=true;
+            item["comment"]="Automatinis stendo veiksmas; į studento pažymį neįtraukiamas. "+item.at("comment").get<std::string>();
+        }
+        points+=item.at("points").get<int>(); maximum+=item.at("max_points").get<int>();
+    }
     return {{"status","graded"},{"submission_id",id},{"student",s},{"lab_id",lab},{"variant",variant},
             {"mode",r.at("mode")},{"bank_id",r.at("bank_id")},{"lab_revision",r.at("lab_revision")},{"rubric_version",r.at("rubric_version")},
-            {"core_version","0.2.0"},{"points",points},{"max_points",g.items.size()},
-            {"grade_10",std::round(100.0*points/g.items.size())/10.0},{"items",g.items},
+            {"core_version","0.3.0"},{"points",points},{"max_points",maximum},
+            {"grade_10",std::round(100.0*points/maximum)/10.0},{"items",g.items},
+            {"practice_used",r.value("practice_used",false)},
             {"note",r.at("note")},{"note_policy","Laisvas tekstas išsaugomas; už jo turinį ši skaitinė rubrika balų neskiria."}};
 }
 std::string html_escape(const std::string& s) {

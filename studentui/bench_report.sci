@@ -217,33 +217,20 @@ function r=bench_report_data(lab)
         "student",struct("number",st.number,"name",st.name,"group",st.group), ...
         "parameters",params,"answers",answers,"observations",observations,"evidence",evidence,"note",note,"practice_used",practice);
     if lab=="LD6" then r.lab_revision="2"; r.rubric_version="LD6-2"; end
+    if lab=="LD1" then
+        if isfield(evidence,"automatic_setup") then
+            if evidence.automatic_setup then r.lab_revision="2";r.rubric_version="LD1-2";end
+        end
+    end
 endfunction
 
 function path=bench_export_report(lab,folder)
     if argn(2)<2 then folder=bench_documents(); end
     r=bench_report_data(lab);
-    payload=strsubst(toJSON(r),"<",ascii(92)+"u003c");
-    rows="";
-    for k=1:length(r.answers)
-        a=r.answers(k); raw=a.raw; if stripblanks(raw)=="" then raw="Neįvesta"; end
-        rows=rows+"<tr><td>"+bench_html(a.id)+"</td><td>"+bench_html(raw)+"</td><td>"+bench_html(a.unit)+"</td></tr>";
-    end
-    measures="";
-    for k=1:length(r.observations)
-        a=r.observations(k); v="Neišmatuota"; if ~isnan(a.value) then v=msprintf("%.12g",a.value); end
-        measures=measures+"<tr><td>"+bench_html(a.id)+"</td><td>"+v+"</td><td>"+bench_html(a.unit)+"</td></tr>";
-    end
-    doc="<!doctype html><html lang=""lt""><meta charset=""utf-8""><meta name=""viewport"" content=""width=device-width""><title>"+r.lab_id+" ataskaita</title>"+ ...
-        "<style>body{font:16px system-ui;max-width:960px;margin:2rem auto;padding:1rem;color:#203237}table{border-collapse:collapse;width:100%}td,th{padding:.5rem;border-bottom:1px solid #ddd;text-align:left}pre{white-space:pre-wrap}h1,h2{color:#17645a}</style>"+ ...
-        "<h1>"+r.lab_id+" · studento ataskaita</h1><p>"+bench_html(r.student.name)+" · "+bench_html(r.student.group)+ ...
-        " · eilės numeris "+string(r.variant)+"</p><p>Variantų bankas: "+bench_html(r.bank_id)+". Režimas: "+r.mode+".</p>"+ ...
-        "<h2>Priskirtos reikšmės</h2><pre>"+bench_html(toJSON(r.parameters))+"</pre><h2>Studento atsakymai</h2><table><tr><th>Laukas</th><th>Atsakymas</th><th>Vienetas</th></tr>"+rows+"</table>"+ ...
-        "<h2>Matavimai</h2><table>"+measures+"</table><h2>Išvados</h2><pre>"+bench_html(r.note)+"</pre>"+ ...
-        "<details><summary>Bandymų taškai ir sujungimai</summary><pre>"+bench_html(toJSON(r.evidence))+"</pre></details>"+ ...
-        "<p>Šį vieną HTML failą persiųskite dėstytojui. Vertinimo programa patikrins jame išsaugotus atsakymus.</p>"+ ...
-        "<script type=""application/json"" id=""ld-data"">"+payload+"</script></html>";
     path=fullfile(folder,r.lab_id+"-V"+msprintf("%02d",r.variant)+"-"+r.submission_id+".html");
-    bench_write_new(path,doc);
+    bench_core_require(); p=ascii(path); b=ascii(toJSON(r));
+    status=call("ld_export_report",p,1,"i",size(p,"*"),2,"i",b,3,"i",size(b,"*"),4,"i","out",[1 1],5,"i");
+    if status<>0 then error("Ataskaita neišsaugota. Patikrinkite aplanko teises ir darbo duomenis."); end
 endfunction
 
 function path=bench_export_current(lab)
@@ -265,6 +252,7 @@ function path=bench_export_current(lab)
         elseif lab=="LD6" then ld6_set_status("Ataskaita išsaugota: "+path,"ok","Persiųskite šį HTML failą dėstytojui.");
         elseif lab=="LD7" then ld7_set_status("Ataskaita išsaugota: "+path,"ok","Persiųskite šį HTML failą dėstytojui.");
         else ld2_set_status("Ataskaita išsaugota: "+path+". Persiųskite šį HTML failą dėstytojui.","ok"); end
+        bench_report_saved(path,"Ataskaita išsaugota");
     catch
         if lab=="LD1" then ld1_set_status(strcat(lasterror()," "),"error","");
         elseif lab=="LD3" then ld3_set_status(strcat(lasterror()," "),"error","");

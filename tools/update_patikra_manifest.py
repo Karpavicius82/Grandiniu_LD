@@ -16,7 +16,7 @@ import sys
 from datetime import datetime, timezone
 from pathlib import Path
 
-RUNTIME_SUFFIXES = {".sci", ".sce", ".sh", ".bat"}
+RUNTIME_SUFFIXES = {".sci", ".sce", ".sh", ".bat", ".command"}
 LOGS = ["modelis.log", "langai.log"]
 
 
