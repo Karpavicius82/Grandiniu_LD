@@ -44,7 +44,7 @@ function bench_report_saved(path,title)
     f.infobar_visible="off"; BENCH_REPORT_WINDOW=f;
     instruction="Persiųskite dėstytojui vieną HTML failą.";
     if title=="Vertinimas baigtas" then instruction="Pažymiai, komentarai ir CSV lentelė paruošti."; end
-    uicontrol(f,"style","text","units","normalized","position",[.05 .67 .9 .25],"string",[title;instruction],"fontunits","pixels","fontsize",16);
+    uicontrol(f,"style","text","units","normalized","position",[.05 .67 .9 .25],"string","<html>"+title+"<br>"+instruction+"</html>","fontunits","pixels","fontsize",16);
     uicontrol(f,"style","edit","units","normalized","position",[.05 .39 .9 .21],"string",path,"max",2,"min",0,"fontunits","pixels","fontsize",13);
     uicontrol(f,"style","pushbutton","units","normalized","position",[.05 .1 .27 .2],"string","Atverti ataskaitą","callback","bench_open_local(BENCH_LAST_REPORT)");
     uicontrol(f,"style","pushbutton","units","normalized","position",[.35 .1 .35 .2],"string","Atverti ataskaitų aplanką","callback","bench_open_local(fileparts(BENCH_LAST_REPORT))");
