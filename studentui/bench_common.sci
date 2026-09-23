@@ -33,6 +33,18 @@ function bench_open_local(path)
     if status<>0 then messagebox(["Nepavyko atverti. Failą rasite čia:";path],"Ataskaitos","error"); end
 endfunction
 
+function bench_report_action(action)
+    global BENCH_REPORT_WINDOW BENCH_LAST_REPORT;
+    select action
+    case 1 then bench_open_local(BENCH_LAST_REPORT);
+    case 2 then bench_open_local(fileparts(BENCH_LAST_REPORT));
+    case 3 then
+        if typeof(BENCH_REPORT_WINDOW)=="handle" then
+            if is_handle_valid(BENCH_REPORT_WINDOW) then delete(BENCH_REPORT_WINDOW); end
+        end
+    end
+endfunction
+
 function bench_report_saved(path,title)
     if getscilabmode()=="NWNI" then return; end
     global BENCH_REPORT_WINDOW BENCH_LAST_REPORT;
@@ -46,9 +58,9 @@ function bench_report_saved(path,title)
     if title=="Vertinimas baigtas" then instruction="Pažymiai, komentarai ir CSV lentelė paruošti."; end
     uicontrol(f,"style","text","units","normalized","position",[.05 .67 .9 .25],"string","<html>"+title+"<br>"+instruction+"</html>","fontunits","pixels","fontsize",16);
     uicontrol(f,"style","edit","units","normalized","position",[.05 .39 .9 .21],"string",path,"max",2,"min",0,"fontunits","pixels","fontsize",13);
-    uicontrol(f,"style","pushbutton","units","normalized","position",[.05 .1 .27 .2],"string","Atverti ataskaitą","callback","bench_open_local(BENCH_LAST_REPORT)");
-    uicontrol(f,"style","pushbutton","units","normalized","position",[.35 .1 .35 .2],"string","Atverti ataskaitų aplanką","callback","bench_open_local(fileparts(BENCH_LAST_REPORT))");
-    uicontrol(f,"style","pushbutton","units","normalized","position",[.73 .1 .22 .2],"string","Grįžti į darbą","callback","delete(BENCH_REPORT_WINDOW)");
+    uicontrol(f,"style","pushbutton","units","normalized","position",[.05 .1 .27 .2],"string","Atverti ataskaitą","callback","bench_report_action(1)");
+    uicontrol(f,"style","pushbutton","units","normalized","position",[.35 .1 .35 .2],"string","Atverti ataskaitų aplanką","callback","bench_report_action(2)");
+    uicontrol(f,"style","pushbutton","units","normalized","position",[.73 .1 .22 .2],"string","Grįžti į darbą","callback","bench_report_action(3)");
 endfunction
 
 function v=bench_cpp_ac(kind,E,f,R,L,C)
