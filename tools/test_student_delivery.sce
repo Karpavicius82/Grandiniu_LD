@@ -32,7 +32,7 @@ try
         student_finish_window(f,screen');
         assert_checkequal(f.axes_size,screen'-[40 120]);
         assert_checkequal(student_size(b.parent),[1280 720]);
-        assert_checktrue(b.parent.parent.scrollable);assert_checkequal(b.position,[.70 .10 .275 .08]);
+        assert_checkequal(b.parent.parent.scrollable,"on");assert_checkequal(b.position,[.70 .10 .275 .08]);
         delete(f);
     end
     exec(root+"tests/workflows.sci",-1);
