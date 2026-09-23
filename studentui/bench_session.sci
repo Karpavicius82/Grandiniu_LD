@@ -197,10 +197,17 @@ function bench_restore_snapshot(session)
             ld1_build_panel(session.state.panel);ld1_set_step(step);
             for field=fieldnames(session.state)';LD1(field)=session.state(field);end
             LD1.powerOn=%f;LD1.demoMode=%f;LD1.pendingTerminal="";
-            ld1_restore_step_inputs(step);ld1_apply_meter_mode_quiet(LD1.meterMode);ld1_set_power_quiet(%f);
-            LD1.ui.vrSlider.value=LD1.VR1;LD1.ui.vrText.string=string(LD1.VR1)+" Ω";
+            ld1_restore_step_inputs(step);
+            if step<9 then
+                ld1_apply_meter_mode_quiet(LD1.meterMode);ld1_set_power_quiet(%f);
+                LD1.ui.vrSlider.value=LD1.VR1;LD1.ui.vrText.string=string(LD1.VR1)+" Ω";
+                ld1_update_actual_values();ld1_redraw_panel();
+            else
+                // Stage 9 has results only; its instrument widgets were deleted.
+                ld1_update_results_table(%f);
+            end
             LD1.ui.studentIdentity.string=student_caption(LD1.student);
-            ld1_update_actual_values();ld1_redraw_panel();ld1_student_sync();
+            ld1_student_sync();
         elseif session.lab=="LD3" then
             step=session.state.step;
             LD3.cfg=session.cfg;LD3.student=session.student;
