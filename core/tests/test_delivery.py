@@ -32,7 +32,7 @@ with tempfile.TemporaryDirectory(prefix='LD pristatymas Žąsė ') as tmp:
             if case=='missing_observation':a['observations'][0]['value']=None
             path=folder/f'{n}-{case}.html';p,np=ints(str(path));b,nb=ints(json.dumps(a,ensure_ascii=False));status=c.c_int(-1)
             lib.ld_export_report(p,c.byref(np),b,c.byref(nb),c.byref(status));assert status.value==0
-            text=path.read_text();v=Visible();v.feed(text)
+            text=path.read_text(encoding="utf-8");v=Visible();v.feed(text)
             assert 's2.q1' not in v.text and 'choice' not in v.text and 'Nuosekli' in v.text
             assert 'Vertinami 15 studento atsakymų' in v.text
             expected[path.name]=(14 if case!='correct' else 15,15)

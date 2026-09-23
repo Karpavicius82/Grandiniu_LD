@@ -12,7 +12,7 @@ exe=a.scilab.resolve();flags=['-nw']
 if os.name=='nt':exe=exe.parent/'WScilex-cli.exe';flags=[]
 with (out/'scilab.log').open('wb') as log:
     r=subprocess.run([str(exe),*flags,'-nb','-f',str(repo/'tools/test_student_delivery.sce')],env=env,stdout=log,stderr=subprocess.STDOUT,timeout=360)
-verdict=(out/'verdict.log').read_text() if (out/'verdict.log').exists() else (out/'scilab.log').read_text(errors='replace')
+verdict=(out/'verdict.log').read_text(encoding="utf-8") if (out/'verdict.log').exists() else (out/'scilab.log').read_text(encoding="utf-8",errors='replace')
 assert r.returncode==0 and verdict.startswith('PASS:'),verdict
 sys.path.insert(0,str(repo/'core/tests'));from test_grading import run
 reports,_=run(a.grader.resolve(),out/'Ataskaitos',out/'Vertinimai')
