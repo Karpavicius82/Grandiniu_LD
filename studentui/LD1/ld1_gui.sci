@@ -268,6 +268,7 @@ function ld1_create_terminal(id)
     end
     ht=student_terminal(LD1.ui.circuitFrame,[x y],ld1_terminal_button_text(id),tcode,cb,tname,bg);
     ht.foregroundcolor=fg;
+    if ld1_guided() then ht.enable="off"; end
     LD1.term.handles($+1)=ht;
     LD1.term.handleIds($+1,1)=id;
     ld1_track_board_handle(ht);
@@ -486,11 +487,11 @@ endfunction
 function ld1_create_gui_classic()
     global LD1;
     f=figure("default_axes","off","dockable","off","menubar","none", ...
-        "toolbar","none","visible","off","axes_size",[1280 800]);
+        "toolbar","none","visible","off","axes_size",[1280 720]);
     f.infobar_visible="off";
-    f.figure_position=[75 75];
+    f.figure_position=[10 10];
     f.figure_name=LD1.cfg.title+"  •  Scilab 2025.1";
-    f.resize="on";
+    f.resize="off";
     LD1.fig=f;
 
     LD1.ui.header=uicontrol(f,"style","text","units","normalized", ..
@@ -523,6 +524,7 @@ function ld1_create_gui_classic()
         "position",[0.018 0.105 0.600 0.770],"backgroundcolor",[1 1 1],"relief","groove");
     LD1.ui.boardHandles=list();
     LD1.ui.resultsTable=uicontrol(LD1.ui.circuitFrame,"style","table","units","normalized", ..
+        "fontname","SansSerif","fontunits","pixels","fontsize",12, ..
         "position",[0.04 0.10 0.92 0.78], ..
         "string",["Bandymas" "Formulė / kilmė" "Skaičiuota" "Multimetro rodmuo" "Vertinimas"; emptystr(1,5)]);
     LD1.ui.resultsTable.visible="off";

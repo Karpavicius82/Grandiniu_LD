@@ -5,6 +5,14 @@ vieno etapo užduotis ir atsakymai. LD1 ir LD2 atsiskaitymo režime **Įrašyti 
 išsaugo jūsų atsakymus. Mokymosi režime **Patikrinti** parodo klaidas.
 Papildomi veiksmai ir režimo pasirinkimas yra skiltyje **Pagalba**.
 
+**LD1:** stendas automatiškai sujungia grandinę, parenka varžą ir įrašo matavimą.
+Studentas pasirenka grandinės tipą, įrašo savo skaičiavimus ir palygina rodmenis.
+**Įrašyti ir toliau** išsaugo atsakymą ir perkelia į kitą etapą; **Atgal** leidžia
+jį pataisyti. Tuščias atsakymas nepraleidžiamas, neteisingas skaičius nepakeičiamas
+teisingu. Visuose devyniuose etapuose langas yra 1280 × 720 px, mygtukų vietos
+nekinta. Rankinį jungimą galima pasirinkti per **Pagalba → Automatinis / rankinis
+stendo valdymas**. Ataskaitoje nurodoma, kad naudotas automatinis paruošimas.
+
 LD3 užduotis tikrinama mygtuku **TIKRINTI**. Įtampą parinkite U1 / U2 / U3,
 maitinimą ir jungiklį valdykite stendo dešinėje. Papildomi veiksmai – viršutiniame
 **Pagalba** meniu; apačioje galima grįžti į ankstesnį etapą arba atverti kontaktų žemėlapį.
@@ -54,8 +62,15 @@ Reikia Scilab 2026.1.0 ir jūsų OS atitinkančio paketo su `bin/ldcore.dll`
 (Windows) arba `bin/ldcore.so` (Linux). Kompiliatorius studentui nereikalingas.
 
 Linux: `./PALEISTI.sh`. Scilab aplinkoje: vykdykite `STENDAS.sce` ir pasirinkite darbą.
+Windows: dukart paspauskite `PALEISTI.bat` arba vykdykite `STENDAS.sce` grafiniame
+Scilab lange. `bin/ldcheck.exe` skirtas dėstytojo ataskaitų tikrinimui.
 Atskirai galima vykdyti atitinkamą `LD1/LD1.sce`–`LD7/LD7.sce` failą.
 Paleidiklis ieško įdiegto Scilab; prireikus nurodykite `SCILAB_BIN=/visas/kelias/bin/scilab`.
+
+Paketą platinkite atsisiuntimo nuoroda. Gmail gali blokuoti archyvą dėl jame esančių
+DLL, EXE ar BAT failų ([Google taisyklės](https://support.google.com/mail/answer/6590?hl=en)).
+Vien toks pranešimas nepatvirtina nei užkrėtimo, nei Scilab lūžio priežasties.
+Neišjunkite apsaugos ir nepervadinkite failų blokavimui apeiti.
 
 Prieš pradedant studentas įveda **eilės numerį sąraše (1–64), vardą ir pavardę,
 grupę**. Tada parodomos jo variantui priskirtos reikšmės. Patvirtinus jos
@@ -87,7 +102,8 @@ Tai virtualių darbų parametrai. Jie nėra fizinio laboratorinio modulio vardin
 - LD2 zondus perjunkite per **Nuimti zondus**. Dažnis įvedamas Hz; galima keisti po 1 Hz.
 - Neteisingo atsakymo nurodymas rodomas stendo apačioje; LD2 tikrinimo klaida nebeatveria blokuojančio lango.
 - Pavyzdys neįskaito rezultatų; **Grįžti į savo darbą** atkuria studento įrašus.
-- LD1 baigus eksportuojamas `LD1-Vnn_rezultatai.csv` su studento duomenimis ir parametrais.
+- LD1 baigus **Išsaugoti ataskaitą** sukuria HTML failą su studento duomenimis,
+  atsakymais ir matavimais automatiniam dėstytojo vertinimui.
 - LD2 **Pagalba → Išsaugoti darbą** išlaiko studento duomenis, variantą, laidus,
   atsakymus ir matavimus `.sod` faile. CSV eksportas prideda `LD2_studentas.csv`.
   Atveriant darbą patikrinama, ar parametrai atitinka išsaugotą variantą.

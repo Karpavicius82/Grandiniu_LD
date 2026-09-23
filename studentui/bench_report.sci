@@ -39,6 +39,10 @@ function r=bench_report_data(lab)
         end
         evidence.realistic=LD1.realistic;
         note="";
+        if isfield(LD1,"guided_used") then
+            evidence.automatic_setup=LD1.guided_used;
+            if LD1.guided_used then note="Stendą paruošė ir matavimus atliko programa. Skaičiavimus ir palyginimus įvedė studentas."; end
+        end
     elseif lab=="LD3" then
         st=LD3.student; cfg=LD3.cfg;
         if isfield(LD3,"assessment") then if LD3.assessment then mode="assessment"; end; end

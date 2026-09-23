@@ -82,6 +82,23 @@ jobs:
         if: runner.os == 'Windows'
         shell: pwsh
         run: python tools/test_ld7.py --scilab "$env:SCILAB_BIN" --checker build/Release/layoutcheck.exe --grader build/Release/ldcheck.exe --output "$env:RUNNER_TEMP/ld7-ui"
+      - name: Actual Linux LD1 student interface and grading
+        if: runner.os == 'Linux'
+        shell: bash
+        run: xvfb-run --auto-servernum --server-args="-screen 0 1920x1080x24" python tools/test_ld1_student.py --scilab "$SCILAB_BIN" --checker build/layoutcheck --grader build/ldcheck --output "$RUNNER_TEMP/ld1-ui"
+      - name: Actual Windows LD1 student interface and grading
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: python tools/test_ld1_student.py --scilab "$env:SCILAB_BIN" --checker build/Release/layoutcheck.exe --grader build/Release/ldcheck.exe --output "$env:RUNNER_TEMP/ld1-ui"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: LD1-student-interface-${{ runner.os }}
+          path: |
+            ${{ runner.temp }}/ld1-ui/*.log
+            ${{ runner.temp }}/ld1-ui/*.tsv
+            ${{ runner.temp }}/ld1-ui/*.png
+            ${{ runner.temp }}/ld1-ui/acceptance.json
       - name: Existing Linux bench geometry
         if: runner.os == 'Linux'
         shell: bash

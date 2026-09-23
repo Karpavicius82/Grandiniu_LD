@@ -13,7 +13,7 @@ prefix = "Grandiniu_LD-studentui/"
 with zipfile.ZipFile(root / "dist/Grandiniu_LD-studentui.zip") as archive:
     assert archive.testzip() is None, "Corrupt ZIP entry"
     runtime = {str(path.relative_to(student)) for path in student.rglob("*")
-               if path.is_file() and path.suffix in {".sci", ".sce", ".sh"}}
+               if path.is_file() and path.suffix in {".sci", ".sce", ".sh", ".bat"}}
     assert runtime == set(manifest["source_sha256"]), "Runtime and test manifest differ"
     for name in sorted(runtime):
         local = (student / name).read_bytes()

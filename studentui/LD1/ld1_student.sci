@@ -6,10 +6,14 @@ function ld1_student_main(root)
             if is_handle_valid(LD1.fig) then show_window(LD1.fig); return; end
         end
     end
-    bench_core_require();
+    try bench_core_require(); catch
+        messagebox(["LD1 nepavyko paleisti.";strcat(lasterror()," "); ...
+            "Išskleiskite visą Windows arba Linux paketą į vieną aplanką ir paleiskite STENDAS.sce per grafinį Scilab."],"LD1 paleidimas","error");
+        return;
+    end
     [ok,st,cfg]=student_enroll("LD1");
     if ~ok then return; end
-    LD1=struct("base",root,"cfg",cfg,"student",st,"assessment",%t);
+    LD1=struct("base",root,"cfg",cfg,"student",st,"assessment",%t,"guided",%t);
     student_remember(st);
     ld1_start();
     LD1.autosave_enabled=%t;
@@ -47,9 +51,12 @@ endfunction
 function ld1_create_gui()
     global LD1;
     ld1_create_gui_classic();
-    LD1.fig.axes_size=[1280 800];
+    LD1.fig.axes_size=[1280 720];
+    LD1.fig.figure_position=[10 10]; LD1.fig.resize="off";
     LD1.fig.figure_name="LD1 · Nuolatinės srovės stendas";
     LD1.fig.background=color(246,248,249);
+    // Java logical font is present on both OSes, including Windows without DejaVu.
+    ld1_ui_font(LD1.fig);
     LD1.ui.header.position=[0.03 0.925 0.68 0.05];
     LD1.ui.header.string="LD1  /  Nuolatinės srovės grandinės";
     LD1.ui.header.horizontalalignment="left";
@@ -113,11 +120,12 @@ function ld1_create_gui()
     LD1.ui.studentIdentity=student_text(LD1.fig,[0.03 0.895 0.94 0.025],"",12,%f,[0.965 0.973 0.977]);
     if isfield(LD1,"student") then LD1.ui.studentIdentity.string=student_caption(LD1.student); end
     LD1.fig.visible="on";
+    ld1_reflow(LD1.fig,LD1.fig.axes_size);
 endfunction
 
 function ld1_set_instruction(title,lines)
     global LD1;
-    LD1.studentDetail=lines;
+    if lines<>[] then LD1.studentDetail=lines; end
     titles=["Sujunkite grandinę";"Apskaičiuokite";"Išmatuokite srovę";"Pakartokite bandymą"; ...
         "Sujunkite dvi šakas";"Išmatuokite įtampą";"Pakeiskite varžą";"Bendra srovė";"Jūsų rezultatai"];
     tips=["Sujunkite kilpą: [T01]→[T03]; [T04]→[T09]; [T10]→[T11]; [T12]→[T02]. Režimas A (DC) [B07]. Pabaigoje pasirinkite NUOSEKLI."; ...
@@ -129,6 +137,18 @@ function ld1_set_instruction(title,lines)
         "Pakeiskite VR1, pvz., į 500 Ω [B03] arba slankikliu [V01], tada vėl MATUOTI [B06]. Ar UAB pasikeitė?"; ...
         "Į bendrą laidą prieš A: [T01]→[T11], COM [T12]→ATARGET. I1→[A08.01], I2→[A08.02], I=I1+I2→[A08.03]."; ...
         "Čia surinkti jūsų skaičiavimai ir matavimai. Neatliktus etapus rasite per Pagalba → Etapai."];
+    if ld1_guided() then
+        titles(1)="Atpažinkite grandinę"; titles(5)="Atpažinkite dvi šakas";
+        tips=["Grandinė jau sujungta. Apžiūrėkite schemą ir pasirinkite jos tipą."; ...
+            "Apskaičiuokite Rbendr = R1 + 1000 Ω ir I = 10 / Rbendr × 1000 mA. Įrašykite du atsakymus."; ...
+            "Srovė jau išmatuota. Palyginkite rodmenį su savo 2 etapo skaičiavimu ir pasirinkite Taip arba Ne."; ...
+            "VR1 automatiškai pakeista į 500 Ω, srovė išmatuota. Apskaičiuokite Rbendr ir I, tada palyginkite su rodmeniu."; ...
+            "Paruoštos dvi šakos: R3 ir R2+VR1. Kaip jos sujungtos tarpusavyje? Pasirinkite tipą."; ...
+            "Įtampa jau išmatuota. Rš2 = R2 + 1000 Ω. Rbendr = R3 × Rš2 / (R3 + Rš2). Įrašykite varžą ir palyginkite UAB su 10 V."; ...
+            "VR1 pakeista iš 1000 į 500 Ω. Programa išmatavo UAB dar kartą. Ar įtampa pasikeitė daugiau kaip 5 %?"; ...
+            "Ampermetras prijungtas ir srovė išmatuota. VR1 = 0 Ω. Apskaičiuokite I1 = 10000/R3, I2 = 10000/R2 ir jų sumą (mA). Palyginkite su rodmeniu."; ...
+            "Patikrinkite surinktus atsakymus ir matavimus. Spauskite Išsaugoti ataskaitą ir persiųskite vieną HTML failą dėstytojui."];
+    end
     LD1.ui.instructionTitle.string=student_wrap(titles(LD1.step),24);
     for k=2:5; LD1.ui.instructionLine(k).visible="off"; end
     tip=tips(LD1.step);
@@ -136,6 +156,9 @@ function ld1_set_instruction(title,lines)
         tip=strsubst(tip,"ATARGET",ld1_terminal_button_text(LD1.kclTargetA)+" ["+ld1_terminal_code(LD1.kclTargetA)+"]");
     end
     LD1.ui.instructionLine(1).string=student_wrap(tip,37);
+    if ld1_guided() & LD1.step==3 then
+        LD1.ui.instructionLine(1).string=student_wrap("Jūsų skaičiuota I: "+LD1.stepQ(2,2)+" mA. Srovė jau išmatuota ir rodoma ampermetre. Ar reikšmės sutampa 5 % ribose?",37);
+    end
     LD1.ui.instructionLine(1).visible="on";
     LD1.ui.instructionFrame.position=[0.07 0.67 0.86 0.30];
     LD1.ui.standFrame.visible="off";
@@ -143,6 +166,8 @@ endfunction
 
 function ld1_student_sync()
     global LD1;
+    if ~isfield(LD1,"fig") then return; end
+    if ~is_handle_valid(LD1.fig) then return; end
     if ~isfield(LD1,"ui") then return; end
     if ~isfield(LD1.ui,"studentReady") then return; end
     LD1.ui.studentProgress.string=string(LD1.step)+" / 9 etapas";
@@ -162,10 +187,17 @@ endfunction
 
 function ld1_student_primary()
     global LD1;
+    if ~is_handle_valid(LD1.fig) then return; end
     if LD1.demoMode then ld1_toggle_solution();
     elseif LD1.step==9 then bench_export_current("LD1");
     elseif isfield(LD1,"assessment") & LD1.assessment then
-        ld1_save_step_inputs();bench_autosave("LD1");ld1_set_step(LD1.step+1);
+        if ld1_guided() then
+            if ~ld1_inputs_present() then return; end
+        end
+        ld1_save_step_inputs();
+        if ~isfield(LD1,"recorded") then LD1.recorded=zeros(1,9)==1; end
+        LD1.recorded(LD1.step)=%t;
+        ld1_set_step(LD1.step+1); bench_autosave("LD1");
     elseif LD1.done(LD1.step) then ld1_next_step();
     else ld1_check_step(); end
     ld1_student_sync();
@@ -173,6 +205,7 @@ endfunction
 
 function ld1_student_answer_changed()
     global LD1;
+    if ~is_handle_valid(LD1.fig) then return; end
     if LD1.demoMode then return; end
     LD1.done(LD1.step)=%f;
     ld1_save_step_inputs(); bench_autosave("LD1"); ld1_student_sync();
@@ -180,9 +213,10 @@ endfunction
 
 function ld1_student_help()
     global LD1;
+    if ~is_handle_valid(LD1.fig) then return; end
     if LD1.demoMode then ld1_toggle_solution(); ld1_student_sync(); return; end
     n=x_choose(["Kaip sujungti šį stendą";"Teorija";"Parodyti pavyzdį"; ...
-        "Atkurti šio etapo stendą";"Etapai";"Pradėti darbą iš naujo";"Studentas ir priskirtos reikšmės";"Išsaugoti ataskaitą dėstytojui";"Atverti juodraštį";"Atsiskaitymo / mokymosi režimas"],"Pagalba");
+        "Atkurti šio etapo stendą";"Etapai";"Pradėti darbą iš naujo";"Studentas ir priskirtos reikšmės";"Išsaugoti ataskaitą dėstytojui";"Atverti juodraštį";"Atsiskaitymo / mokymosi režimas";"Automatinis / rankinis stendo valdymas"],"Pagalba");
     select n
     case 1 then ld1_show_wiring_guide();
     case 2 then ld1_show_help();
@@ -192,11 +226,13 @@ function ld1_student_help()
         options=emptystr(9,1);
         for k=1:9
             state="Neatlikta"; if LD1.done(k) then state="Atlikta"; end
+            if isfield(LD1,"recorded") then if LD1.recorded(k) & ~LD1.done(k) then state="Įrašyta"; end; end
             options(k)=string(k)+" etapas · "+state;
         end
         k=x_choose(options,"Etapai · atsakymai išlieka");
         if k>0 then
-            if k<=LD1.step | LD1.done(k) | LD1.skipped(k) then ld1_set_step(k);
+            saved=%f; if isfield(LD1,"recorded") then saved=LD1.recorded(k); end
+            if k<=LD1.step | LD1.done(k) | LD1.skipped(k) | saved then ld1_set_step(k);
             else ld1_set_status("Šio etapo dar nepasiekėte.","info","Dabartinį etapą patikrinkite ir spauskite Toliau."); end
         end
     case 6 then ld1_restart();
@@ -204,6 +240,7 @@ function ld1_student_help()
     case 8 then bench_export_current("LD1");
     case 9 then bench_open_snapshot("LD1");
     case 10 then bench_mode("LD1");
+    case 11 then ld1_toggle_guided();
     end
     ld1_student_sync();
 endfunction
@@ -218,6 +255,7 @@ function ld1_student_source(pos)
     LD1.ui.power=student_button(fr,[0.09 0.10 0.82 0.25],caption,"ld1_toggle_power()");
     ld1_register_button(LD1.ui.power,"ld1_toggle_power()");
     LD1.ui.power.enable="on";
+    if ld1_guided() then LD1.ui.power.visible="off"; end
     if LD1.demoMode | LD1.step==1 | LD1.step==2 | LD1.step==5 then LD1.ui.power.enable="off"; end
 endfunction
 
@@ -229,7 +267,7 @@ function ld1_student_resistor(pos,name,value,variable)
     h=student_text(fr,[0.09 0.16 0.82 0.30],string(value)+" Ω",16,%f,bg);
     if variable then
         LD1.ui.vrText=h;
-        if LD1.step==7 & ~LD1.demoMode then
+        if LD1.step==7 & ~LD1.demoMode & ~ld1_guided() then
             h.position=[0.09 0.36 0.82 0.24];
             hb=student_button(fr,[0.09 0.06 0.82 0.26],"500 Ω","ld1_set_vr(500)");
             ld1_register_button(hb,"ld1_set_vr(500)");
@@ -252,6 +290,7 @@ function ld1_student_meter(pos)
     LD1.ui.measure.string="<html><center>[B06] Matuoti</center></html>";
     LD1.ui.measure.fontsize=12;
     if LD1.step==1 | LD1.step==2 | LD1.step==5 | LD1.demoMode then LD1.ui.measure.visible="off"; end
+    if ld1_guided() then LD1.ui.measure.visible="off"; end
 endfunction
 
 function ld1_draw_series_board()
@@ -336,7 +375,7 @@ function ld1_redraw_panel()
     global LD1;
     drawing=LD1.fig.immediate_drawing; LD1.fig.immediate_drawing="off";
     ld1_redraw_panel_classic();
-    if LD1.step==1 | LD1.step==5 | LD1.step==8 then
+    if ~ld1_guided() & (LD1.step==1 | LD1.step==5 | LD1.step==8) then
         h=student_button(LD1.ui.circuitFrame,[0.04 0.025 0.24 0.05],"Atšaukti laidą","ld1_remove_last_wire()");
         ld1_register_button(h,"ld1_remove_last_wire()");
         ld1_track_board_handle(h);
@@ -346,5 +385,6 @@ function ld1_redraw_panel()
         ld1_board_text([0.34 0.025 0.62 0.05],tip,13,%f);
     end
     ld1_student_sync();
+    ld1_ui_font(LD1.ui.circuitFrame);
     LD1.fig.immediate_drawing=drawing;
 endfunction

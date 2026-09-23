@@ -67,6 +67,7 @@ function ld1_init_state()
     LD1.lastMeasurementStep=0;
     LD1.parallelBaseVoltage=%nan;
     LD1.done=zeros(1,9)==1;
+    LD1.recorded=zeros(1,9)==1; LD1.guided_used=%f;
 
     // Studentų įrašai ir matavimai saugomi atskirai kiekvienam etapui.
     // Grįžus atgal nieko nereikia spręsti iš naujo.
@@ -112,6 +113,7 @@ function ld1_start()
     ld1_create_gui();
     ld1_build_panel("series");
     ld1_set_step(1);
+    LD1.fig.resizefcn="ld1_resize("+string(LD1.fig.figure_id)+")";
 endfunction
 
 function ld1_switch_panel(kind)
@@ -232,6 +234,9 @@ endfunction
 
 function ld1_save_step_inputs()
     global LD1;
+    if isfield(LD1,"fig") then
+        if ~is_handle_valid(LD1.fig) then return; end
+    end
     if ~isfield(LD1,"ui") then return; end
     if LD1.step<1 | LD1.step>9 then return; end
     if LD1.demoMode then return; end
@@ -261,6 +266,7 @@ function ld1_save_step_inputs()
         LD1.stepMeas(LD1.step)=LD1.lastMeasurement;
         LD1.stepMeasUnit(LD1.step)=LD1.lastMeasurementUnit;
     end
+    ld1_sync_recorded_results();
 endfunction
 
 function ld1_restore_step_inputs(n)
@@ -401,6 +407,9 @@ endfunction
 function ld1_restore_current_stage_board()
     // Atkuriama tik dabartinio etapo saugi pradinė būsena, o ne visas laboratorinis darbas.
     global LD1;
+    if ld1_guided() & ~LD1.demoMode then
+        ld1_guided_prepare(); if LD1.step<9 then ld1_redraw_panel(); end; return;
+    end
     ld1_force_power_off();
     LD1.pendingTerminal="";
 
@@ -494,6 +503,7 @@ endfunction
 
 function ld1_terminal_click(id)
     global LD1;
+    if ld1_guided() | LD1.demoMode then return; end
     if LD1.pendingTerminal=="" then
         LD1.pendingTerminal=id;
         ld1_set_status("Pasirinkta: "+ld1_terminal_label(id)+". Dabar pasirinkite antrą gnybtą.","info",ld1_current_connection_fix());
@@ -1079,6 +1089,7 @@ function ld1_restore_solution_state()
         end
     end
     LD1.ui.resultsTable.string=S.resultsString;
+    if LD1.step==9 then ld1_results_cards(S.resultsString); end
     LD1.ui.checkStep.string=S.checkStepString;
     ld1_button_string(LD1.ui.solution,"Pagalba → Pavyzdys");
     ld1_update_actual_values();
@@ -1586,6 +1597,7 @@ function ld1_set_step(n)
 
     // Atkuriame to etapo anksčiau įvestus atsakymus ir matavimą.
     ld1_restore_step_inputs(n);
+    ld1_guided_prepare();
 
     if n<9 then
         ld1_refresh_meter_idle_display();
@@ -1766,6 +1778,7 @@ function ld1_update_results_table(showExample)
            "Kirchhofo dėsnis" "8 et.: I1=E/R3; I2=E/R2" sKcalc sMIt sKe];
     end
     LD1.ui.resultsTable.string=t;
+    ld1_results_cards(t);
 endfunction
 
 function ld1_export_results()
