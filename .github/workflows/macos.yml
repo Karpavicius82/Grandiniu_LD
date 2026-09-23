@@ -28,7 +28,7 @@ jobs:
           cmake --install build --prefix studentui
       - name: Install matching Scilab
         run: |
-          curl --fail --location --retry 3 "https://www.utc.fr/~mottelet/scilab/download/2026.1.0/scilab-2026.1.0-${{ matrix.arch }}.dmg" -o "$RUNNER_TEMP/scilab.dmg"
+          curl --fail --location --retry 3 --retry-all-errors "https://www.utc.fr/~mottelet/scilab/download/2026.1.0/scilab-2026.1.0-${{ matrix.arch }}.dmg" -o "$RUNNER_TEMP/scilab.dmg"
           mkdir "$RUNNER_TEMP/scilab-volume"
           hdiutil attach "$RUNNER_TEMP/scilab.dmg" -nobrowse -readonly -mountpoint "$RUNNER_TEMP/scilab-volume"
           app=$(find "$RUNNER_TEMP/scilab-volume" -maxdepth 2 -name '*.app' -type d -print -quit)
@@ -38,6 +38,8 @@ jobs:
           exe=$(find "$RUNNER_TEMP/Scilab.app/Contents" -type f -name scilab -print -quit)
           test -x "$exe"
           echo "SCILAB_BIN=$exe" >> "$GITHUB_ENV"
+          dirname "$exe" >> "$GITHUB_PATH"
+          find "$RUNNER_TEMP/Scilab.app/Contents" -name scilab-cli-bin -exec dirname {} \; >> "$GITHUB_PATH"
       - name: Scilab native integration and real reports
         run: python tools/test_automatic_reports.py --scilab "$SCILAB_BIN" --runtime studentui
       - name: Actual student windows

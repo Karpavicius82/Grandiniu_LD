@@ -23,4 +23,8 @@ if [ -z "$bench_scilab" ] || [ ! -x "$bench_scilab" ]; then
     printf '%s\n' 'Scilab nerastas. Atverkite STENDAS.sce per Scilab arba nurodykite SCILAB_BIN.' >&2
     exit 1
 fi
+if [ "$(uname -s)" = Darwin ]; then
+    PATH="$(dirname -- "$bench_scilab"):$PATH"
+    export PATH
+fi
 exec "$bench_scilab" -f "$bench_dir/STENDAS.sce"
