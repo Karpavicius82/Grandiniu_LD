@@ -1,0 +1,47 @@
+
+(process:3749): Gtk-WARNING **: 10:20:46.746: Locale not supported by C library.
+	Using the fallback 'C' locale.
+
+(scilab-bin:3749): dbind-WARNING **: 10:20:46.800: AT-SPI: Error retrieving accessibility bus address: org.freedesktop.DBus.Error.ServiceUnknown: The name org.a11y.Bus was not provided by any .service files
+xwininfo: can not set locale properly
+/home/runner/work/_temp/ld1-ui/E1.png 1280 732
+Shared archive loaded.
+Link done.
+UI LD1 V01 E1 PASS
+UI LD1 V01 E2 PASS
+xwininfo: can not set locale properly
+/home/runner/work/_temp/ld1-ui/E3.png 1280 732
+UI LD1 V01 E3 PASS
+UI LD1 V01 E4 PASS
+UI LD1 V01 E5 PASS
+UI LD1 V01 E6 PASS
+UI LD1 V01 E7 PASS
+xwininfo: can not set locale properly
+/home/runner/work/_temp/ld1-ui/E8.png 1280 732
+UI LD1 V01 E8 PASS
+xwininfo: can not set locale properly
+/home/runner/work/_temp/ld1-ui/ataskaita.png 1280 732
+UI LD1 V17 E1 PASS
+UI LD1 V17 E2 PASS
+UI LD1 V17 E3 PASS
+UI LD1 V17 E4 PASS
+UI LD1 V17 E5 PASS
+UI LD1 V17 E6 PASS
+UI LD1 V17 E7 PASS
+UI LD1 V17 E8 PASS
+UI LD1 V64 E1 PASS
+UI LD1 V64 E2 PASS
+UI LD1 V64 E3 PASS
+UI LD1 V64 E4 PASS
+UI LD1 V64 E5 PASS
+UI LD1 V64 E6 PASS
+UI LD1 V64 E7 PASS
+UI LD1 V64 E8 PASS
+PASS LD1 V17: etapas 1
+PASS LD1 V17: etapas 2
+PASS LD1 V17: etapas 3
+PASS LD1 V17: etapas 4
+PASS LD1 V17: etapas 5
+PASS LD1 V17: etapas 6
+PASS LD1 V17: etapas 7
+PASS LD1 V17: etapas 8

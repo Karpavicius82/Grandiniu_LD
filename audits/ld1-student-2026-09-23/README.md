@@ -1,6 +1,13 @@
 # LD1 studento sąsajos pataisos
 
 Pradinis kodas: `358e4ee`. Naujausias LD7 pakeitimas LD1 nelietė.
+Galutinė versija: `b045713`. [Windows ir Linux patikra](https://github.com/Karpavicius82/Grandiniu_LD/actions/runs/35847820285)
+**PASS**: kiekvienoje OS 9 C++ testų rinkiniai, 449 faktinės ataskaitos,
+LD1 trijų variantų studento eiga ir rankinio režimo regresija, 9 geometrijos
+atvejai be klaidų. Keturi užbaigti darbai įvertinti 22/22, trys darbai su
+tyčia neteisingu atsakymu – 21/22. Atkurti tiek tarpinio etapo, tiek baigto
+darbo juodraščiai. Paketų manifestas apima 96 vykdymo ir paleidimo failus.
+
 Atkurta ankstesnė LD1 klaida: atsiskaitymo režimas leido be jungimų pereiti
 į trečią etapą, kuriame gnybtai jau buvo užrakinti. Matavimas nutrūkdavo,
 nes vietoje keturių laidų buvo nulis.

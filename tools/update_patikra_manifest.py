@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Atnaujina studentui/tests/results/PATIKRA.json po runtime failu pasikeitimu.
 
-Perskaiciuoja SHA256 visiems .sci/.sce/.sh failams po studentui/ (tas pats
+Perskaiciuoja SHA256 visiems .sci/.sce/.sh/.bat failams po studentui/ (tas pats
 aibes apibrezimas kaip check_student_package.py) ir surasa naujausiu
 PATIKRINTI.sh zurnalu (tests/results/*.log) kontrolines sumas.
 
@@ -16,7 +16,7 @@ import sys
 from datetime import datetime, timezone
 from pathlib import Path
 
-RUNTIME_SUFFIXES = {".sci", ".sce", ".sh"}
+RUNTIME_SUFFIXES = {".sci", ".sce", ".sh", ".bat"}
 LOGS = ["modelis.log", "langai.log"]
 
 

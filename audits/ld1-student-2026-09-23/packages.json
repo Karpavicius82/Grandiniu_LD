@@ -1,0 +1,20 @@
+{
+  "Grandiniu_LD-Linux.zip": {
+    "sha256": "51bd3fe9d94b3600f99d1c565e491030da514fbfcb76b95131ea715ec58d3e9f",
+    "ci_original_sha256": "451044a51d40a62a7b006096d68b7e90c75586522b9bd6db071475e97d225bc7",
+    "runtime_unchanged": true
+  },
+  "Grandiniu_LD-Windows.zip": {
+    "sha256": "a9009178d1d1177fa42e0d3ccefdadcce763a59af2ed817f810a2b44c26d0a64",
+    "ci_original_sha256": "715c3221367bb604e79b3aaea92576731073b6f6c983efee0f303a72f69c63a1",
+    "runtime_unchanged": true
+  },
+  "Grandiniu_LD-studentui.zip": {
+    "sha256": "84434e2696496ba585a5f89ba4db1f14da06fd1b9d5b6af97f694c1a64540d82",
+    "runtime_files": 96,
+    "platforms": [
+      "Linux",
+      "Windows"
+    ]
+  }
+}
