@@ -1,0 +1,1 @@
+LD8_PASS: 3 GUI variants; series/parallel/mixed wirings; true MNA readings; actual report button; saved wiring evidence; comma input without Enter; demo isolation; draft restore; 13 fixed-window geometry cases including resize callback; close/autosave and Help restore; assessment and learning modes; 146 grading comparisons

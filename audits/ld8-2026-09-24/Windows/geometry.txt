@@ -1,0 +1,1 @@
+scenarios=13 controls=352 contacts=182 wire_segments=289 min_contact_gap_px=37.616 errors=0

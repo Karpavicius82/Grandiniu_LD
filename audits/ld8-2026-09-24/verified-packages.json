@@ -1,0 +1,94 @@
+{
+  "source_commit": "35774a80f28d059c3f1c53b1ef4eabf5b6c449cc",
+  "runtime_files": 107,
+  "platforms": {
+    "Windows": {
+      "ci_archive_sha256": "ad26e7ec37cf3c1085a459e629dbf7284350f49198b45a512316100d9a616fe2",
+      "native_sha256": {
+        "ldcheck.exe": "71a006347590d9c744453311e6cd07af1daf868304b6a8c8edf90d24ba0403e3",
+        "ldcore.dll": "e5bf6b164684a71074b5b3fbb0d8b3203728f0275c70d2beaf0faa7629534e8e",
+        "mokytojas.exe": "9e8ada697c1da5497ee8d74f945bebcb71ad220d5cfdf69b22bce071ffe04f4f"
+      },
+      "ld8": {
+        "status": "PASS",
+        "tolerance_cases": 146,
+        "actual_gui_reports": 3,
+        "variants": [
+          1,
+          17,
+          64
+        ],
+        "geometry_cases": 13,
+        "assessment_reports_selected": true,
+        "close_autosave_restore": true,
+        "platform": "nt"
+      }
+    },
+    "Linux": {
+      "ci_archive_sha256": "6728a281692d5a87873c9b8f536f8a6eea87365ecffcf72d22329bea10c34016",
+      "native_sha256": {
+        "ldcheck": "023479d1d8ef2bd7667bd2bf00c402610b6bad55df120ce798c4d867bbedb774",
+        "ldcore.so": "c248ff1ec2013a4f85e265a164dbbf634908e46e66498034a0d9c737ef378d2d",
+        "mokytojas": "059b7dfdaff25b505acc1d42b29726c553e4d788e613c35284c1c0a86cd92411"
+      },
+      "ld8": {
+        "status": "PASS",
+        "tolerance_cases": 146,
+        "actual_gui_reports": 3,
+        "variants": [
+          1,
+          17,
+          64
+        ],
+        "geometry_cases": 13,
+        "assessment_reports_selected": true,
+        "close_autosave_restore": true,
+        "platform": "posix"
+      }
+    },
+    "macOS-arm64": {
+      "ci_archive_sha256": "4b3a069f3620f262765673bbc33f29b16bcdfd644d7accdd43bd0d69c35f7412",
+      "native_sha256": {
+        "ldcheck": "e5e8595cdb045308dcdc847323f42365d390a0eefaf814e53825ce3b363cff2d",
+        "ldcore.dylib": "8db0784536782e6c8ee4b0e9ee96363db8c597d6bb7e143b41a23a19442ff755",
+        "mokytojas": "096c1a926398a4707408eb518897b9a6e0e4eda24ed2d7faabd6b13a8fe5c5dc"
+      },
+      "ld8": {
+        "status": "PASS",
+        "tolerance_cases": 146,
+        "actual_gui_reports": 3,
+        "variants": [
+          1,
+          17,
+          64
+        ],
+        "geometry_cases": 13,
+        "assessment_reports_selected": true,
+        "close_autosave_restore": true,
+        "platform": "posix"
+      }
+    },
+    "macOS-x86_64": {
+      "ci_archive_sha256": "d167e0d5b756f145f6300f4d72a09497160d1d355de91215ed29669e6334ec14",
+      "native_sha256": {
+        "ldcheck": "96a1d7c6916009b17b118a0755211c19d0bd0578cf976bbc5645662c352e25f2",
+        "ldcore.dylib": "370041c7c6466dd52c8df3535ed74aee1642dbdf20d47fe6c9d1f625029fbb6e",
+        "mokytojas": "25f9b84343ae77fa8ac8a846d868018c0b8bacefd0acc476c96af17d33ac0e65"
+      },
+      "ld8": {
+        "status": "PASS",
+        "tolerance_cases": 146,
+        "actual_gui_reports": 3,
+        "variants": [
+          1,
+          17,
+          64
+        ],
+        "geometry_cases": 13,
+        "assessment_reports_selected": true,
+        "close_autosave_restore": true,
+        "platform": "posix"
+      }
+    }
+  }
+}

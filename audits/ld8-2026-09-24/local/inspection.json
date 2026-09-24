@@ -1,0 +1,41 @@
+{
+  "note": "Screenshots and grading precede final close-event guard. Focused close/reopen/Help regression passed after guard; final acceptance is CI at 35774a8.",
+  "geometry": "scenarios=13 controls=352 contacts=182 wire_segments=289 min_contact_gap_px=37.616 errors=0",
+  "grading_cases": 146,
+  "wrong_answer_grade": {
+    "points": 20,
+    "max_points": 21,
+    "grade_10": 9.5
+  },
+  "wrong_answer_feedback": [
+    {
+      "comment": "Įrašas nėra baigtinis skaičius. Įveskite skaičių be formulės ir vieneto.",
+      "expected": 776.6,
+      "given": null,
+      "id": "s2.q1",
+      "label": "Nuoseklioji grandinė: Rt = R1 + R2 + R3",
+      "max_points": 1,
+      "points": 0,
+      "raw": "wrong",
+      "status": "invalid",
+      "tolerance": {
+        "absolute": 1e-09,
+        "relative": 0.01
+      },
+      "unit": "Ohm"
+    }
+  ],
+  "practice_excluded": true,
+  "source_kind": "Uncommitted LD8 worktree during fixes; exact files below",
+  "ld8_source_sha256": {
+    "LD8/LD8.sce": "f085e3970217f9fab47024895f5bfde7e70608c38398a051c7f0781e5901a590",
+    "LD8/LD8_LOAD.sce": "98eee9eb456ae3c25dcd595f2b5386b367842c4e78ba00101ab3d25fa05e18a3",
+    "LD8/ld8_callbacks.sci": "4ef23fa193659acf7c23a817e75c10cecce930021f46462b7288cc99fd58b6fe",
+    "LD8/ld8_circuit.sci": "9248cfd659fa50081f64073a97c75912ec03052e1b4555b68ca38cd0364c7bd6",
+    "LD8/ld8_config.sci": "f19d41c1e03ce79db0cec976386aff1558567801f628f1bd4d2bcd19af46aac8",
+    "LD8/ld8_gui.sci": "09b86d39cec839d73fb0df320738c875ec766373ebeaa2323cee800333b58d17",
+    "LD8/ld8_ids.sci": "f438bf31aa6915b2beb9a39e9dcfefaab023dd5044f9098d2592c4f511d88ddd",
+    "LD8/ld8_student.sci": "2a60e9188c1ae597165e969ca78ad0c6061261560734f7dc630ae0fd026bd22b",
+    "LD8/ld8_utils.sci": "51723102bbf2d7a2a31224fe35fae9b847b4698c2779e81a442b467a952657de"
+  }
+}

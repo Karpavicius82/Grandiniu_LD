@@ -1,59 +1,115 @@
 {
-  "time_utc": "2026-09-23T12:01:47.383205+00:00",
+  "time_utc": "2026-09-24T13:20:05.604562+00:00",
   "scilab": "2026.1.0",
-  "command": "GitHub Actions native.yml and macos.yml: CTest, 449 actual reports, LD1-LD7 GUI and student delivery",
+  "command": "GitHub Actions native.yml and macos.yml: 11 CTest suites, 513 actual reports, LD1-LD8 GUI and student delivery",
   "status": "PASS",
   "coverage": {
-    "source_commit": "34eb59cef922a1b91b10edf4e753145058f2e839",
+    "source_commit": "35774a80f28d059c3f1c53b1ef4eabf5b6c449cc",
     "status": "PASS",
-    "native_ci": "https://github.com/Karpavicius82/Grandiniu_LD/actions/runs/35854144025",
-    "macos_ci": "https://github.com/Karpavicius82/Grandiniu_LD/actions/runs/35854144069",
+    "native_ci": "https://github.com/Karpavicius82/Grandiniu_LD/actions/runs/36002507038",
+    "macos_ci": "https://github.com/Karpavicius82/Grandiniu_LD/actions/runs/36002507075",
     "platforms": [
       "Windows Server 2022",
       "Ubuntu 22.04",
       "macOS 15 arm64",
       "macOS 15 x86_64"
     ],
-    "ctest_suites_per_platform": 10,
-    "actual_reports_per_platform": 449,
+    "ctest_suites_per_platform": 11,
+    "actual_reports_per_platform": 513,
     "packages": {
       "Windows": {
-        "sha256": "dffb0aaded69ffa803884b7ddeac63b4c0e487218fbf0163bf4e61105eb4d0a4",
+        "ci_archive_sha256": "ad26e7ec37cf3c1085a459e629dbf7284350f49198b45a512316100d9a616fe2",
         "native_sha256": {
-          "ldcheck.exe": "e40f5eed5049600a05155e58d435a61b39bb0edcc32392759fe843caa19a02d7",
-          "ldcore.dll": "a0f9f9297de003d315cc78ffaf4ef8b453bfd83a691081d451e35f7118f29218",
-          "mokytojas.exe": "41004e96e9d0dde716df6ad16df6f6f47daedbd6139970655fb6cee72088c4ec"
+          "ldcheck.exe": "71a006347590d9c744453311e6cd07af1daf868304b6a8c8edf90d24ba0403e3",
+          "ldcore.dll": "e5bf6b164684a71074b5b3fbb0d8b3203728f0275c70d2beaf0faa7629534e8e",
+          "mokytojas.exe": "9e8ada697c1da5497ee8d74f945bebcb71ad220d5cfdf69b22bce071ffe04f4f"
+        },
+        "ld8": {
+          "status": "PASS",
+          "tolerance_cases": 146,
+          "actual_gui_reports": 3,
+          "variants": [
+            1,
+            17,
+            64
+          ],
+          "geometry_cases": 13,
+          "assessment_reports_selected": true,
+          "close_autosave_restore": true,
+          "platform": "nt"
         }
       },
       "Linux": {
-        "sha256": "e1d099391e019243823d23dec9e04e1e20814ddc42f4ddddf826e08ee6783d82",
+        "ci_archive_sha256": "6728a281692d5a87873c9b8f536f8a6eea87365ecffcf72d22329bea10c34016",
         "native_sha256": {
           "ldcheck": "023479d1d8ef2bd7667bd2bf00c402610b6bad55df120ce798c4d867bbedb774",
-          "ldcore.so": "068dfa1027462d96e1c834dfe70da327a2be34340bc30e66867cf9c0e5614cc2",
+          "ldcore.so": "c248ff1ec2013a4f85e265a164dbbf634908e46e66498034a0d9c737ef378d2d",
           "mokytojas": "059b7dfdaff25b505acc1d42b29726c553e4d788e613c35284c1c0a86cd92411"
+        },
+        "ld8": {
+          "status": "PASS",
+          "tolerance_cases": 146,
+          "actual_gui_reports": 3,
+          "variants": [
+            1,
+            17,
+            64
+          ],
+          "geometry_cases": 13,
+          "assessment_reports_selected": true,
+          "close_autosave_restore": true,
+          "platform": "posix"
         }
       },
       "macOS-arm64": {
-        "sha256": "b757912c1ccdd4bd0954948dd71800ee1adf62955f3414a1270bf35f849178ba",
+        "ci_archive_sha256": "4b3a069f3620f262765673bbc33f29b16bcdfd644d7accdd43bd0d69c35f7412",
         "native_sha256": {
           "ldcheck": "e5e8595cdb045308dcdc847323f42365d390a0eefaf814e53825ce3b363cff2d",
-          "ldcore.dylib": "c877ad4d792fe9f4b5b1226b030af881a7c73e2b9c0652b456b42d9fc361a19c",
+          "ldcore.dylib": "8db0784536782e6c8ee4b0e9ee96363db8c597d6bb7e143b41a23a19442ff755",
           "mokytojas": "096c1a926398a4707408eb518897b9a6e0e4eda24ed2d7faabd6b13a8fe5c5dc"
+        },
+        "ld8": {
+          "status": "PASS",
+          "tolerance_cases": 146,
+          "actual_gui_reports": 3,
+          "variants": [
+            1,
+            17,
+            64
+          ],
+          "geometry_cases": 13,
+          "assessment_reports_selected": true,
+          "close_autosave_restore": true,
+          "platform": "posix"
         }
       },
       "macOS-x86_64": {
-        "sha256": "8428fd4f863d24bf6424b91075ac0e82b67e4c8ed8778f1428c0aa3f72f158c8",
+        "ci_archive_sha256": "d167e0d5b756f145f6300f4d72a09497160d1d355de91215ed29669e6334ec14",
         "native_sha256": {
           "ldcheck": "96a1d7c6916009b17b118a0755211c19d0bd0578cf976bbc5645662c352e25f2",
-          "ldcore.dylib": "784101f2ca1d5c154b11a07d1ab2e0fb8d36beab9059a5b7b2c848b0faf93dd5",
+          "ldcore.dylib": "370041c7c6466dd52c8df3535ed74aee1642dbdf20d47fe6c9d1f625029fbb6e",
           "mokytojas": "25f9b84343ae77fa8ac8a846d868018c0b8bacefd0acc476c96af17d33ac0e65"
+        },
+        "ld8": {
+          "status": "PASS",
+          "tolerance_cases": 146,
+          "actual_gui_reports": 3,
+          "variants": [
+            1,
+            17,
+            64
+          ],
+          "geometry_cases": 13,
+          "assessment_reports_selected": true,
+          "close_autosave_restore": true,
+          "platform": "posix"
         }
       }
     }
   },
   "source_sha256": {
     "DESTYTOJUI.sce": "6518ec1acc2679736b3bd2b334381aded90c03e6f313559fde5ca1df46af1aa4",
-    "GUI_PATIKRA.sce": "ad8996ef4080053fc8392e9465f7576b132cc0f691502ef041179f8d1c796eb9",
+    "GUI_PATIKRA.sce": "4416a0db87222714602d20b0e06472d691c297dc2e73b470648162fa44fcfccf",
     "LD1/LD1.sce": "369863c411bca178ef30347fe4b4ae90a4ba00904abacff9b8b41a81b3eec611",
     "LD1/LD1_LOAD.sce": "0d68fa3867d82a2085c2d0d494b725acfe774cd32ca0cb7bc955cb810190a379",
     "LD1/ld1_assist.sci": "687d418bee6d66e232c84b1da41a52e6583dff3c301c69806709847d954217f6",
@@ -128,6 +184,15 @@
     "LD7/ld7_ids.sci": "640dd4cff2cfe7a1d111065cc56b54636a874721c5facaa0c98b9cca4e2a063d",
     "LD7/ld7_student.sci": "21adb5e881575b1814bae2a64ae280d11a1986df54d6645a582e528787742729",
     "LD7/ld7_utils.sci": "46ebf36d62bba2ffd0475619e1a29093f87df2a7cf8ec921cca8bb6c66cdbf29",
+    "LD8/LD8.sce": "f085e3970217f9fab47024895f5bfde7e70608c38398a051c7f0781e5901a590",
+    "LD8/LD8_LOAD.sce": "98eee9eb456ae3c25dcd595f2b5386b367842c4e78ba00101ab3d25fa05e18a3",
+    "LD8/ld8_callbacks.sci": "4ef23fa193659acf7c23a817e75c10cecce930021f46462b7288cc99fd58b6fe",
+    "LD8/ld8_circuit.sci": "9248cfd659fa50081f64073a97c75912ec03052e1b4555b68ca38cd0364c7bd6",
+    "LD8/ld8_config.sci": "f19d41c1e03ce79db0cec976386aff1558567801f628f1bd4d2bcd19af46aac8",
+    "LD8/ld8_gui.sci": "a1343faf228fc564f96ec5966591f79d0c726650c4123447261366bb6da8febd",
+    "LD8/ld8_ids.sci": "f438bf31aa6915b2beb9a39e9dcfefaab023dd5044f9098d2592c4f511d88ddd",
+    "LD8/ld8_student.sci": "2a60e9188c1ae597165e969ca78ad0c6061261560734f7dc630ae0fd026bd22b",
+    "LD8/ld8_utils.sci": "51723102bbf2d7a2a31224fe35fae9b847b4698c2779e81a442b467a952657de",
     "PALEISTI.bat": "86cd5f0f3924a441e1c0c3a75869a9394837b8146f08a177fbcfa0e0901f8098",
     "PALEISTI.command": "3226e339e3acd67b747099e7eee335a82bf6d5289033755b05a975eb25b222f6",
     "PALEISTI.sh": "630f98bd7e7238a09408387f1ee2548934e38e7f22d8fb20653287372a6953c2",
@@ -139,16 +204,17 @@
     "PERZIURA_LD5.sce": "1e059d014b6e9b73b6cbd4b1c85a3e35a6b34906e1413c9a83bc9aaa4eb04e5e",
     "PERZIURA_LD6.sce": "c3def3feb52e1b8cb204856564ae973dc135cfedb1b1c487b8203b72902a4fc6",
     "PERZIURA_LD7.sce": "5b5c73c6b380a5c0fded53ee2518f08c6f32795b7e679cfa7f1eaaec60b7eebd",
-    "STENDAS.sce": "56fa4b6a7649056e554d0a547450ff03900de7ccbca4900e0c208bc5a17b9d89",
-    "bench_common.sci": "bec4f6611959d05bd3a10658c7e0bbf4251824acb50409d57547edd226d81ecd",
-    "bench_report.sci": "224b486b16085ad8cd1667f897d154a7ced629bb3f8c400d7874d09e08ad2d00",
-    "bench_session.sci": "7cf7300b4717bddd35cc4f78ceaa91ffaaeed8a1bfdb546f0bd9b35c1859b8c3",
+    "PERZIURA_LD8.sce": "0dc7a84c7a6cbbca9d96a87b72ab666c6c944d752d5dd62c108d5604e885d64a",
+    "STENDAS.sce": "d3c1816e2360d6b6bb9bccade91b46ccd20928e167f97d2d6f227fa99b6a1afc",
+    "bench_common.sci": "4cc1f3b53354905117d1ad1755d02d100cfdaa7948049f273e1d85ad2ee9c740",
+    "bench_report.sci": "301ef972efd0d9d59720b63c251decb4e486b924a545bbd7aec0869e5e913875",
+    "bench_session.sci": "4250ea6d192971740c2ebdeb57e18f7352a8e6eed1cba0e2a6e8b2c2a9095022",
     "bench_teacher.sci": "ec1ce34f4358bace3694bc8a2d30320c41675399dd91f96425d1a6a614192911",
-    "student_profile.sci": "eb3d7bdf590549b12eada30099df0a7e522edadf368e5b4063ea9d75c731f60f",
+    "student_profile.sci": "682a329a74907c37c6e0c832cbc15a92c0e1235cf4732b41bee7a011f8135ddb",
     "student_style.sci": "a50dc32c8c73a11ec885b6118c7d0326e912a1af8d0f3bc13edfe97be1495ee2",
-    "tests/AUTOMATINIS.sce": "617006fd81eb006143e6a12e93d3b36c25b3dea980235ebdebe7c768c6e34089",
-    "tests/HEADLESS.sce": "89c1e596db96d63f070d276ef377a6dbeb6149bf16f586f17f27701a83babb87",
-    "tests/workflows.sci": "eae048c01bfafca7cfb93bdba1a5f9174a6decae17be4b42bf2bd445b02a5d27"
+    "tests/AUTOMATINIS.sce": "b23027a60fc3efc741b5d5915d7038d2bcad453ab3c9ea2337cd082b71c24d55",
+    "tests/HEADLESS.sce": "1cffb4ee4571d06f1aad7884731c1cd52afda2be211339dc44a065540d842238",
+    "tests/workflows.sci": "5f4a10cea241c42c5af90828b133405e8617933230210cb48de38f20da167ae3"
   },
   "log_sha256": {}
 }

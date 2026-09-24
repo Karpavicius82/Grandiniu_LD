@@ -41,7 +41,26 @@ tarpus, valdiklių persidengimą, komponentus kertančius laidus ir nepažymėta
 laidų sankirtas. 146 ataskaitų palyginimai apima tolerancijų ribas, klaidingą
 atsakymą ir mokymosi bandymo neįtraukimą į suvestinę.
 
-Galutinės keturių platformų patikros ir paketų kontrolinės sumos bus
-užfiksuotos kartu su patikrintais paketais. Windows CI nepakeičia konkretaus
+## Galutinis rezultatas
+
+Patikrinta versija: `35774a80f28d059c3f1c53b1ef4eabf5b6c449cc`.
+[Windows ir Linux](https://github.com/Karpavicius82/Grandiniu_LD/actions/runs/36002507038)
+ir [macOS ARM / Intel](https://github.com/Karpavicius82/Grandiniu_LD/actions/runs/36002507075): **PASS**.
+Kiekvienoje platformoje: 11 CTest rinkinių, 513 faktinių Scilab ataskaitų,
+146 LD8 vertinimo palyginimai, trys pilni GUI darbai ir 13 LD8 geometrijos
+atvejų be klaidų. Trys atsiskaitymo ataskaitos įtrauktos į pažymių suvestinę.
+Visi 8 langai patikrinti bendru pristatymo testu.
+
+`verified-packages.json` sieja originalių CI paketų ir jų C++ failų SHA256 su
+patikrinta versija. `distributed-sha256.json` nurodo pateikiamų ZIP SHA256.
+macOS paketai yra nepakeisti CI archyvai; Windows ir Linux bendras paketas
+sudarytas tik sutikrinus visus Scilab ir paleidimo failus bei variantų bankus.
+Galutiniai paketai paruošti atskirame darbo kataloge, nes pagrindiniame
+kataloge tuo pat metu dirbo kitas procesas.
+
+Vėluojantys pagalbos ir piešimo callback po lango uždarymo ignoruojami.
+Tikro Linux lango vaizdai papildomai peržiūrėti rankiniu būdu.
+
+Windows CI nepakeičia konkretaus
 Windows 11 kompiuterio DPI / vaizdo tvarkyklės bandymo. Ši patikra nėra išorinė
 aprobacija ar vykdomųjų failų pasirašymas.
