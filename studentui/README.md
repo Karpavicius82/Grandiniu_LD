@@ -39,6 +39,15 @@ mazgų) ir mišrioji (R1 nuosekliai su lygiagrečiais R2 ir R3). Voltmetro zonda
 šaltinio galų; kiekvienoje grandinėje matuojami U ir I, žurnale rodoma Re = U/I.
 Skaičiuojamos teorinės ir eksperimentinės varžos bei lygiagretės grandinės šakų srovės.
 64 variantai: `LD8/VARIANTAI.csv`, bankas `LD8-64-A-2026`, ataskaitos revizija 1.
+Pradedama atsiskaitymo režimu: **Įrašyti ir toliau** išsaugo jūsų atsakymą,
+o jo teisingumą vertina dėstytojo programa (21 kriterijus). Tuščius laukus reikia
+užpildyti. **Pagalba → Mokymosi / atsiskaitymo režimas** leidžia tikrintis;
+naudojus mokymąsi ar pavyzdį, ataskaita pažymima mokomąja ir neįtraukiama į
+pažymių suvestinę. Naują atsiskaitymą pradėkite iš naujo.
+Laidai, matavimai ir atsakymai automatiškai išsaugomi vietiniame juodraštyje;
+uždarant išsaugomas ir dar nepatvirtintas įvedimas. Grįžkite per
+**Pagalba → Tęsti išsaugotą darbą**. Atkurtas stendas visada būna be maitinimo.
+**Pagalba → Studentas ir priskirtos reikšmės** leidžia pakartotinai peržiūrėti duomenis.
 
 **LD7 – įtampos, srovės ir galios suderinamumas:** šeši etapai, trys sujungimai:
 darbinė grandinė E → jungiklis → ampermetras → reostatas R (penkios padėtys P1–P5),

@@ -31,6 +31,7 @@ function ld8_start()
         end
         if isfield(LD8.ui, "circuitFrame") then needgui = %f; end  // jau pastatyta
     end
+    if ~isfield(LD8,"autosave_enabled") then LD8.autosave_enabled=needgui; end
     if needgui & ~isfield(LD8, "fig") then
         ld8_build_gui();
     end
@@ -47,14 +48,14 @@ function ld8_student_primary()
     end
     // Vienas paspaudimas: patikrinti ir, pavykus, iškart pereiti (LD2 semantika).
     if ~LD8.done(LD8.step) then
-        ld8_check_step();
+        ld8_check_step(~LD8.assessment);
     end
     if LD8.done(LD8.step) & LD8.step < 6 then
         ld8_next_step();
     elseif LD8.step == 6 & LD8.done(6) & ~and(LD8.done) then
         pending = find(~LD8.done); ld8_set_step(pending(1));
     end
-    ld8_student_sync();
+    ld8_student_sync(); bench_autosave("LD8");
 endfunction
 
 function ld8_jump_step(n)
@@ -80,6 +81,8 @@ function ld8_student_sync()
             LD8.ui.studentPrimary.string = "UŽBAIGTI PRALEISTĄ ETAPĄ";
         elseif LD8.done(LD8.step) then
             LD8.ui.studentPrimary.string = "TOLIAU →";
+        elseif LD8.assessment then
+            LD8.ui.studentPrimary.string = "ĮRAŠYTI IR TOLIAU →";
         else
             LD8.ui.studentPrimary.string = "TIKRINTI";
         end

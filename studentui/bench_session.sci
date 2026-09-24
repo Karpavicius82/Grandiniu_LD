@@ -303,6 +303,8 @@ function bench_restore_snapshot(session)
             end
             LD8.powerOn=%f;LD8.switchOn=%f;LD8.demoMode=%f;LD8.pending="";
             LD8.lastMeasurement=%nan;
+            if ~isfield(session.state,"assessment") then LD8.assessment=%f;LD8.practice_used=%t;end
+            LD8.autosave_enabled=~LD8.ui.headless;
             ld8_render_stage();
             ld8_set_status("Juodraštis atkurtas: "+student_caption(LD8.student),"ok","Maitinimas išjungtas.");
         else

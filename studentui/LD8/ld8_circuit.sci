@@ -81,6 +81,7 @@ endfunction
 
 function ld8_init_state()
     global LD8;
+    LD8.assessment = %t; LD8.practice_used = %f;
     LD8.step = 1; LD8.done = zeros(1, 6) == 1; LD8.skipped = zeros(1, 6) == 1;
     LD8.powerOn = %f; LD8.switchOn = %f; LD8.wireMode = 1;
     LD8.wires = emptystr(0, 2); LD8.journal = [];

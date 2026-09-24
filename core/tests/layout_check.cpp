@@ -19,7 +19,7 @@ bool inside(Rect a,Rect b,double eps=1.) {
  return a.x>=b.x-eps && a.y>=b.y-eps && a.x+a.w<=b.x+b.w+eps && a.y+a.h<=b.y+b.h+eps;
 }
 bool action(const Item& a) {
- return a.style=="pushbutton" || a.style=="edit" || a.style=="radiobutton" || a.style=="checkbox" || a.style=="slider";
+ return a.style=="pushbutton" || a.style=="edit" || a.style=="radiobutton" || a.style=="checkbox" || a.style=="slider" || a.style=="listbox";
 }
 bool prefix(const std::string& s,const std::string& p) {return s.rfind(p,0)==0;}
 bool terminal(const Item& a) {return a.tag.size()==3 && a.tag[0]=='T' && a.tag[1]>='0' && a.tag[1]<='9';}
@@ -41,6 +41,9 @@ bool crossing(Rect a,Rect b) {
 }
 int main(int argc,char**argv) {try {
  if(argc==2 && std::string(argv[1])=="--self-test") {
+  Item journal{}; journal.style="listbox";
+  if(!action(journal) || !overlap({65.536,496.656,595.264,133.056},{621.84,476.656,36,40}))
+   throw std::runtime_error("LD8 journal/contact overlap missed");
   if(!overlap({284.16,118.4,79.36,24},{307.2,118.4,121.6,24})) throw std::runtime_error("LD3 overlap missed");
   if(overlap({0,0,36,40},{44,0,36,40})) throw std::runtime_error("gap misclassified");
   if(!wire_hits({0,49,200,3},{50,30,50,50})) throw std::runtime_error("wire obstruction missed");

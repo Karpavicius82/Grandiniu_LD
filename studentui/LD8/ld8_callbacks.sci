@@ -3,7 +3,7 @@ function ld8_invalidate_mode()
     mode = LD8.wireMode; LD8.report_wires(mode) = emptystr(0, 2);
     if LD8.journal <> [] then LD8.journal(find(LD8.journal(:,3) == mode), :) = []; end
     select mode
-    case 1 then LD8.done(1) = %f;
+    case 1 then LD8.done([1 2]) = %f;
     case 2 then LD8.done([3 5]) = %f;
     case 3 then LD8.done(4) = %f;
     end
@@ -14,6 +14,7 @@ function ld8_terminal_click(id)
     global LD8;
     if ~ld8_wiring_editable() | ~or(ld8_terminal_ids() == id) then return; end
     if LD8.powerOn then ld8_set_status("Prieš keisdami laidus išjunkite [B01].", "error", ""); return; end
+    changed = %f;
     if LD8.pending == "" then
         LD8.pending = id;
         ld8_set_status("Pasirinktas [" + ld8_terminal_code(id) + "] " + ld8_terminal_name(id), "info", "Spauskite kitą gnybtą. Pakartoję esamo laido galus jį pašalinsite.");
@@ -34,10 +35,11 @@ function ld8_terminal_click(id)
                 LD8.wires($+1,:) = [first id]; ld8_set_status("Laidas pridėtas.", "ok", "");
             end
             LD8.wires_by_mode(LD8.wireMode) = LD8.wires;
-            LD8.switchOn = %f; ld8_invalidate_mode();
+            LD8.switchOn = %f; ld8_invalidate_mode(); changed=%t;
         end
     end
     ld8_render_wires(); ld8_render_journal(); ld8_student_sync();
+    if changed then bench_autosave("LD8"); end
 endfunction
 
 function ld8_toggle_power()
@@ -88,6 +90,7 @@ function ld8_measure()
     ld8_render_journal(); ld8_render_wires();
     ld8_set_status(msprintf("%s: U = %.4f V; I = %.3f mA.", ld8_mode_name(tag), voltage, current), "ok", ...
         msprintf("Re = U/I = %.1f Ω — užsirašykite skaičiavimams.", resistance));
+    bench_autosave("LD8");
 endfunction
 
 function ok = ld8_close_enough(value, expected, relative, absolute)
@@ -98,8 +101,9 @@ function ok = ld8_close_enough(value, expected, relative, absolute)
     ok = abs(value - expected) <= absolute + relative*abs(expected);
 endfunction
 
-function ld8_check_step()
+function ld8_check_step(check_answers)
     global LD8;
+    if argn(2)<1 then check_answers=%t; end
     if LD8.demoMode then return; end
     ld8_save_answers(); step = LD8.step;
     if ~ld8_valid_index(step, 6) then return; end
@@ -130,6 +134,12 @@ function ld8_check_step()
     for index = 1:12
         [answer_step, slot] = ld8_answer_slot(index);
         if answer_step <> step then continue; end
+        if ~check_answers then
+            if stripblanks(LD8.answers(step,slot))=="" then
+                ld8_set_status("Įrašykite ["+ld8_answer_code(step,slot)+"].","error","Atsakymą vertins dėstytojo programa."); return;
+            end
+            continue;
+        end
         value = ld8_parse_number(LD8.answers(step, slot)); relative = .02; absolute = 1e-9;
         if or(step == [2 3 4]) & slot == 1 then relative = .01; end
         if step == 6 then relative = 0; absolute = 0; end
@@ -138,7 +148,9 @@ function ld8_check_step()
         end
     end
     LD8.done(step) = %t; ld8_render_stage();
-    ld8_set_status(string(step) + " etapas patikrintas.", "ok", "");
+    text=string(step)+" etapas patikrintas.";
+    if ~check_answers then text=string(step)+" etapo atsakymai įrašyti."; end
+    ld8_set_status(text, "ok", "");
 endfunction
 
 function ld8_next_step()
@@ -268,13 +280,25 @@ function ld8_restore_stage()
     if ld8_wiring_editable() then
         LD8.wires = emptystr(0, 2); LD8.wires_by_mode(LD8.wireMode) = LD8.wires; ld8_invalidate_mode();
     end
-    ld8_render_stage(); ld8_set_status("Šio etapo stendas atkurtas.", "info", "");
+    ld8_render_stage(); ld8_set_status("Šio etapo stendas atkurtas.", "info", ""); bench_autosave("LD8");
 endfunction
 
 function ld8_restart()
-    ld8_init_state(); ld8_render_stage(); ld8_set_status("Darbas pradėtas iš naujo.", "info", "Studentas ir variantas išliko.");
+    ld8_init_state(); ld8_render_stage(); ld8_set_status("Darbas pradėtas iš naujo.", "info", "Studentas ir variantas išliko."); bench_autosave("LD8");
 endfunction
 
 function ld8_answers_changed()
-    ld8_save_answers(); ld8_student_sync();
+    ld8_save_answers(); ld8_student_sync(); bench_autosave("LD8");
+endfunction
+
+function ld8_close()
+    global LD8;
+    if ~isfield(LD8,"fig") then return; end
+    if ~is_handle_valid(LD8.fig) then return; end
+    if LD8.demoMode then ld8_toggle_solution(); end
+    bench_autosave("LD8");
+    if isfield(LD8,"autosave_error") then
+        if LD8.autosave_error<>"" then return; end
+    end
+    delete(LD8.fig);
 endfunction

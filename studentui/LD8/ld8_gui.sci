@@ -17,7 +17,7 @@ endfunction
 function [term_xy, boxes] = ld8_layout()
     // All terminals sit outside their own component, with 36 x 40 px targets.
     // Planas (iš apačios): režimų eilutė 10,5–18 %, E/K/A eilutė 22–35 %,
-    // V kairėje 40–56 %, R1–R3 stovas dešinėje 40–80 %, žurnalas [V02] 74–98 %.
+    // V kairėje 40–56 %, R1–R3 stovas dešinėje 40–80 %, žurnalas [V02] 80–98 %.
     // Laidų koridoriai: 20 % (apatinis), 36,5/38,5 % (voltmetro zondai),
     // 37,5 % (prie R1), 53 % ir 67 % (tarp stovo pakopų), 98 % (dešinysis).
     boxes = struct("E", [7 22 15 13], "K", [38.5 22 12 13], "A", [66 22 14 13], ...
@@ -70,6 +70,7 @@ function ld8_polyline(points, col)
 endfunction
 
 function route = ld8_route(a, b)
+    global LD8;
     // Kanoniniai maršrutai nepriklausomai nuo paspaudimo eilės (absoliučiai taškai).
     route = [];
     if (a == "V_P" & b == "E_P") | (a == "E_P" & b == "V_P") then
@@ -164,13 +165,14 @@ endfunction
 
 function value = cfg_value(id)
     global LD8;
-    value = LD8.cfg("R" + strsubst(id, "R", ""));
+    value = LD8.cfg(id + "nom");
 endfunction
 
 function ld8_render_journal()
     global LD8;
     if ~isfield(LD8, "ui") then return; end
     if ~isfield(LD8.ui, "journalList") then return; end
+    if ~is_handle_valid(LD8.ui.journalList) then return; end
     rows = emptystr(0, 1);
     names = ["Nuosekliai";"Lygiagrečiai";"Mišriai"];
     for tag = 1:3
@@ -189,6 +191,7 @@ function ld8_render_stage()
     if ~isfield(LD8, "ui") then return; end
     if isfield(LD8.ui, "headless") then if LD8.ui.headless then return; end; end
     if ~isfield(LD8.ui, "answerEdits") then return; end
+    if ~is_handle_valid(LD8.fig) then return; end
     row = 0;
     for k = 1:12
         [st, sl] = ld8_answer_slot(k); h = LD8.ui.answerEdits(k); lab = LD8.ui.answerLabels(k);
@@ -230,10 +233,10 @@ function ld8_build_gui()
     student_button(f, [0.87 0.93 0.105 0.044], "Pagalba", "ld8_show_actions()");
     p = student_frame(f, [0.025 0.12 0.655 0.77]); LD8.ui.circuitFrame = p;
     right = student_frame(f, [0.70 0.12 0.275 0.77]); LD8.ui.right = right;
-    student_text(p, [0.40 0.63 0.30 0.10], student_wrap("Laidas: spauskite abu galus. Pakartoję — pašalinsite. Tarpas sankirtoje: nesujungta.", 20), 12, %f);
+    student_text(p, [0.40 0.63 0.30 0.10], student_wrap("Laidas: spauskite abu galus. Pakartoję — pašalinsite. Tarpas sankirtoje: nesujungta.", 30), 12, %f);
     // Trijų grandinių matavimų žurnalas.
     LD8.ui.journalList = uicontrol(p, "style", "listbox", "units", "normalized", ...
-        "position", [0.04 0.74 0.71 0.24], "string", "Matavimai", ...
+        "position", [0.04 0.80 0.64 0.18], "string", "Matavimai", ...
         "fontname", "DejaVu Sans", "fontunits", "pixels", "fontsize", 12, "tag", "V02");
     controls = [];
     modes = ["Nuosekliai";"Lygiagrečiai";"Mišriai"];
@@ -268,16 +271,30 @@ function ld8_build_gui()
     LD8.ui.statusMain = student_text(f, [0.025 0.055 0.95 0.035], "", 13, %t, [0.94 0.96 0.96]);
     LD8.ui.statusFix = student_text(f, [0.025 0.020 0.95 0.035], "", 12, %f, [0.94 0.96 0.96]);
     ld8_font(f); student_finish_window(f); f.visible = "on"; ld8_render_stage();
+    f.closerequestfcn = "ld8_close()";
     f.resizefcn = "ld8_resize(" + string(f.figure_id) + ")";
 endfunction
 
 function ld8_show_actions()
-    choice = messagebox("Pagalba ir darbo veiksmai", "LD8", "info", ...
-        ["[B04] Kaip sujungti" "[B05] Žemėlapis" "[B07] Pavyzdys" "[B08] Ataskaita" "[B06] Atkurti stendą" "[B09] Iš naujo" "Grįžti"], "modal");
+    global LD8;
+    if ~isfield(LD8,"fig") then return; end
+    if ~is_handle_valid(LD8.fig) then return; end
+    choice=x_choose(["Tęsti išsaugotą darbą";"[B04] Kaip sujungti";"[B08] Išsaugoti ataskaitą";"Mokymosi / atsiskaitymo režimas";"Daugiau veiksmų";"Studentas ir priskirtos reikšmės"],"LD8 · Pagalba");
     select choice
-    case 1 then ld8_show_wiring_guide(); case 2 then ld8_show_stand_map();
-    case 3 then ld8_toggle_solution(); case 4 then bench_export_current("LD8");
-    case 5 then ld8_restore_stage(); case 6 then ld8_restart();
+    case 1 then bench_open_snapshot("LD8");
+    case 2 then ld8_show_wiring_guide();
+    case 3 then bench_export_current("LD8");
+    case 4 then bench_mode("LD8"); ld8_student_sync(); bench_autosave("LD8");
+    case 6 then ld8_text_window("Studentas ir priskirtos reikšmės",[student_caption(LD8.student);"";student_parameter_lines("LD8",LD8.cfg)]);
+    case 5 then
+        extra=x_choose(["[B05] Žemėlapis";"[B07] Pavyzdys";"[B06] Atkurti stendą";"[B09] Pradėti iš naujo"],"LD8 · Daugiau veiksmų");
+        select extra
+        case 1 then ld8_show_stand_map();
+        case 2 then ld8_toggle_solution();
+        case 3 then ld8_restore_stage();
+        case 4 then
+            if messagebox("Pradėti darbą iš naujo? Atsakymai bus išvalyti.","LD8","question",["Pradėti" "Grįžti"],"modal")==1 then ld8_restart(); end
+        end
     end
 endfunction
 
