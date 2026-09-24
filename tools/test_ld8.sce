@@ -11,7 +11,7 @@ function selected=messagebox(varargin)
 endfunction
 function capture_ld8(name)
     global LD8;
-    if getos()=="Windows" then return; end
+    if getos()<>"Linux" then return; end
     LD8.fig.figure_name="LD8 PATIKRA "+name; show_window(LD8.fig); sleep(500);
     command="/usr/bin/python3 """+getenv("LD8_TEST_RUNTIME")+"/capture_window.py"" ""LD8 PATIKRA "+name+""" """+getenv("LD8_TEST_OUT")+"/"+name+".png""";
     assert_checkequal(host(command),0);
