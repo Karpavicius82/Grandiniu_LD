@@ -45,12 +45,17 @@ Bank bank(int variant) {
     const double e8a=std::round(n8a[a]*(1+d8a/100.0)*10)/10.0;
     const double e8b=std::round(n8b[b]*(1+d8b/100.0)*10)/10.0;
     const double e8c=std::round(n8c[(a+b)%8]*(1+d8c/100.0)*10)/10.0;
+    // LD9-64-A-2026: nuoseklus RLC ir įtampų rezonansas — L pagal eilutę,
+    // C pagal stulpelį; R = sqrt(L/C)/Qt, Qt = 2..3,5 pagal (a+b)%4 (Q>1 visada).
+    const double l9=ls[a]*1e-3, c9=cs[b]*1e-9;
+    const double qt9=2.0+0.5*((a+b)%4);
+    const double e9r=std::round(100.0*std::sqrt(l9/c9)/qt9)/100.0;
     return {dc[a],dc[b],dc[(a+b)%8],rc[a],35+5.0*(b+1),rl[b],35+5.0*(a+1),
             std::round(std::sqrt(l/c)/(2.8+.35*(a+1)+.20*(b+1))),l,c,
             uu[b][0],uu[b][1],uu[b][2],rld[a],
             n1[a],n2[b],a1,a2,
             pp[b][0],pp[b][1],pp[b][2],
-            (double)e2v[b],r6,(double)r6n[a],ev7[b],(double)rv7[a],w7[0],w7[1],w7[2],w7[3],w7[4],e8a,e8b,e8c};
+            (double)e2v[b],r6,(double)r6n[a],ev7[b],(double)rv7[a],w7[0],w7[1],w7[2],w7[3],w7[4],e8a,e8b,e8c,l9,c9,e9r};
 }
 Values ac(int kind,double E,double f,double R,double L,double C) {
     for(double v:{E,f,R,L,C}) if(!std::isfinite(v)) throw std::runtime_error("non_finite");

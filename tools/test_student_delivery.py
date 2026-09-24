@@ -18,5 +18,5 @@ sys.path.insert(0,str(repo/'core/tests'));from test_grading import run
 reports,_=run(a.grader.resolve(),out/'Ataskaitos',out/'Vertinimai')
 graded=[r for r in reports['results'] if r['status']=='graded'];assert len(graded)==2
 assert all(r['points']==r['max_points'] for r in graded),graded
-summary=dict(status='PASS',platform=sys.platform,labs=list(range(1,9)),canvas=[1280,720],small_screens=[[1024,768],[900,600]],scrollable=True,report_buttons=3,ld2_ld3_workflows=True)
+summary=dict(status='PASS',platform=sys.platform,labs=list(range(1,10)),canvas=[1280,720],small_screens=[[1024,768],[900,600]],scrollable=True,report_buttons=3,ld2_ld3_workflows=True)
 (out/'acceptance.json').write_text(json.dumps(summary,indent=2)+'\n');print(verdict);print(json.dumps(summary))

@@ -48,6 +48,10 @@ function lines=student_parameter_lines(lab,cfg)
     elseif lab=="LD8" then
         lines=[msprintf("Šaltinis: E = %.0f V. Trys tiriamieji rezistoriai (nominalai ±5 %%):",cfg.E); ...
             msprintf("R1 = %.1f Ω (nom. %.0f); R2 = %.1f Ω (nom. %.0f); R3 = %.1f Ω (nom. %.0f).",cfg.R1,cfg.R1nom,cfg.R2,cfg.R2nom,cfg.R3,cfg.R3nom)];
+    elseif lab=="LD9" then
+        lines=[msprintf("Generatorius: E = %.0f V RMS. Nuosekli RLC grandinė:",cfg.E); ...
+            msprintf("R = %.2f Ω; L = %g mH; C = %g nF.",cfg.R,cfg.LmH,cfg.CnF); ...
+            "Rezonanso dažnį f0 apskaičiuosite pirmajame etape."];
     else
         lines=[msprintf("RC: %.1f V RMS; %.1f Hz; R8 = %.0f Ω; C2 = %.2f µF.",cfg.E_RC,cfg.F_RC,cfg.R8,cfg.C2*1e6); ...
             msprintf("RL: %.1f V RMS; %.1f Hz; R9 = %.0f Ω; L1 = %.3f H.",cfg.E_RL,cfg.F_RL,cfg.R9,cfg.L1); ...
@@ -94,6 +98,9 @@ function [ok,st,cfg]=student_enroll(lab,previous)
             elseif lab=="LD8" then
                 cfg=ld8_variant_config(st.number);
                 [valid,why]=ld8_validate_config(cfg); if ~valid then error(why); end
+            elseif lab=="LD9" then
+                cfg=ld9_variant_config(st.number);
+                [valid,why]=ld9_validate_config(cfg); if ~valid then error(why); end
             else
                 cfg=ld2_variant_config(st.number);
                 [valid,why]=ld2_validate_config(cfg); if ~valid then error(why); end

@@ -24,7 +24,7 @@ LD_API void ld_sources(const int*,const double*,double*,int*) noexcept;
 namespace ld {
 using Values=std::array<double,10>;
 Values ac(int kind,double E,double f,double R,double L,double C);
-struct Bank {double r1,r2,r3,r8,frc,r9,frl,r13,l3,c4,u1,u2,u3,r,r1n,r2n,r1a,r2a,p1,p2,p3,e2,r6,r6n,e7,r7,w71,w72,w73,w74,w75,e8a,e8b,e8c;};
+struct Bank {double r1,r2,r3,r8,frc,r9,frl,r13,l3,c4,u1,u2,u3,r,r1n,r2n,r1a,r2a,p1,p2,p3,e2,r6,r6n,e7,r7,w71,w72,w73,w74,w75,e8a,e8b,e8c,e9l,e9c,e9r;};
 Bank bank(int variant);
 void write_new(const std::filesystem::path&,const std::string&);
 int run_batch(const std::filesystem::path&,const std::filesystem::path&);

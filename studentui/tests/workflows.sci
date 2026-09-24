@@ -451,7 +451,6 @@ function bench_ld4_workflow(n,root,gui)
     end
 endfunction
 
-
 // ------------------------------- LD5 ----------------------------------------
 function bench_ld5_action(callback)
     global LD5;
@@ -555,7 +554,6 @@ function bench_ld5_workflow(n,root,gui)
     end
 endfunction
 
-
 // ------------------------------- LD6 ----------------------------------------
 function bench_ld6_action(callback)
     global LD6;
@@ -576,7 +574,6 @@ function bench_ld6_primary()
     if LD6.ui.headless then ld6_student_primary();
     else bench_button(LD6.ui.studentPrimary); end
 endfunction
-
 
 function bench_ld6_answers(step,values)
     global LD6;
@@ -644,7 +641,6 @@ function bench_ld6_workflow(number,root,gui)
         delete(LD6.fig);
     end
 endfunction
-
 
 // ------------------------------- LD7 ----------------------------------------
 function bench_ld7_action(callback)
@@ -741,7 +737,6 @@ function bench_ld7_workflow(number,root,gui)
     end
 endfunction
 
-
 // ------------------------------- LD8 ----------------------------------------
 function bench_ld8_action(callback)
     global LD8;
@@ -833,5 +828,106 @@ function bench_ld8_workflow(number,root,gui)
         assert_checkequal(size(listfiles(bench_documents()+"/*.html"),"*"),before+1);
         assert_checktrue(strindex(LD8.ui.statusMain.string,"Ataskaita išsaugota")<>[]);
         delete(LD8.fig);
+    end
+endfunction
+
+// ------------------------------- LD9 ----------------------------------------
+function bench_ld9_action(callback)
+    global LD9;
+    if LD9.ui.headless then execstr(callback); return; end
+    for k=1:size(LD9.ui.dynamic,"*")
+        h=LD9.ui.dynamic(k);
+        if h.callback==callback then bench_button(h); return; end
+    end
+    error("Nėra matomo LD9 mygtuko: "+callback);
+endfunction
+
+function bench_ld9_click(id)
+    bench_ld9_action(msprintf("ld9_terminal_click(""%s"")",id));
+endfunction
+
+function bench_ld9_primary()
+    global LD9;
+    if LD9.ui.headless then ld9_student_primary();
+    else bench_button(LD9.ui.studentPrimary); end
+endfunction
+
+function bench_ld9_answers(step,values)
+    global LD9;
+    if LD9.ui.headless then ld9_test_answers(step,values); return; end
+    value_index=1;
+    for index=1:12
+        [answer_step,slot]=ld9_answer_slot(index);
+        if answer_step==step then
+            LD9.ui.answerEdits(index).string=msprintf("%.17g",values(value_index));
+            value_index=value_index+1;
+        end
+    end
+endfunction
+
+function bench_ld9_connect()
+    global LD9;
+    wires=ld9_canonical_wires();
+    assert_checkequal(size(LD9.wires,1),0);
+    for index=1:size(wires,1)
+        bench_ld9_click(wires(index,1)); bench_ld9_click(wires(index,2));
+    end
+    bench_ld9_click(wires($,1)); bench_ld9_click(wires($,2));
+    [valid,message]=ld9_wiring_valid(LD9.wires); assert_checkfalse(valid);
+    bench_ld9_click(wires($,2)); bench_ld9_click(wires($,1));
+    [valid,message]=ld9_wiring_valid(LD9.wires); assert_checktrue(valid);
+endfunction
+
+function bench_ld9_measure_point(step)
+    // Nustato etapo dažnį ir išmatuoja visus keturis taikinius.
+    global LD9;
+    bench_ld9_action("ld9_set_freq("+string(step-1)+")");
+    bench_ld9_action("ld9_toggle_power()"); bench_ld9_action("ld9_toggle_switch()");
+    for target=1:4
+        bench_ld9_action("ld9_set_target("+string(target)+")");
+        bench_ld9_action("ld9_measure()");
+    end
+    bench_ld9_action("ld9_toggle_power()");
+    assert_checkequal(size(ld9_journal_rows(step-1,4),1),1);
+endfunction
+
+function bench_ld9_workflow(number,root,gui)
+    global LD9;
+    if argn(2)<3 then gui=%f; end
+    cfg=ld9_variant_config(number); [valid,message]=ld9_validate_config(cfg); assert_checktrue(valid);
+    LD9=struct("cfg",cfg,"student",student_profile(number,"Automatinė Patikra","TEST","LD9"),"ui",struct("headless",~gui));
+    ld9_start();
+    f0=1/(2*%pi*sqrt(cfg.L*cfg.C));
+    expected=ld9_expected_answers();
+    for step=1:6
+        assert_checkequal(LD9.step,step);
+        select step
+        case 1 then
+            bench_ld9_connect();
+            bench_ld9_answers(step,[f0]);
+        case 2 then
+            bench_ld9_measure_point(2);
+        case 3 then
+            bench_ld9_measure_point(3);
+            bench_ld9_answers(step,[expected(3,1) expected(3,2)]);
+        case 4 then
+            bench_ld9_measure_point(4);
+        case 5 then
+            bench_ld9_answers(step,expected(5,1:6));
+        case 6 then
+            bench_ld9_answers(step,[1 1 1]);
+        end
+        bench_ld9_primary();
+        if ~LD9.done(step) then error("LD9 variantas "+string(number)+", etapas "+string(step)); end
+        if gui then mprintf("PASS LD9 V%02d: etapas %d\n",number,step); end
+    end
+    assert_checktrue(and(LD9.done)); assert_checkequal(size(LD9.journal,1),12);
+    if gui then
+        LD9.assessment=%t;
+        before=size(listfiles(bench_documents()+"/*.html"),"*");
+        bench_ld9_primary();
+        assert_checkequal(size(listfiles(bench_documents()+"/*.html"),"*"),before+1);
+        assert_checktrue(strindex(LD9.ui.statusMain.string,"Ataskaita išsaugota")<>[]);
+        delete(LD9.fig);
     end
 endfunction

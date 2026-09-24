@@ -33,6 +33,14 @@ Pavyzdžio peržiūra nekeičia jūsų matavimų ir jos negalima pateikti kaip a
 LD5 skaičiavimams ir ataskaitų vertinimui naudojamas bendras C++ branduolys.
 LD5 turi 64 pastovius variantus: `LD5/VARIANTAI.csv`.
 
+**LD9 – nuosekli RLC grandinė: trikampiai ir įtampų rezonansas:** šeši etapai,
+viena nuosekli grandinė generatorius → jungiklis → ampermetras → R → L → C.
+Dažnis nustatomas mygtukais [B10]–[B12] (0,5·f0, f0, 2·f0); vienas voltmetras
+pereina taikiniais [B13]–[B16] (UR, UL, UC, U). Kiekviename taške matuojami I ir
+visos keturios įtampos. Skaičiuojami teorinis f0, kokybė Q, įtampų trikampis
+√(UR²+(UL−UC)²), varžų Z ir cos φ bei galių P, Q, S. Ties f0 tikrinama UL = UC.
+64 variantai: `LD9/VARIANTAI.csv`, bankas `LD9-64-A-2026`, ataskaitos revizija 1.
+
 **LD8 – varžų nuoseklus, lygiagretus ir mišrus jungimas:** šeši etapai, trys studento
 sujungiamos grandinės: nuoseklioji (R1→R2→R3), lygiagretė (visos varžos tarp tų pačių
 mazgų) ir mišrioji (R1 nuosekliai su lygiagrečiais R2 ir R3). Voltmetro zondai prie
@@ -91,7 +99,7 @@ Paketai nėra pasirašyti Apple Developer sertifikatu ar notarizuoti.
 Linux: `./PALEISTI.sh`. Scilab aplinkoje: vykdykite `STENDAS.sce` ir pasirinkite darbą.
 Windows: dukart paspauskite `PALEISTI.bat` arba vykdykite `STENDAS.sce` grafiniame
 Scilab lange. `bin/ldcheck.exe` skirtas dėstytojo ataskaitų tikrinimui.
-Atskirai galima vykdyti atitinkamą `LD1/LD1.sce`–`LD8/LD8.sce` failą.
+Atskirai galima vykdyti atitinkamą `LD1/LD1.sce`–`LD9/LD9.sce` failą.
 Paleidiklis ieško įdiegto Scilab; prireikus nurodykite `SCILAB_BIN=/visas/kelias/bin/scilab`.
 
 Paketą platinkite atsisiuntimo nuoroda. Gmail gali blokuoti archyvą dėl jame esančių
