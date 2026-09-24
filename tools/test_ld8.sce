@@ -126,7 +126,8 @@ try
     assert_checkequal(LD8.step,6); assert_checkequal(LD8.answers(5,2),"1+2");
     // Close flushes an edit without Enter; actual Help restores the saved work.
     LD8.ui.answerEdits(10).string="2,0";
-    closing=LD8.fig; execstr(closing.closerequestfcn); assert_checkfalse(is_handle_valid(closing));
+    closing=LD8.fig; execstr(closing.closerequestfcn);
+    if is_handle_valid(closing) then error("LD8_CLOSE_FAILED: "+LD8.autosave_error); end
     ld8_show_actions(); ld8_render_stage(); ld8_render_journal(); // queued events after close
     LD8_DRAFT=LD8.autosave_paths($);
     saved=bench_read_snapshot(LD8_DRAFT,"LD8"); assert_checkequal(saved.state.answers(6,1),"2,0");
@@ -139,7 +140,7 @@ try
     LD8_CHOICES=[4 2]; ld8_test_help(); assert_checkfalse(LD8.assessment); assert_checktrue(LD8.practice_used);
     LD8_CHOICES=[4 1]; ld8_test_help(); assert_checktrue(LD8.assessment); assert_checktrue(LD8.practice_used);
     LD8_CHOICES=6; ld8_test_help(); window=gcf(); assert_checktrue(window<>LD8.fig); delete(window);
-    exec(source+"tools/test_ld8_edges.sci",-1); ld8_edge_checks();
+    mprintf("LD8_EDGE_BEGIN\n"); exec(source+"tools/test_ld8_edges.sci",-1); ld8_edge_checks(); mprintf("LD8_EDGE_END\n");
     cases=list(); specs=[2 1 .01;2 2 .02;3 1 .01;3 2 .02;4 1 .01;4 2 .02;5 1 .02;5 2 .02;5 3 .02];
     for number=[1 17 64]
         bench_ld8_workflow(number,root,%f); expected=ld8_expected_answers(); original=LD8.answers;

@@ -9,15 +9,15 @@ function ld8_edge_checks()
     assert_checkequal(snap.state.answers(5,2),"17,345");
     ld8_toggle_solution();
     snap=bench_read_snapshot(LD8.autosave_paths($),"LD8");
-    assert_checktrue(snap.state.practice_used); assert_checkfalse(snap.state.demoMode);
+    assert_checktrue(snap.state.practice_used); if snap.state.demoMode then error("LD8_EDGE: draft saved in demo mode"); end
     assert_checkequal(snap.state.answers(5,2),"17,345");
     for k=1:6; assert_checkequal(LD8.ui.controls(k).enable,"off"); end
-    bench_ld8_primary(); assert_checkfalse(LD8.demoMode);
+    bench_ld8_primary(); if LD8.demoMode then error("LD8_EDGE: primary did not exit demo"); end
     assert_checkequal(LD8.ui.answerEdits(8).string,"17,345");
     // The helper closes itself even while the stand is the current figure.
     ld8_show_wiring_guide(); helpfig=gcf(); closebutton=findobj(helpfig,"tag","H01");
     scf(LD8.fig); bench_button(closebutton(1));
-    assert_checktrue(is_handle_valid(LD8.fig)); assert_checkfalse(is_handle_valid(helpfig));
+    assert_checktrue(is_handle_valid(LD8.fig)); if is_handle_valid(helpfig) then error("LD8_EDGE: help close left its window open"); end
     // Import rejection must leave the current student's state intact.
     good=bench_snapshot("LD8"); original=LD8.answers; original_student=LD8.student;
     for defect=1:6
@@ -47,7 +47,7 @@ function ld8_edge_checks()
     ld8_close(); assert_checktrue(is_handle_valid(LD8.fig));
     assert_checktrue(LD8.autosave_error<>"");assert_checktrue(isfile(previous));
     setenv("LD_DATA_DIR",folder); LD8.done(:)=%t; LD8.step=6; ld8_render_stage();
-    ld8_close(); assert_checkfalse(is_handle_valid(LD8.fig));
+    ld8_close(); if is_handle_valid(LD8.fig) then error("LD8_EDGE: close failed: "+LD8.autosave_error); end
     saved=LD8; count=size(listfiles(bench_documents()+"/*.html"),"*");
     // Delayed buttons cannot write a new report, mutate data or open another window.
     ld8_student_primary();ld8_toggle_power();ld8_toggle_switch();ld8_set_step(1);
