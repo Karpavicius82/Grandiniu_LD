@@ -39,6 +39,7 @@ function ld8_start()
 endfunction
 
 function ld8_student_primary()
+    if ~ld8_can_act() then return; end
     global LD8;
     if LD8.demoMode then ld8_toggle_solution(); return; end
     ld8_save_answers();
@@ -59,6 +60,7 @@ function ld8_student_primary()
 endfunction
 
 function ld8_jump_step(n)
+    if ~ld8_can_act() then return; end
     global LD8;
     if ~ld8_valid_index(n, 6) then return; end
     if n <= LD8.step | LD8.done(n) | LD8.skipped(n) then
@@ -72,6 +74,12 @@ function ld8_student_sync()
     global LD8;
     if ~isfield(LD8, "ui") then return; end
     if isfield(LD8.ui, "headless") then if LD8.ui.headless then return; end end
+    if isfield(LD8.ui,"studentBack") then
+        if is_handle_valid(LD8.ui.studentBack) then
+            LD8.ui.studentBack.enable="on";
+            if LD8.step==1 then LD8.ui.studentBack.enable="off"; end
+        end
+    end
     if isfield(LD8.ui, "studentPrimary") & is_handle_valid(LD8.ui.studentPrimary) then
         if LD8.demoMode then
             LD8.ui.studentPrimary.string = "GRĮŽTI Į SAVO DARBĄ";

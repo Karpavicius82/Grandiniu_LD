@@ -60,6 +60,14 @@ try
             label=msprintf("LD8-E%d-%dx%d",step,sizes(dimension,1),sizes(dimension,2));
             geometry_dump(LD8.fig,label,descriptor);
             LD8.wires=LD8.wires(:,[2 1]); ld8_render_wires(); geometry_dump(LD8.fig,label+"-reverse",descriptor);
+            LD8.wires=LD8.wires($:-1:1,:); ld8_render_wires(); geometry_dump(LD8.fig,label+"-shuffled",descriptor);
+            for wi=1:size(LD8.wires,1)
+                a=ld8_terminal_xy(LD8.wires(wi,1)); b=ld8_terminal_xy(LD8.wires(wi,2));
+                route=ld8_route(LD8.wires(wi,1),LD8.wires(wi,2));
+                if route<>[] then
+                    assert_checktrue((norm(route(1,:)-a)<1e-9 & norm(route($,:)-b)<1e-9) | (norm(route(1,:)-b)<1e-9 & norm(route($,:)-a)<1e-9));
+                end
+            end
             if step>=2 then capture_ld8("E"+string(step)); end
         end
     end
@@ -131,7 +139,7 @@ try
     LD8_CHOICES=[4 2]; ld8_test_help(); assert_checkfalse(LD8.assessment); assert_checktrue(LD8.practice_used);
     LD8_CHOICES=[4 1]; ld8_test_help(); assert_checktrue(LD8.assessment); assert_checktrue(LD8.practice_used);
     LD8_CHOICES=6; ld8_test_help(); window=gcf(); assert_checktrue(window<>LD8.fig); delete(window);
-    delete(LD8.fig);
+    exec(source+"tools/test_ld8_edges.sci",-1); ld8_edge_checks();
     cases=list(); specs=[2 1 .01;2 2 .02;3 1 .01;3 2 .02;4 1 .01;4 2 .02;5 1 .02;5 2 .02;5 3 .02];
     for number=[1 17 64]
         bench_ld8_workflow(number,root,%f); expected=ld8_expected_answers(); original=LD8.answers;
@@ -169,7 +177,7 @@ try
         end
     end
     mputl(toJSON(cases),out+"tolerance-cases.json");
-    mputl("LD8_PASS: 3 GUI variants; series/parallel/mixed wirings; true MNA readings; actual report button; saved wiring evidence; comma input without Enter; demo isolation; draft restore; 13 fixed-window geometry cases including resize callback; close/autosave and Help restore; assessment and learning modes; 146 grading comparisons",out+"verdict.log"); exit(0);
+    mputl("LD8_PASS: 3 GUI variants; series/parallel/mixed wirings; true MNA readings; actual report button; saved wiring evidence; comma input without Enter; demo isolation; draft restore; 19 fixed-window geometry cases including resize callback; close/autosave and Help restore; assessment and learning modes; 146 grading comparisons; uncommitted edit retention; durable practice marker; six malformed drafts rejected; save failure preservation; late callbacks ignored",out+"verdict.log"); exit(0);
 catch
     [problem,code,line,fn]=lasterror();
     mputl("LD8_FAIL: "+strcat(problem," | ")+" at "+fn+":"+string(line),out+"verdict.log"); disp(problem); exit(1);

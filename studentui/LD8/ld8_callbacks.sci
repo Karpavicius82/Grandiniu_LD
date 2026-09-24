@@ -11,6 +11,7 @@ function ld8_invalidate_mode()
 endfunction
 
 function ld8_terminal_click(id)
+    if ~ld8_can_act() then return; end
     global LD8;
     if ~ld8_wiring_editable() | ~or(ld8_terminal_ids() == id) then return; end
     if LD8.powerOn then ld8_set_status("Prieš keisdami laidus išjunkite [B01].", "error", ""); return; end
@@ -43,6 +44,7 @@ function ld8_terminal_click(id)
 endfunction
 
 function ld8_toggle_power()
+    if ~ld8_can_act() then return; end
     global LD8;
     LD8.powerOn = ~LD8.powerOn;
     if ~LD8.powerOn then LD8.switchOn = %f; end
@@ -52,6 +54,7 @@ function ld8_toggle_power()
 endfunction
 
 function ld8_toggle_switch()
+    if ~ld8_can_act() then return; end
     global LD8;
     if ~LD8.powerOn then ld8_set_status("Pirma įjunkite [B01].", "error", ""); return; end
     LD8.switchOn = ~LD8.switchOn; ld8_render_wires();
@@ -60,6 +63,7 @@ function ld8_toggle_switch()
 endfunction
 
 function ld8_set_mode(mode)
+    if ~ld8_can_act() then return; end
     global LD8;
     if LD8.demoMode | ~ld8_valid_index(mode, 3) then return; end
     if mode <> LD8.wireMode then
@@ -72,6 +76,7 @@ function ld8_set_mode(mode)
 endfunction
 
 function ld8_measure()
+    if ~ld8_can_act() then return; end
     global LD8;
     if LD8.demoMode then return; end
     if ~or(LD8.step == [1 3 4]) | LD8.wireMode <> ld8_stage_mode(LD8.step) then
@@ -102,6 +107,7 @@ function ok = ld8_close_enough(value, expected, relative, absolute)
 endfunction
 
 function ld8_check_step(check_answers)
+    if ~ld8_can_act() then return; end
     global LD8;
     if argn(2)<1 then check_answers=%t; end
     if LD8.demoMode then return; end
@@ -154,12 +160,14 @@ function ld8_check_step(check_answers)
 endfunction
 
 function ld8_next_step()
+    if ~ld8_can_act() then return; end
     global LD8;
     if LD8.step >= 6 | ~LD8.done(LD8.step) then return; end
     ld8_set_step(LD8.step + 1);
 endfunction
 
 function ld8_set_step(step)
+    if ~ld8_can_act() then return; end
     global LD8;
     if ~ld8_valid_index(step, 6) then return; end
     if LD8.demoMode then ld8_toggle_solution(); end
@@ -211,11 +219,12 @@ function name = ld8_mode_name(mode)
 endfunction
 
 function ld8_show_wiring_guide()
+    if ~ld8_can_act() then return; end
     global LD8;
     text = ["LD8 · " + ld8_mode_name(LD8.wireMode); ""; "Išjunkite maitinimą prieš jungdami laidus."];
     wires = ld8_canonical_wires(LD8.wireMode);
     for index = 1:size(wires, 1)
-        text($+1) = msprintf("%d. [%s]–[%s]: %s → %s", index, ld8_terminal_code(wires(index,1)), ld8_terminal_code(wires(index,2)), wires(index,1), wires(index,2));
+        text($+1) = msprintf("%d. [%s] %s → [%s] %s", index, ld8_terminal_code(wires(index,1)), ld8_terminal_name(wires(index,1)), ld8_terminal_code(wires(index,2)), ld8_terminal_name(wires(index,2)));
     end
     notes = ["Voltmetro zondai visada prie šaltinio galų [T01]/[T02]."];
     if LD8.wireMode == 2 then
@@ -230,6 +239,7 @@ function ld8_show_wiring_guide()
 endfunction
 
 function ld8_show_stand_map()
+    if ~ld8_can_act() then return; end
     [ids, callbacks, labels, hints] = ld8_button_registry();
     text = ["LD8 · STENDO ŽEMĖLAPIS";"T01/T02 – šaltinis E (+ ir −).";"T03/T04 – jungiklis."; ...
         "T05/T06 – ampermetras; T07/T08 – R1."; "T09/T10 – R2; T11/T12 – R3."; ...
@@ -249,23 +259,25 @@ function ld8_text_window(title, lines)
     uicontrol(window, "style", "listbox", "units", "normalized", "position", [.02 .10 .96 .84], ...
         "string", lines, "fontname", "SansSerif", "fontunits", "pixels", "fontsize", 12);
     uicontrol(window, "style", "pushbutton", "units", "normalized", "position", [.35 .02 .30 .06], ...
-        "string", "[H01] Uždaryti", "tag", "H01", "callback", "close()");
+        "string", "[H01] Uždaryti", "tag", "H01", "callback", msprintf("close(%d)",window.figure_id));
 endfunction
 
 function ld8_toggle_solution()
+    if ~ld8_can_act() then return; end
     global LD8;
     if LD8.demoMode then
         LD8.demoMode = %f;
         for field = ["wires" "answers" "wireMode" "journal" "powerOn" "switchOn" "lastMeasurement"]
             LD8(field) = LD8.backup(field);
         end
-        LD8.pending = ""; ld8_render_stage(); ld8_set_status("Grįžta į savo darbą.", "info", ""); return;
+        LD8.pending = ""; ld8_render_stage(); ld8_set_status("Grįžta į savo darbą.", "info", ""); bench_autosave("LD8"); return;
     end
     ld8_save_answers(); LD8.backup = struct();
     for field = ["wires" "answers" "wireMode" "journal" "powerOn" "switchOn" "lastMeasurement"]
         LD8.backup(field) = LD8(field);
     end
-    LD8.practice_used = %t; LD8.demoMode = %t; LD8.pending = "";
+    LD8.practice_used = %t; bench_autosave("LD8");
+    LD8.demoMode = %t; LD8.pending = "";
     LD8.wires = ld8_canonical_wires(LD8.wireMode); LD8.powerOn = %t; LD8.switchOn = %t;
     LD8.journal = [];
     [voltage, current, ok, message] = ld8_measure_values();
@@ -274,8 +286,10 @@ function ld8_toggle_solution()
 endfunction
 
 function ld8_restore_stage()
+    if ~ld8_can_act() then return; end
     global LD8;
     if LD8.demoMode then ld8_toggle_solution(); return; end
+    ld8_save_answers();
     LD8.powerOn = %f; LD8.switchOn = %f; LD8.pending = ""; LD8.lastMeasurement = %nan;
     if ld8_wiring_editable() then
         LD8.wires = emptystr(0, 2); LD8.wires_by_mode(LD8.wireMode) = LD8.wires; ld8_invalidate_mode();
@@ -284,10 +298,12 @@ function ld8_restore_stage()
 endfunction
 
 function ld8_restart()
+    if ~ld8_can_act() then return; end
     ld8_init_state(); ld8_render_stage(); ld8_set_status("Darbas pradėtas iš naujo.", "info", "Studentas ir variantas išliko."); bench_autosave("LD8");
 endfunction
 
 function ld8_answers_changed()
+    if ~ld8_can_act() then return; end
     ld8_save_answers(); ld8_student_sync(); bench_autosave("LD8");
 endfunction
 

@@ -155,6 +155,13 @@ function ld8_render_wires()
         h = LD8.ui.controls(k); h.backgroundcolor = [0.94 0.96 0.96]; h.foregroundcolor = [0.08 0.20 0.22];
         if LD8.wireMode == k then h.backgroundcolor = [0.08 0.39 0.37]; h.foregroundcolor = [1 1 1]; end
     end
+    powerLabel="[B01] Įjungti"; if LD8.powerOn then powerLabel="[B01] Išjungti"; end
+    switchLabel="[B02] Uždaryti"; if LD8.switchOn then switchLabel="[B02] Atverti"; end
+    LD8.ui.controls(4).string=powerLabel; LD8.ui.controls(5).string=switchLabel;
+    for k=1:5
+        LD8.ui.controls(k).enable="on";
+        if LD8.demoMode then LD8.ui.controls(k).enable="off"; end
+    end
     LD8.ui.controls(6).enable = "off";
     if ~LD8.demoMode & or(LD8.step == [1 3 4]) & LD8.wireMode == ld8_stage_mode(LD8.step) then
         LD8.ui.controls(6).enable = "on";
@@ -207,6 +214,7 @@ function ld8_render_stage()
     LD8.ui.progress.string = string(LD8.step) + " / 6 etapas";
     if LD8.demoMode then LD8.ui.progress.string = "PAVYZDYS"; end
     LD8.ui.identity.string = student_caption(LD8.student);
+    LD8.ui.identity.tooltipstring = student_caption(LD8.student);
     ld8_render_wires(); ld8_render_journal(); ld8_student_sync();
 endfunction
 
@@ -265,7 +273,8 @@ function ld8_build_gui()
     end
     LD8.ui.studentPrimary = ld8_button(right, [0.07 0.085 0.86 0.075], "Tikrinti", "ld8_student_primary()", 15, [0.08 0.39 0.37]);
     controls($+1) = LD8.ui.studentPrimary;
-    controls($+1) = ld8_button(right, [0.07 0.015 0.37 0.045], "← Atgal", "ld8_jump_step(LD8.step-1)", 12);
+    LD8.ui.studentBack = ld8_button(right, [0.07 0.015 0.37 0.045], "← Atgal", "ld8_jump_step(LD8.step-1)", 12);
+    controls($+1) = LD8.ui.studentBack;
     controls($+1) = ld8_button(right, [0.48 0.015 0.45 0.045], "Žemėlapis", "ld8_show_stand_map()", 12);
     LD8.ui.controls = controls; LD8.ui.dynamic = controls;
     LD8.ui.statusMain = student_text(f, [0.025 0.055 0.95 0.035], "", 13, %t, [0.94 0.96 0.96]);
