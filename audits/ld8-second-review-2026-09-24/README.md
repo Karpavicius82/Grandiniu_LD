@@ -34,7 +34,9 @@ režimo požymiai. Neleidžiama importuoti GUI ar vykdymo laukų.
 Maitinimo ir jungiklio mygtukai rodo kitą veiksmą. Pavyzdyje neveikiantys
 jungimo mygtukai išjungti; pirmame etape išjungtas „Atgal“. Jungimo pagalboje
 naudojami gnybtų kodai ir lietuviški objektų pavadinimai. Ilgi studento
-rekvizitai pasiekiami ir užuominoje.
+rekvizitai pasiekiami ir užuominoje. Formulėse aiškiai parodytas daugiklis
+1000 pereinant tarp amperų ir ekrane rodomų miliamperų; skaitinės reikšmės
+ir vertinimo tolerancijos nepakeistos.
 
 ## Patikros apimtis
 

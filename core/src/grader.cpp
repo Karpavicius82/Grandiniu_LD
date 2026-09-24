@@ -569,14 +569,14 @@ void grade_ld8(Grader& grader,const Json& report,const Bank& variant) {
         grader.measured("i"+std::to_string(mode+1),std::string("Matavimas: I, ")+names[mode],currents[mode],"mA",.02);
     }
     grader.answer("s2.q1","Nuoseklioji grandinė: Rt = R1 + R2 + R3",series,"Ohm","Varžos sudedamos.",.01,1e-9);
-    grader.answer("s2.q2","Nuoseklioji grandinė: Re = U / I",series,"Ohm","Re = U/I (I – amperais).",.02,1e-9);
+    grader.answer("s2.q2","Nuoseklioji grandinė: Re = 1000·U / I",series,"Ohm","Re = 1000·U/I, kai I imama iš žurnalo mA.",.02,1e-9);
     grader.answer("s3.q1","Lygiagretė grandinė: Rt = 1/(1/R1+1/R2+1/R3)",parallel,"Ohm","Laidžiai sudedami.",.01,1e-9);
-    grader.answer("s3.q2","Lygiagretė grandinė: Re = U / I",parallel,"Ohm","Re = U/I (I – amperais).",.02,1e-9);
+    grader.answer("s3.q2","Lygiagretė grandinė: Re = 1000·U / I",parallel,"Ohm","Re = 1000·U/I, kai I imama iš žurnalo mA.",.02,1e-9);
     grader.answer("s4.q1","Mišrioji grandinė: Rt = R1 + R2·R3/(R2+R3)",mixed,"Ohm","R2 ir R3 lygiagrečiai, plius R1.",.01,1e-9);
-    grader.answer("s4.q2","Mišrioji grandinė: Re = U / I",mixed,"Ohm","Re = U/I (I – amperais).",.02,1e-9);
-    grader.answer("s5.q1","Šakos srovė lygiagrečiai: I1 = U / R1",E/r1*1000,"mA","I = U/R, mA.",.02,1e-9);
-    grader.answer("s5.q2","Šakos srovė lygiagrečiai: I2 = U / R2",E/r2*1000,"mA","I = U/R, mA.",.02,1e-9);
-    grader.answer("s5.q3","Šakos srovė lygiagrečiai: I3 = U / R3",E/r3*1000,"mA","I = U/R, mA.",.02,1e-9);
+    grader.answer("s4.q2","Mišrioji grandinė: Re = 1000·U / I",mixed,"Ohm","Re = 1000·U/I, kai I imama iš žurnalo mA.",.02,1e-9);
+    grader.answer("s5.q1","Šakos srovė lygiagrečiai: I1 = 1000·U / R1",E/r1*1000,"mA","I = 1000·U/R, kai U — V, R — Ω; rezultatas — mA.",.02,1e-9);
+    grader.answer("s5.q2","Šakos srovė lygiagrečiai: I2 = 1000·U / R2",E/r2*1000,"mA","I = 1000·U/R, kai U — V, R — Ω; rezultatas — mA.",.02,1e-9);
+    grader.answer("s5.q3","Šakos srovė lygiagrečiai: I3 = 1000·U / R3",E/r3*1000,"mA","I = 1000·U/R, kai U — V, R — Ω; rezultatas — mA.",.02,1e-9);
     grader.answer("s6.q1","Išvada: nuoseklioji Rt didesnė už kiekvieną varžą",1,"choice","1 – Taip, 2 – Ne.",0,0);
     grader.answer("s6.q2","Išvada: lygiagretė Rt mažesnė už mažiausią varžą",1,"choice","1 – Taip, 2 – Ne.",0,0);
     grader.answer("s6.q3","Išvada: šakų srovių suma lygi bendrai srovei",1,"choice","1 – Taip, 2 – Ne.",0,0);

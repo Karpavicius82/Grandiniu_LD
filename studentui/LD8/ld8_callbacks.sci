@@ -94,7 +94,7 @@ function ld8_measure()
     LD8.lastMeasurement = current;
     ld8_render_journal(); ld8_render_wires();
     ld8_set_status(msprintf("%s: U = %.4f V; I = %.3f mA.", ld8_mode_name(tag), voltage, current), "ok", ...
-        msprintf("Re = U/I = %.1f Ω — užsirašykite skaičiavimams.", resistance));
+        msprintf("Re = 1000·U/I = %.1f Ω — užsirašykite skaičiavimams.", resistance));
     bench_autosave("LD8");
 endfunction
 
@@ -180,10 +180,10 @@ function text = ld8_step_instruction(step)
     cfg = LD8.cfg;
     select step
     case 1 then text = msprintf("[B10] Sujunkite nuoseklią grandinę be maitinimo: E → jungiklis → ampermetras → R1 → R2 → R3; voltmetro zondai prie šaltinio [T01]/[T02]. Seka: Pagalba → [B04]. Tada įjunkite [B01], uždarykite [B02] ir matuokite [B03].", cfg.E);
-    case 2 then text = "[A02.01] Apskaičiuokite teorinę varžą: Rt = R1 + R2 + R3. [A02.02] Eksperimentinę: Re = U/I (I — amperais). Lyginkite — jos turėtų sutapti.";
-    case 3 then text = "[B11] Sujunkite lygiagrečią grandinę: visos trys varžos tarp tų pačių mazgų. Išmatuokite U ir I. [A03.01] Rt = 1/(1/R1+1/R2+1/R3); [A03.02] Re = U/I.";
-    case 4 then text = "[B12] Sujunkite mišrią grandinę: R1 nuosekliai su lygiagrečiais R2 ir R3. Išmatuokite. [A04.01] Rt = R1 + R2·R3/(R2+R3); [A04.02] Re = U/I.";
-    case 5 then text = "Lygiagrečiosios grandinės šakų srovės esant U iš 3 etapo: [A05.01] I1 = U/R1; [A05.02] I2 = U/R2; [A05.03] I3 = U/R3 (mA). Patikrinkite: I1+I2+I3 = I.";
+    case 2 then text = "[A02.01] Apskaičiuokite teorinę varžą: Rt = R1 + R2 + R3. [A02.02] Eksperimentinę: Re = 1000·U/I, kai I imama iš žurnalo mA. Lyginkite — jos turėtų sutapti.";
+    case 3 then text = "[B11] Sujunkite lygiagrečią grandinę: visos trys varžos tarp tų pačių mazgų. Išmatuokite U ir I. [A03.01] Rt = 1/(1/R1+1/R2+1/R3); [A03.02] Re = 1000·U/I (I — mA).";
+    case 4 then text = "[B12] Sujunkite mišrią grandinę: R1 nuosekliai su lygiagrečiais R2 ir R3. Išmatuokite. [A04.01] Rt = R1 + R2·R3/(R2+R3); [A04.02] Re = 1000·U/I (I — mA).";
+    case 5 then text = "Naudokite U iš 3 etapo. Šakų srovės: I1 = 1000·U/R1; I2 = 1000·U/R2; I3 = 1000·U/R3. Įrašykite mA. Patikrinkite: I1+I2+I3 = I.";
     case 6 then text = "[A06.01] Ar nuoseklioji Rt didesnė už kiekvieną varžą? [A06.02] Ar lygiagretė Rt mažesnė už mažiausią? [A06.03] Ar šakų srovių suma lygi bendrai srovei? 1 – Taip, 2 – Ne.";
     else text = "";
     end
