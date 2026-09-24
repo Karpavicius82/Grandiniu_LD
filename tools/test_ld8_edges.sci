@@ -42,11 +42,21 @@ function ld8_edge_checks()
     bench_ld8_action("ld8_toggle_switch()"); assert_checktrue(strindex(LD8.ui.controls(5).string,"Atverti")<>[]);
     before_wires=LD8.wires;bench_ld8_click("E_P");bench_ld8_click("K1");assert_checkequal(LD8.wires,before_wires);
     // A write failure must preserve both the open window and its last good draft.
-    previous=LD8.autosave_paths($); folder=getenv("LD_DATA_DIR");
-    blocked=fullfile(getenv("LD8_TEST_OUT"),"not-a-directory"); mputl("test",blocked); setenv("LD_DATA_DIR",blocked);
-    ld8_close(); assert_checktrue(is_handle_valid(LD8.fig));
-    assert_checktrue(LD8.autosave_error<>"");assert_checktrue(isfile(previous));
-    setenv("LD_DATA_DIR",folder); LD8.done(:)=%t; LD8.step=6; ld8_render_stage();
+    previous=LD8.autosave_paths($);
+    // Block the actual draft directory instead of changing the process environment:
+    // restoring a Unicode LD_DATA_DIR through setenv did not recover on Windows.
+    draft_folder=fullfile(bench_documents(),"Juodrasciai");
+    draft_backup=draft_folder+"-test-backup-"+bench_id();
+    [ok,msg]=movefile(draft_folder,draft_backup); if ~ok then error(msg); end
+    mputl("test",draft_folder);
+    ld8_close(); still_open=is_handle_valid(LD8.fig); save_error=LD8.autosave_error;
+    [old_folder,old_name,old_extension]=fileparts(previous);
+    backup_exists=isfile(fullfile(draft_backup,old_name+old_extension));
+    mdelete(draft_folder);
+    [ok,msg]=movefile(draft_backup,draft_folder); if ~ok then error(msg); end
+    assert_checktrue(still_open); assert_checktrue(save_error<>"");
+    assert_checktrue(backup_exists); assert_checktrue(isfile(previous));
+    LD8.done(:)=%t; LD8.step=6; ld8_render_stage();
     ld8_close(); if is_handle_valid(LD8.fig) then error("LD8_EDGE: close failed: "+LD8.autosave_error); end
     saved=LD8; count=size(listfiles(bench_documents()+"/*.html"),"*");
     // Delayed buttons cannot write a new report, mutate data or open another window.
