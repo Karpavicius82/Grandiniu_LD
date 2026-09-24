@@ -1,0 +1,1 @@
+LD8_FAIL: LD8_EDGE: close failed: Juodraštis neišsaugotas. Ankstesnis įrašas liko nepakeistas. at ld8_edge_checks:49

@@ -57,5 +57,39 @@ ar savarankiško darbo. Mažame ekrane išlaikomas 1280 × 720 loginis plotas
 su slinkimu; konkrečių įrenginių DPI, klaviatūros naršymas ir ekranų
 skaitytuvai šiais callback bandymais nėra sertifikuojami.
 
-Galutiniai platformų rezultatai ir paketų kontrolinės sumos bus pridėti
-užbaigus šios versijos patikrą.
+## Galutinis rezultatas
+
+Patikrinta versija: `f49ee60ec3cb529b43a5e3824e2c9d0591303e1d`.
+[Linux](https://github.com/Karpavicius82/Grandiniu_LD/actions/runs/36008371352),
+[Windows](https://github.com/Karpavicius82/Grandiniu_LD/actions/runs/36012493838)
+ir [macOS ARM / Intel](https://github.com/Karpavicius82/Grandiniu_LD/actions/runs/36008371413): **PASS**.
+Windows testų versija: `811cda449612b331ecea3732d180a4bc41be1d10`;
+jos `studentui` ir `core` medis identiškas aukščiau nurodytai programos
+versijai. Pirmasis Windows bandymas nepraėjo naujo gedimo atkūrimo testo:
+jo metu `LD_DATA_DIR` buvo keičiamas ir atkuriamas su Unicode keliu.
+Pakartojimas su tikslia diagnostika nustatė nesėkmingą juodraščio įrašymą
+atkūrus šį kintamąjį. Testas pakeistas tiesioginiu juodraščių katalogo
+blokavimu ir atkūrimu, nekeičiant aplinkos kintamųjų. Nei studento UI,
+nei C++ kodas dėl šios testavimo pataisos nekeisti. Nesėkmingi CI bandymai
+`36008371352` (tik Windows darbas) ir `36010170293` nelaikomi PASS.
+
+Kiekvienoje platformoje: 11 CTest rinkinių, 513 faktinių Scilab ataskaitų,
+146 LD8 vertinimo palyginimai, trys pilnos LD8 GUI eigos, 19 geometrijos
+scenarijų ir papildomos klaidų atkūrimo patikros. Bendras pristatymo
+bandymas atidarė visus aštuonis laboratorinių darbų langus.
+
+Platformų kataloguose pateikti JSON rezultatai ir geometrijos įrodymai.
+`verified-packages.json` susieja CI versiją, originalius ZIP ir C++ failų
+SHA256. `distributed-sha256.json` fiksuoja pateikiamų paketų SHA256.
+107 Scilab ir paleidimo failai bei aštuoni variantų bankai sutikrinti su
+patikrintos šakos turiniu. macOS ZIP palikti nepakeisti iš CI; bendras
+Windows / Linux paketas sudarytas iš sutikrintų platformų paketų.
+
+Linux katalogo PNG vaizdai užfiksuoti galutinės versijos CI bandyme.
+Windows Server 2022 CI nėra konkretaus Windows 11 kompiuterio,
+antivirusinės reputacijos ar archyvo pristatymo el. paštu sertifikavimas.
+Patikros apima macOS 15 abiejų architektūrų CI ir Ubuntu 22.04; kitų OS
+versijų suderinamumas vien šiais rezultatais netvirtinamas.
+
+Pataisos ir paketai saugomi `codex/ld8-verified-delivery` šakoje. Pagrindinio
+katalogo vykstantys LD9 pakeitimai ir paketai šios peržiūros metu nekeisti.

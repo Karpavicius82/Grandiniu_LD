@@ -1,13 +1,14 @@
 {
-  "time_utc": "2026-09-24T13:20:05.604562+00:00",
+  "time_utc": "2026-09-24T14:41:20.334536+00:00",
   "scilab": "2026.1.0",
   "command": "GitHub Actions native.yml and macos.yml: 11 CTest suites, 513 actual reports, LD1-LD8 GUI and student delivery",
   "status": "PASS",
   "coverage": {
-    "source_commit": "35774a80f28d059c3f1c53b1ef4eabf5b6c449cc",
+    "source_commit": "f49ee60ec3cb529b43a5e3824e2c9d0591303e1d",
     "status": "PASS",
-    "native_ci": "https://github.com/Karpavicius82/Grandiniu_LD/actions/runs/36002507038",
-    "macos_ci": "https://github.com/Karpavicius82/Grandiniu_LD/actions/runs/36002507075",
+    "linux_ci": "https://github.com/Karpavicius82/Grandiniu_LD/actions/runs/36008371352",
+    "windows_ci": "https://github.com/Karpavicius82/Grandiniu_LD/actions/runs/36012493838",
+    "macos_ci": "https://github.com/Karpavicius82/Grandiniu_LD/actions/runs/36008371413",
     "platforms": [
       "Windows Server 2022",
       "Ubuntu 22.04",
@@ -18,11 +19,13 @@
     "actual_reports_per_platform": 513,
     "packages": {
       "Windows": {
-        "ci_archive_sha256": "ad26e7ec37cf3c1085a459e629dbf7284350f49198b45a512316100d9a616fe2",
+        "ci_url": "https://github.com/Karpavicius82/Grandiniu_LD/actions/runs/36012493838",
+        "ci_commit": "811cda449612b331ecea3732d180a4bc41be1d10",
+        "ci_archive_sha256": "7b0456e89e6a2a92521ca9f9201f5d889b2ea1973db41eb4e81b3bacfdc7acb9",
         "native_sha256": {
-          "ldcheck.exe": "71a006347590d9c744453311e6cd07af1daf868304b6a8c8edf90d24ba0403e3",
-          "ldcore.dll": "e5bf6b164684a71074b5b3fbb0d8b3203728f0275c70d2beaf0faa7629534e8e",
-          "mokytojas.exe": "9e8ada697c1da5497ee8d74f945bebcb71ad220d5cfdf69b22bce071ffe04f4f"
+          "ldcheck.exe": "ca27b3b7090ed8d584b6ae6248385e9d2d9230cac66d7cd5acf53a5ada064e21",
+          "ldcore.dll": "e7b00fdbcac9965eaa5764d13211525fe2956cc87b7016d4810db5f2bc026d14",
+          "mokytojas.exe": "5d52b82a7dbe021b36c4e63307ff301723b9c19c55b7460a0bfb2035a1ae6c42"
         },
         "ld8": {
           "status": "PASS",
@@ -33,17 +36,27 @@
             17,
             64
           ],
-          "geometry_cases": 13,
+          "geometry_cases": 19,
           "assessment_reports_selected": true,
           "close_autosave_restore": true,
+          "edge_cases": true,
+          "malformed_drafts_rejected": 6,
+          "report_traceability": true,
+          "submission_sha256": {
+            "LD8-V01-20260924T143312-1200-107-85.html": "9384dd37caad5ef25bb2a633c70aa8bc7dc124c16c3997f213a7045dd7feddee",
+            "LD8-V17-20260924T143338-1200-910-170.html": "5730424e3cc375156d0fdcbeec7ecc7c95e9d51c36c817360644b647c7b8dd43",
+            "LD8-V64-20260924T143405-1200-162-255.html": "6e2877609d30e309a6e4e441196bd77957b79f26c03840c32110389ace36e4da"
+          },
           "platform": "nt"
         }
       },
       "Linux": {
-        "ci_archive_sha256": "6728a281692d5a87873c9b8f536f8a6eea87365ecffcf72d22329bea10c34016",
+        "ci_url": "https://github.com/Karpavicius82/Grandiniu_LD/actions/runs/36008371352",
+        "ci_commit": "f49ee60ec3cb529b43a5e3824e2c9d0591303e1d",
+        "ci_archive_sha256": "96ad3a8a0f0901b590e0cff6fa29ddeb3b61da6ce47815b1f62cf64cf10881cb",
         "native_sha256": {
           "ldcheck": "023479d1d8ef2bd7667bd2bf00c402610b6bad55df120ce798c4d867bbedb774",
-          "ldcore.so": "c248ff1ec2013a4f85e265a164dbbf634908e46e66498034a0d9c737ef378d2d",
+          "ldcore.so": "dc4e98d829a25828fa7c14348463643d83828e1840d4a1984d9d5f3b0fc6c946",
           "mokytojas": "059b7dfdaff25b505acc1d42b29726c553e4d788e613c35284c1c0a86cd92411"
         },
         "ld8": {
@@ -55,17 +68,27 @@
             17,
             64
           ],
-          "geometry_cases": 13,
+          "geometry_cases": 19,
           "assessment_reports_selected": true,
           "close_autosave_restore": true,
+          "edge_cases": true,
+          "malformed_drafts_rejected": 6,
+          "report_traceability": true,
+          "submission_sha256": {
+            "LD8-V17-20260924T135509-3974-93-170.html": "7f81b62240e2a0a327fda73d428b1619fbf4b506e1be366721b23146952dfb2d",
+            "LD8-V64-20260924T135525-3974-287-255.html": "b8199d9cea1f19565d81b2829ad2486f28d19c6be5af06a191c9f27f10386493",
+            "LD8-V01-20260924T135452-3974-120-85.html": "5a99d1ae3d538b4f862e67760f6488b44341c7b01a5db3f84694998220a82ea3"
+          },
           "platform": "posix"
         }
       },
       "macOS-arm64": {
-        "ci_archive_sha256": "4b3a069f3620f262765673bbc33f29b16bcdfd644d7accdd43bd0d69c35f7412",
+        "ci_url": "https://github.com/Karpavicius82/Grandiniu_LD/actions/runs/36008371413",
+        "ci_commit": "f49ee60ec3cb529b43a5e3824e2c9d0591303e1d",
+        "ci_archive_sha256": "083da1924a3c9fb51ed1879295d4cfa155e66db1e097d09c4c88027163391e03",
         "native_sha256": {
           "ldcheck": "e5e8595cdb045308dcdc847323f42365d390a0eefaf814e53825ce3b363cff2d",
-          "ldcore.dylib": "8db0784536782e6c8ee4b0e9ee96363db8c597d6bb7e143b41a23a19442ff755",
+          "ldcore.dylib": "44189dad39ae54e4d3068a1f07634cf34270e82db8c71efb6aa457b48905caaf",
           "mokytojas": "096c1a926398a4707408eb518897b9a6e0e4eda24ed2d7faabd6b13a8fe5c5dc"
         },
         "ld8": {
@@ -77,17 +100,27 @@
             17,
             64
           ],
-          "geometry_cases": 13,
+          "geometry_cases": 19,
           "assessment_reports_selected": true,
           "close_autosave_restore": true,
+          "edge_cases": true,
+          "malformed_drafts_rejected": 6,
+          "report_traceability": true,
+          "submission_sha256": {
+            "LD8-V17-20260924T135847-13987-843-170.html": "294ddfa8c043405a3b8e0652f1f7f67cbb8c44c680f1079d6205967d43244053",
+            "LD8-V01-20260924T135813-13987-48-85.html": "fea44ded88271769945ae2aef9de1fab4ea8e8144251c6381cbea110a14b32b3",
+            "LD8-V64-20260924T135916-13987-605-255.html": "87e46278cbd4f998b43dc5d9761d610785f4b1c0341a6fbda122a51d12f73dd9"
+          },
           "platform": "posix"
         }
       },
       "macOS-x86_64": {
-        "ci_archive_sha256": "d167e0d5b756f145f6300f4d72a09497160d1d355de91215ed29669e6334ec14",
+        "ci_url": "https://github.com/Karpavicius82/Grandiniu_LD/actions/runs/36008371413",
+        "ci_commit": "f49ee60ec3cb529b43a5e3824e2c9d0591303e1d",
+        "ci_archive_sha256": "c87fd49dce87eeb91f4c30b6198645f77c37be5e1e1e3abd99d130a87a0a0d79",
         "native_sha256": {
           "ldcheck": "96a1d7c6916009b17b118a0755211c19d0bd0578cf976bbc5645662c352e25f2",
-          "ldcore.dylib": "370041c7c6466dd52c8df3535ed74aee1642dbdf20d47fe6c9d1f625029fbb6e",
+          "ldcore.dylib": "738f9d10cee533ee92bf8343f6f96ef620161d7e2bb7df45b8d3fe5a2f030f07",
           "mokytojas": "25f9b84343ae77fa8ac8a846d868018c0b8bacefd0acc476c96af17d33ac0e65"
         },
         "ld8": {
@@ -99,9 +132,17 @@
             17,
             64
           ],
-          "geometry_cases": 13,
+          "geometry_cases": 19,
           "assessment_reports_selected": true,
           "close_autosave_restore": true,
+          "edge_cases": true,
+          "malformed_drafts_rejected": 6,
+          "report_traceability": true,
+          "submission_sha256": {
+            "LD8-V01-20260924T140019-14523-713-85.html": "c20518ad8eb5d996383fd2c8650feb6920c1beae148942106746dba67834a64c",
+            "LD8-V17-20260924T140131-14523-226-170.html": "21d0244a8f60c9d85e8769cef338c68c9f09ac2a5a44cdf079b256d51f86f25f",
+            "LD8-V64-20260924T140233-14523-505-255.html": "b27dbef8a2c127c5015bbcef05dcb070c42716c993f1155ebd3126bb3ec23d2c"
+          },
           "platform": "posix"
         }
       }
@@ -186,13 +227,13 @@
     "LD7/ld7_utils.sci": "46ebf36d62bba2ffd0475619e1a29093f87df2a7cf8ec921cca8bb6c66cdbf29",
     "LD8/LD8.sce": "f085e3970217f9fab47024895f5bfde7e70608c38398a051c7f0781e5901a590",
     "LD8/LD8_LOAD.sce": "98eee9eb456ae3c25dcd595f2b5386b367842c4e78ba00101ab3d25fa05e18a3",
-    "LD8/ld8_callbacks.sci": "4ef23fa193659acf7c23a817e75c10cecce930021f46462b7288cc99fd58b6fe",
+    "LD8/ld8_callbacks.sci": "c735c4e3d3a38f51baf29e511686a3df1bde0d6770b8a7e107b85f20f11fd8c1",
     "LD8/ld8_circuit.sci": "9248cfd659fa50081f64073a97c75912ec03052e1b4555b68ca38cd0364c7bd6",
     "LD8/ld8_config.sci": "f19d41c1e03ce79db0cec976386aff1558567801f628f1bd4d2bcd19af46aac8",
-    "LD8/ld8_gui.sci": "a1343faf228fc564f96ec5966591f79d0c726650c4123447261366bb6da8febd",
+    "LD8/ld8_gui.sci": "446c9350b1d2a4c1ad841407b4562b2d968daa55593c89e1e55083fd267f1599",
     "LD8/ld8_ids.sci": "f438bf31aa6915b2beb9a39e9dcfefaab023dd5044f9098d2592c4f511d88ddd",
-    "LD8/ld8_student.sci": "2a60e9188c1ae597165e969ca78ad0c6061261560734f7dc630ae0fd026bd22b",
-    "LD8/ld8_utils.sci": "51723102bbf2d7a2a31224fe35fae9b847b4698c2779e81a442b467a952657de",
+    "LD8/ld8_student.sci": "f35787fbcfbd5be1de1e0ff03d9ace64f2a47c2ab07f757fe90995142cdcaff1",
+    "LD8/ld8_utils.sci": "b4cd566e6af98288b8237c0797510ee555a9c0bb6f6957bfd9a49b12e94e470e",
     "PALEISTI.bat": "86cd5f0f3924a441e1c0c3a75869a9394837b8146f08a177fbcfa0e0901f8098",
     "PALEISTI.command": "3226e339e3acd67b747099e7eee335a82bf6d5289033755b05a975eb25b222f6",
     "PALEISTI.sh": "630f98bd7e7238a09408387f1ee2548934e38e7f22d8fb20653287372a6953c2",
@@ -208,7 +249,7 @@
     "STENDAS.sce": "d3c1816e2360d6b6bb9bccade91b46ccd20928e167f97d2d6f227fa99b6a1afc",
     "bench_common.sci": "4cc1f3b53354905117d1ad1755d02d100cfdaa7948049f273e1d85ad2ee9c740",
     "bench_report.sci": "301ef972efd0d9d59720b63c251decb4e486b924a545bbd7aec0869e5e913875",
-    "bench_session.sci": "4250ea6d192971740c2ebdeb57e18f7352a8e6eed1cba0e2a6e8b2c2a9095022",
+    "bench_session.sci": "7783a7afe5fcf7358b5e60ee68e9e46b37b4df0b76a27f201e0a37a4fb6741f3",
     "bench_teacher.sci": "ec1ce34f4358bace3694bc8a2d30320c41675399dd91f96425d1a6a614192911",
     "student_profile.sci": "682a329a74907c37c6e0c832cbc15a92c0e1235cf4732b41bee7a011f8135ddb",
     "student_style.sci": "a50dc32c8c73a11ec885b6118c7d0326e912a1af8d0f3bc13edfe97be1495ee2",
