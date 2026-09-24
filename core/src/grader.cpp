@@ -629,7 +629,7 @@ void grade_ld9(Grader& grader,const Json& report,const Bank& variant) {
     grader.answer("s3.q2","Skirtumas ties f0: UL − UC",ul[1]-uc[1],"V","Ties rezonansu UL = UC.",0,.02);
     const double z1=E/(current[0]/1000);
     grader.answer("s5.q1","Įtampų trikampis f1: √(UR² + (UL−UC)²)",std::hypot(ur[0],ul[0]-uc[0]),"V","Pitagoro teorema.",.02,1e-9);
-    grader.answer("s5.q2","Pilnutinė varža f1: Z = U / I",z1,"Ohm","I – amperais.",.02,1e-9);
+    grader.answer("s5.q2","Pilnutinė varža f1: Z = 1000·U / I",z1,"Ohm","Z = 1000·U[V]/I[mA].",.02,1e-9);
     grader.answer("s5.q3","Galios faktorius f1: cos φ = UR / U",ur[0]/E,"1","cos φ = R/Z = UR/U.",.02,1e-9);
     grader.answer("s5.q4","Aktyvioji galia f1: P = UR · I",ur[0]*current[0],"mW","P = UR[V]·I[mA].",.02,1e-9);
     grader.answer("s5.q5","Reaktyvioji galia f1: Q = (UL−UC) · I",(ul[0]-uc[0])*current[0],"mvar","Q = (UL−UC)[V]·I[mA].",.02,1e-9);

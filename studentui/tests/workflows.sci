@@ -879,16 +879,11 @@ function bench_ld9_connect()
 endfunction
 
 function bench_ld9_measure_point(step)
-    // Nustato etapo dažnį ir išmatuoja visus keturis taikinius.
     global LD9;
-    bench_ld9_action("ld9_set_freq("+string(step-1)+")");
-    bench_ld9_action("ld9_toggle_power()"); bench_ld9_action("ld9_toggle_switch()");
-    for target=1:4
-        bench_ld9_action("ld9_set_target("+string(target)+")");
-        bench_ld9_action("ld9_measure()");
-    end
+    if LD9.step<>step then ld9_set_step(step); end
+    bench_ld9_action("ld9_measure_all()");
+    for target=1:4; assert_checkequal(size(ld9_journal_rows(step-1,target),1),1); end
     bench_ld9_action("ld9_toggle_power()");
-    assert_checkequal(size(ld9_journal_rows(step-1,4),1),1);
 endfunction
 
 function bench_ld9_workflow(number,root,gui)
@@ -923,7 +918,7 @@ function bench_ld9_workflow(number,root,gui)
     end
     assert_checktrue(and(LD9.done)); assert_checkequal(size(LD9.journal,1),12);
     if gui then
-        LD9.assessment=%t;
+        assert_checktrue(LD9.assessment);
         before=size(listfiles(bench_documents()+"/*.html"),"*");
         bench_ld9_primary();
         assert_checkequal(size(listfiles(bench_documents()+"/*.html"),"*"),before+1);

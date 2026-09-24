@@ -6,6 +6,7 @@ function ld9_invalidate_wiring()
 endfunction
 
 function ld9_terminal_click(id)
+    if ~ld9_can_act() then return; end
     global LD9;
     if ~ld9_wiring_editable() | ~or(ld9_terminal_ids() == id) then return; end
     if LD9.powerOn then ld9_set_status("Prieš keisdami laidus išjunkite [B01].", "error", ""); return; end
@@ -31,11 +32,13 @@ function ld9_terminal_click(id)
             LD9.switchOn = %f; ld9_invalidate_wiring();
         end
     end
-    ld9_render_wires(); ld9_render_journal(); ld9_student_sync();
+    ld9_render_wires(); ld9_render_journal(); ld9_student_sync(); bench_autosave("LD9");
 endfunction
 
 function ld9_toggle_power()
+    if ~ld9_can_act() then return; end
     global LD9;
+    if LD9.demoMode then return; end
     LD9.powerOn = ~LD9.powerOn;
     if ~LD9.powerOn then LD9.switchOn = %f; end
     ld9_render_wires();
@@ -44,7 +47,9 @@ function ld9_toggle_power()
 endfunction
 
 function ld9_toggle_switch()
+    if ~ld9_can_act() then return; end
     global LD9;
+    if LD9.demoMode then return; end
     if ~LD9.powerOn then ld9_set_status("Pirma įjunkite [B01].", "error", ""); return; end
     LD9.switchOn = ~LD9.switchOn; ld9_render_wires();
     if LD9.switchOn then ld9_set_status("Jungiklis uždarytas.", "ok", "Rodmenis įrašykite [B03].");
@@ -52,6 +57,7 @@ function ld9_toggle_switch()
 endfunction
 
 function ld9_set_freq(k)
+    if ~ld9_can_act() then return; end
     global LD9;
     if LD9.demoMode | ~ld9_valid_index(k, 3) then return; end
     LD9.freqPoint = k;
@@ -61,6 +67,7 @@ function ld9_set_freq(k)
 endfunction
 
 function ld9_set_target(t)
+    if ~ld9_can_act() then return; end
     global LD9;
     if LD9.demoMode | ~ld9_valid_index(t, 4) then return; end
     LD9.target = t;
@@ -69,12 +76,14 @@ function ld9_set_target(t)
     ld9_set_status(names(t), "info", "Įjungę maitinimą matuokite [B03].");
 endfunction
 
-function ld9_measure()
+function ld9_measure(refresh)
+    if ~ld9_can_act() then return; end
     global LD9;
     if LD9.demoMode then return; end
     if ~or(LD9.step == [2 3 4]) then
         ld9_set_status("Matuojama 2, 3 ir 4 etapuose.", "error", "Kiekvienam etapui — savas dažnis ir visi keturi taikiniai."); return;
     end
+    if argn(2)<1 then refresh=%t; end
     kk = [0.5 1 2];
     if LD9.freqPoint <> LD9.step - 1 then
         names = ["[B10] 0,5·f0";"[B11] f0";"[B12] 2·f0"];
@@ -89,7 +98,7 @@ function ld9_measure()
     f = kk(LD9.freqPoint)/sqrt(LD9.cfg.L*LD9.cfg.C)/(2*%pi);
     LD9.journal($+1,:) = [voltage, current, tag, f, target];
     LD9.lastMeasurement = current;
-    ld9_render_journal(); ld9_render_wires();
+    if refresh then ld9_render_journal(); ld9_render_wires(); bench_autosave("LD9"); end
     ld9_set_status(msprintf("Užfiksuota: U = %.4f V; I = %.3f mA.", voltage, current), "ok", "Taškui išmatuokite visus keturis taikinius.");
 endfunction
 
@@ -101,9 +110,11 @@ function ok = ld9_close_enough(value, expected, relative, absolute)
     ok = abs(value - expected) <= absolute + relative*abs(expected);
 endfunction
 
-function ld9_check_step()
+function ld9_check_step(check_answers)
+    if ~ld9_can_act() then return; end
     global LD9;
     if LD9.demoMode then return; end
+    if argn(2)<1 then check_answers=%t; end
     ld9_save_answers(); step = LD9.step;
     if ~ld9_valid_index(step, 6) then return; end
     if LD9.done(step) then return; end
@@ -125,6 +136,12 @@ function ld9_check_step()
     for index = 1:12
         [answer_step, slot] = ld9_answer_slot(index);
         if answer_step <> step then continue; end
+        if ~check_answers then
+            if stripblanks(LD9.answers(step,slot))=="" then
+                ld9_set_status("Įrašykite ["+ld9_answer_code(step,slot)+"].","error","Atsakymą vertins dėstytojo programa."); return;
+            end
+            continue;
+        end
         value = ld9_parse_number(LD9.answers(step, slot)); relative = .02; absolute = 1e-9;
         if step == 1 then relative = .01; end
         if step == 3 & slot == 1 then relative = .03; end
@@ -139,28 +156,32 @@ function ld9_check_step()
 endfunction
 
 function ld9_next_step()
+    if ~ld9_can_act() then return; end
     global LD9;
     if LD9.step >= 6 | ~LD9.done(LD9.step) then return; end
     ld9_set_step(LD9.step + 1);
 endfunction
 
 function ld9_set_step(step)
+    if ~ld9_can_act() then return; end
     global LD9;
     if ~ld9_valid_index(step, 6) then return; end
     if LD9.demoMode then ld9_toggle_solution(); end
     ld9_save_answers(); LD9.pending = ""; LD9.step = step;
-    ld9_render_stage();
+    if or(step==[2 3 4]) then LD9.freqPoint=step-1; LD9.target=1; end
+    if step==5 then LD9.freqPoint=1; LD9.target=4; end
+    ld9_render_stage(); bench_autosave("LD9");
 endfunction
 
 function text = ld9_step_instruction(step)
     global LD9;
     cfg = LD9.cfg;
     select step
-    case 1 then text = msprintf("Sujunkite nuoseklią grandinę be maitinimo: generatorius → jungiklis → ampermetras → R → L → C → grįžimas. Seka: Pagalba → [B04]. [A01.01] Apskaičiuokite teorinį rezonanso dažnį f0 = 1/(2π·√(L·C)); L = %g mH, C = %g nF.", cfg.LmH, cfg.CnF);
-    case 2 then text = "[B10] Nustatykite 0,5·f0. Išmatuokite I ir visus keturis įtempimus: [B13] UR, [B14] UL, [B15] UC, [B16] U — kiekvienam mygtukui [B03].";
-    case 3 then text = "[B11] Nustatykite f0. Išmatuokite I, UR, UL, UC, U. [A03.01] Q = UL/U; [A03.02] UL − UC (turėtų būti ≈ 0).";
-    case 4 then text = "[B12] Nustatykite 2·f0. Išmatuokite I, UR, UL, UC, U.";
-    case 5 then text = "Iš pirmojo taško (0,5·f0) matavimų: [A05.01] įtampų trikampis √(UR²+(UL−UC)²); [A05.02] Z = U/I; [A05.03] cos φ = UR/U; [A05.04] P = UR·I; [A05.05] Q = (UL−UC)·I; [A05.06] S = U·I (I — mA).";
+    case 1 then text = msprintf("Sujunkite 6 laidus: Pagalba → [B04]. Įrašykite f0 = 1/(2π√(L·C)), Hz. Formulei naudokite L = %g H ir C = %g F. Priskirtos mH/nF reikšmės – ant elementų.", cfg.L, cfg.C);
+    case 2 then text = "Dažnis 0,5·f0 nustatytas. [B17] įjungs grandinę ir įrašys visus 4 matavimus. Arba matuokite po vieną: [B13]–[B16], tada [B03].";
+    case 3 then text = "Rezonanso dažnis f0 nustatytas. [B17] įrašykite visus 4 matavimus. [A03.01] Q = UL/U; [A03.02] UL − UC (turėtų būti ≈ 0).";
+    case 4 then text = "Dažnis 2·f0 nustatytas. [B17] įrašykite visus 4 matavimus, tada tęskite.";
+    case 5 then text = "Naudokite 0,5·f0 taško matavimus žurnale. U — V, I — mA. Formulės ir rezultato vienetai – prie laukelių. Reaktyvioji galia Q (mvar) gali būti neigiama; kokybė Q (3 etapas) neturi vienetų.";
     case 6 then text = "[A06.01] Ties f0 φ = 0? [A06.02] Ties f0 UL = UC? [A06.03] Žemiau f0 grandinė talpinė, aukščiau — indukcinė? 1 – Taip, 2 – Ne.";
     else text = "";
     end
@@ -192,17 +213,19 @@ function ld9_test_answers(step, values)
 endfunction
 
 function ld9_show_wiring_guide()
+    if ~ld9_can_act() then return; end
     global LD9;
     text = ["LD9 · Nuosekli RLC grandinė"; ""; "Išjunkite generatorių prieš jungdami laidus."];
     wires = ld9_canonical_wires();
     for index = 1:size(wires, 1)
-        text($+1) = msprintf("%d. [%s]–[%s]: %s → %s", index, ld9_terminal_code(wires(index,1)), ld9_terminal_code(wires(index,2)), wires(index,1), wires(index,2));
+        text($+1) = msprintf("%d. [%s]–[%s]: %s → %s", index, ld9_terminal_code(wires(index,1)), ld9_terminal_code(wires(index,2)), ld9_terminal_name(wires(index,1)), ld9_terminal_name(wires(index,2)));
     end
-    text = [text; ""; "Voltmetras jungiamas mygtukais [B13]–[B16] — zondų kilnojti nereikia."; "Dažnis nustatomas mygtukais [B10]–[B12] pagal etapą."];
+    text = [text; ""; "Voltmetras jungiamas mygtukais [B13]–[B16] — zondų kilnoti nereikia."; "Dažnis nustatomas mygtukais [B10]–[B12] pagal etapą."];
     ld9_text_window("Kaip sujungti", text);
 endfunction
 
 function ld9_show_stand_map()
+    if ~ld9_can_act() then return; end
     [ids, callbacks, labels, hints] = ld9_button_registry();
     text = ["LD9 · STENDO ŽEMĖLAPIS";"T01/T02 – generatorius (~, 5 V RMS).";"T03/T04 – jungiklis."; ...
         "T05/T06 – ampermetras; T07/T08 – R."; "T09/T10 – L; T11/T12 – C."; ...
@@ -222,23 +245,24 @@ function ld9_text_window(title, lines)
     uicontrol(window, "style", "listbox", "units", "normalized", "position", [.02 .10 .96 .84], ...
         "string", lines, "fontname", "SansSerif", "fontunits", "pixels", "fontsize", 12);
     uicontrol(window, "style", "pushbutton", "units", "normalized", "position", [.35 .02 .30 .06], ...
-        "string", "[H01] Uždaryti", "tag", "H01", "callback", "close()");
+        "string", "[H01] Uždaryti", "tag", "H01", "callback", msprintf("close(%d)",window.figure_id));
 endfunction
 
 function ld9_toggle_solution()
+    if ~ld9_can_act() then return; end
     global LD9;
     if LD9.demoMode then
         LD9.demoMode = %f;
         for field = ["wires" "answers" "journal" "powerOn" "switchOn" "lastMeasurement" "freqPoint" "target"]
             LD9(field) = LD9.backup(field);
         end
-        LD9.pending = ""; ld9_render_stage(); ld9_set_status("Grįžta į savo darbą.", "info", ""); return;
+        LD9.pending = ""; ld9_render_stage(); ld9_set_status("Grįžta į savo darbą.", "info", ""); bench_autosave("LD9"); return;
     end
     ld9_save_answers(); LD9.backup = struct();
     for field = ["wires" "answers" "journal" "powerOn" "switchOn" "lastMeasurement" "freqPoint" "target"]
         LD9.backup(field) = LD9(field);
     end
-    LD9.practice_used = %t; LD9.demoMode = %t; LD9.pending = "";
+    LD9.practice_used = %t; bench_autosave("LD9"); LD9.demoMode = %t; LD9.pending = "";
     LD9.wires = ld9_canonical_wires(); LD9.powerOn = %t; LD9.switchOn = %t;
     LD9.journal = [];
     if or(LD9.step == [2 3 4]) then
@@ -254,19 +278,48 @@ function ld9_toggle_solution()
 endfunction
 
 function ld9_restore_stage()
+    if ~ld9_can_act() then return; end
     global LD9;
     if LD9.demoMode then ld9_toggle_solution(); return; end
+    ld9_save_answers();
     LD9.powerOn = %f; LD9.switchOn = %f; LD9.pending = ""; LD9.lastMeasurement = %nan;
     if ld9_wiring_editable() then
         LD9.wires = emptystr(0, 2); ld9_invalidate_wiring();
     end
-    ld9_render_stage(); ld9_set_status("Šio etapo stendas atkurtas.", "info", "");
+    ld9_render_stage(); ld9_set_status("Šio etapo stendas atkurtas.", "info", ""); bench_autosave("LD9");
 endfunction
 
 function ld9_restart()
-    ld9_init_state(); ld9_render_stage(); ld9_set_status("Darbas pradėtas iš naujo.", "info", "Studentas ir variantas išliko.");
+    if ~ld9_can_act() then return; end
+    ld9_init_state(); ld9_render_stage(); ld9_set_status("Darbas pradėtas iš naujo.", "info", "Studentas ir variantas išliko."); bench_autosave("LD9");
 endfunction
 
 function ld9_answers_changed()
-    ld9_save_answers(); ld9_student_sync();
+    if ~ld9_can_act() then return; end
+    ld9_save_answers(); ld9_student_sync(); bench_autosave("LD9");
+endfunction
+
+function ld9_close()
+    global LD9;
+    if ~isfield(LD9,"fig") then return; end
+    if ~is_handle_valid(LD9.fig) then return; end
+    if LD9.demoMode then ld9_toggle_solution(); end
+    bench_autosave("LD9");
+    if isfield(LD9,"autosave_error") then
+        if LD9.autosave_error<>"" then return; end
+    end
+    delete(LD9.fig);
+endfunction
+
+// One real measurement cycle; keeps the manual controls available.
+function ld9_measure_all()
+    if ~ld9_can_act() then return; end
+    global LD9;
+    if LD9.demoMode | ~or(LD9.step==[2 3 4]) then return; end
+    [valid,why]=ld9_wiring_valid(LD9.wires);
+    if ~valid then ld9_set_status(why,"error","Grįžkite į 1 etapą ir pataisykite laidus."); return; end
+    LD9.freqPoint=LD9.step-1; LD9.powerOn=%t; LD9.switchOn=%t;
+    for target=1:4; LD9.target=target; ld9_measure(%f); end
+    LD9.target=4; ld9_render_wires(); ld9_render_journal(); bench_autosave("LD9");
+    ld9_set_status("Visi 4 šio dažnio matavimai įrašyti.","ok","Rodmenys žurnale. Užpildykite etapo atsakymus ir tęskite.");
 endfunction

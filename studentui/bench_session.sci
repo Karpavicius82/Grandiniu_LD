@@ -331,6 +331,7 @@ function bench_restore_snapshot(session)
             ld8_render_stage();
             ld8_set_status("Juodraštis atkurtas: "+student_caption(LD8.student),"ok","Maitinimas išjungtas.");
         elseif session.lab=="LD9" then
+            ld9_validate_snapshot(session);
             LD9.cfg=session.cfg;LD9.student=session.student;
             // Apply the store before rendering, so stale edits cannot overwrite it.
             for field=fieldnames(session.state)';LD9(field)=session.state(field);end
@@ -340,6 +341,9 @@ function bench_restore_snapshot(session)
             end
             LD9.powerOn=%f;LD9.switchOn=%f;LD9.demoMode=%f;LD9.pending="";
             LD9.lastMeasurement=%nan;
+            if ~isfield(session.state,"assessment") then LD9.assessment=%f;LD9.practice_used=%t;end
+            if ~isfield(session.state,"practice_used") then LD9.practice_used=%t;end
+            LD9.autosave_enabled=~LD9.ui.headless;
             ld9_render_stage();
             ld9_set_status("Juodraštis atkurtas: "+student_caption(LD9.student),"ok","Maitinimas išjungtas.");
         else

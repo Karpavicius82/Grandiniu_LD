@@ -1,4 +1,5 @@
 import copy
+import csv
 import json
 import math
 from pathlib import Path
@@ -17,6 +18,14 @@ def variant_values(number):
 
 
 def main(executable):
+    with (Path(__file__).resolve().parents[2] / 'studentui/LD9/VARIANTAI.csv').open(encoding='utf-8') as bank:
+        rows=list(csv.DictReader(bank, delimiter=';'))
+    assert len(rows)==64
+    for number,row in enumerate(rows,1):
+        l,c,r=variant_values(number)
+        assert row['Variantas']==f'LD9-V{number:02}' and float(row['E_V_RMS'])==5
+        for name,value in [('R_Ohm',r),('L_H',l),('C_F',c),('L_mH',l*1e3),('C_nF',c*1e9)]:
+            assert math.isclose(float(row[name]),value,rel_tol=1e-12), (number,name)
     for number in range(1, 65):
         l, c, r = variant_values(number)
         f0 = 1 / (2 * math.pi * math.sqrt(l * c))

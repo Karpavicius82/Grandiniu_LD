@@ -72,6 +72,7 @@ endfunction
 
 function ld9_init_state()
     global LD9;
+    LD9.assessment = %t; LD9.practice_used = %f;
     LD9.step = 1; LD9.done = zeros(1, 6) == 1; LD9.skipped = zeros(1, 6) == 1;
     LD9.powerOn = %f; LD9.switchOn = %f; LD9.freqPoint = 0; LD9.target = 0;
     LD9.wires = emptystr(0, 2); LD9.journal = [];
