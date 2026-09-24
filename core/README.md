@@ -1,6 +1,6 @@
 # Bendras C++ branduolys ir automatinis vertinimas
 
-Versija 0.3.0. Įgyvendintas **LD1–LD8** ataskaitų vertinimas, kiekvienam po 64 pastovius variantus. Kitų 5 darbų ši versija dar nevertina. [Ankstesnis 2026-09-13 patikros protokolas](../audits/closure-2026-09-13/README.md). Tai vidiniams priėmimo bandymams skirtas leidimas, ne išorinė aprobacija.
+Versija 0.3.0. Įgyvendintas **LD1–LD9** ataskaitų vertinimas, kiekvienam po 64 pastovius variantus. Kitų 4 darbų ši versija dar nevertina. [Ankstesnis 2026-09-13 patikros protokolas](../audits/closure-2026-09-13/README.md). Tai vidiniams priėmimo bandymams skirtas leidimas, ne išorinė aprobacija.
 
 Studentas atveria `STENDAS.sce`, įveda vardą, grupę ir eilės numerį. Atsiskaitymo režime mygtukas **Įrašyti ir toliau** išsaugo ir klaidingus atsakymus. Pabaigoje **Išsaugoti ataskaitą** sukuria vieną HTML failą naudotojo aplanke `Grandiniu_LD_darbai`. Tą failą studentas persiunčia dėstytojui. Ataskaitą galima sukurti ir nebaigus darbo, per Pagalbą. Mokymosi režimas, pavyzdžiai ir juodraščio atvėrimas yra Pagalboje.
 
@@ -19,6 +19,8 @@ LD6 revizija 2, bankas `LD6-64-B-2026`, rubrika `LD6-2`: 25 vienodo svorio krite
 LD7, bankas `LD7-64-A-2026`, rubrika `LD7-1`: 27 vienodo svorio kriterijai – 12 atsakymų, 12 matavimo reikšmių (penkios padėtys U ir I, tuščiosios eigos U0, trumpojo jungimo Ik) ir trijų sujungimų laidų įrodymai. MNA skaičiuoja tą pačią išorinę charakteristiką U = E − r·I per visą padėčių diapazoną; tuščioji eiga modeliuojama 1 MΩ, trumpasis jungimas – 1 µΩ apkrova. LD7 atsakymų tolerancijos: 3 % vidinei varžai r (du taškai), 1 % įtampai ir E patikrai, 2 % galiai bei srovei, pasirinkimai tikslūs.
 
 LD8, bankas `LD8-64-A-2026`, rubrika `LD8-1`: 21 vienodo svorio kriterijus – 12 atsakymų (teorinės ir eksperimentinėms varžoms trims grandinėms, šakų srovės, išvados), 6 matavimo reikšmės (U ir I kiekvienai grandinei) ir 3 sujungimų laidų įrodymai. Matavimai skaičiuojami tikru trijų varžų MNA tinklu per `bench_cpp_dc`: nuoseklioji, lygiagretė ir mišrioji topologija. Tolerancijos: 1 % teorinėms varžoms, 2 % eksperimentinėms ir srovėms, U matuojama 0,005 V; pasirinkimai tikslūs.
+
+LD9, bankas `LD9-64-A-2026`, rubrika `LD9-1`: 28 vienodo svorio kriterijai – 12 atsakymų (teorinis f0, kokybė Q, UL−UC, įtampų trikampis, Z, cos φ, P/Q/S, išvados), 15 matavimo reikšmių (3 dažnio taškai × I, UR, UL, UC, U) ir 1 sujungimo įrodymas. Fizika — tas pats `ld::ac` nuoseklio RLC modelys ties 0,5·f0, f0 ir 2·f0. Nauji ataskaitos vienetai `mvar` ir `mVA` reaktyviajai bei pilnutinei galiai. Tolerancijos: 1 % f0 ir Q, UL−UC iki 0,02 V, 2 % trikampių dydžiams; pasirinkimai tikslūs.
 
 `LD1-2` (automatinis stendo paruošimas): 15 studento atsakymų kriterijų. Penki matavimai ir du sujungimai išlieka diagnostikoje, tačiau turi 0 balų svorį.
 

@@ -175,6 +175,41 @@ def fixture(lab, n, identity):
                    4: base + [["R1_B", "R2_A"], ["R2_A", "R3_A"], ["R2_B", "R3_B"], ["R3_B", "E_N"]]}
         report["evidence"] = dict(wiring={f"s{stage}": dict(pairs=copy.deepcopy(wirings[stage]), meter="DC")
                                         for stage in [1, 3, 4]})
+    elif lab == "LD9":
+        import math as m9
+        l9_ = [10, 12, 15, 18, 22, 27, 33, 39][a] * 1e-3
+        c9_ = [47, 56, 68, 82, 100, 120, 150, 180][b] * 1e-9
+        qt = 2.0 + 0.5 * ((a + b) % 4)
+        r9_ = round(100 * m9.sqrt(l9_ / c9_) / qt) / 100
+        report["parameters"] = dict(E=5, R=r9_, L=l9_, C=c9_)
+        f0 = 1 / (2 * m9.pi * m9.sqrt(l9_ * c9_))
+        z = m9.hypot(r9_, 0)  # pakaitas; realias reikšmes skaičiuoja ld::ac
+        for point, k in enumerate([0.5, 1.0, 2.0]):
+            f = k * f0
+            xl = 2 * m9.pi * f * l9_
+            xc = 1 / (2 * m9.pi * f * c9_)
+            zz = m9.hypot(r9_, xl - xc)
+            current = 5 / zz
+            values = dict(ur=current * r9_, ul=current * xl, uc=current * xc, i=current * 1000)
+            observation(f"i{point+1}", values["i"], "mA")
+            observation(f"ur{point+1}", values["ur"], "V")
+            observation(f"ul{point+1}", values["ul"], "V")
+            observation(f"uc{point+1}", values["uc"], "V")
+            observation(f"ue{point+1}", 5, "V")
+            if point == 0:
+                first = values
+            elif point == 1:
+                resonant = values
+        vector(1, [f0], ["Hz"])
+        vector(3, [resonant["ul"] / 5, resonant["ul"] - resonant["uc"]], ["1", "V"])
+        vector(5, [m9.hypot(first["ur"], first["ul"] - first["uc"]),
+                   5 / (first["i"] / 1000), first["ur"] / 5,
+                   first["ur"] * first["i"], (first["ul"] - first["uc"]) * first["i"],
+                   5 * first["i"]], ["V", "Ohm", "1", "mW", "mvar", "mVA"])
+        vector(6, [1, 1, 1], ["choice", "choice", "choice"])
+        wiring = [["GEN_P", "K1"], ["K2", "A_P"], ["A_N", "R_A"],
+                  ["R_B", "L_A"], ["L_B", "C_A"], ["C_B", "GEN_N"]]
+        report["evidence"] = dict(wiring={"s1": dict(pairs=copy.deepcopy(wiring), meter="AC")})
     else:
         report["parameters"] = dict(E_RC=9,F_RC=frc,R8=r8,C2=4.7e-6,E_RL=9,F_RL=frl,R9=r9,L1=.5,
                                     E_RLC=5,R13=r13,L3=l,C4=c)
