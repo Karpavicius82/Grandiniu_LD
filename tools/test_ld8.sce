@@ -50,8 +50,10 @@ try
     assert_checktrue(rejected); ld8_measure(); ld8_check_step(); assert_checkfalse(or(LD8.done));
     ld8_toggle_solution(); assert_checkequal(size(LD8.journal,1),0); assert_checkequal(size(LD8.wires,1),0);
     descriptor=mopen(out+"geometry.tsv","wt"); sizes=[1280 720];
+    screen=get(0,"screensize_px"); viewport=min(sizes,max([320 240],screen(3:4)-[40 120]));
     for dimension=1
-        assert_checkequal(matrix(LD8.fig.axes_size,1,-1),sizes);
+        assert_checkequal(matrix(LD8.fig.axes_size,1,-1),viewport);
+        assert_checkequal(student_size(LD8.ui.circuitFrame.parent),sizes);
         for step=1:6
             LD8.step=step; LD8.wireMode=ld8_stage_mode(step); LD8.wires=ld8_canonical_wires(LD8.wireMode);
             LD8.powerOn=%t; LD8.switchOn=%t; ld8_render_stage();
@@ -65,7 +67,8 @@ try
     // This checks the callback contract; it does not emulate an OS drag event.
     LD8.ui.answerEdits(10).string="1,0";
     for dimension=1
-        assert_checkequal(matrix(LD8.fig.axes_size,1,-1),sizes);
+        assert_checkequal(matrix(LD8.fig.axes_size,1,-1),viewport);
+        assert_checkequal(student_size(LD8.ui.circuitFrame.parent),sizes);
         assert_checktrue(LD8.fig.resizefcn<>""); execstr(LD8.fig.resizefcn);
         assert_checkequal(LD8.ui.answerEdits(10).string,"1,0");
         geometry_dump(LD8.fig,"LD8-resize-"+string(dimension),descriptor);
