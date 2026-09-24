@@ -7,7 +7,7 @@ function a=bench_observation(id,value,unit)
 endfunction
 
 function r=bench_report_data(lab)
-    global LD1 LD2 LD3 LD4 LD5 LD6 LD7;
+    global LD1 LD2 LD3 LD4 LD5 LD6 LD7 LD8;
     answers=list(); observations=list(); evidence=struct(); params=struct();
     mode="learning";practice=%f;
     if lab=="LD1" then
@@ -178,6 +178,33 @@ function r=bench_report_data(lab)
         evidence.wiring("s5te")=struct("pairs",bench_pairs(LD7.report_wires(2)),"meter","DC");
         evidence.wiring("s5tj")=struct("pairs",bench_pairs(LD7.report_wires(3)),"meter","DC");
         note="";
+    elseif lab=="LD8" then
+        if isfield(LD8,"demoMode") & LD8.demoMode then error("Grįžkite iš pavyzdžio į savo darbą prieš išsaugodami ataskaitą."); end
+        st=LD8.student; cfg=LD8.cfg;
+        if isfield(LD8,"assessment") then if LD8.assessment then mode="assessment"; end; end
+        if isfield(LD8,"practice_used") then practice=LD8.practice_used; end
+        specs=["2" "1" "Ohm";"2" "2" "Ohm";"3" "1" "Ohm";"3" "2" "Ohm"; ...
+               "4" "1" "Ohm";"4" "2" "Ohm";"5" "1" "mA";"5" "2" "mA";"5" "3" "mA"; ...
+               "6" "1" "choice";"6" "2" "choice";"6" "3" "choice"];
+        for k=1:size(specs,1)
+            step=bench_safe_number(specs(k,1)); q=bench_safe_number(specs(k,2));
+            answers($+1)=bench_answer(msprintf("s%d.q%d",step,q),LD8.answers(step,q),specs(k,3));
+        end
+        if isfield(LD8,"journal") & LD8.journal<>[] then
+            for tag=1:3
+                row=find(LD8.journal(:,3)==tag);
+                if row<>[] then
+                    observations($+1)=bench_observation(msprintf("u%d",tag),LD8.journal(row(1),1),"V");
+                    observations($+1)=bench_observation(msprintf("i%d",tag),LD8.journal(row(1),2),"mA");
+                end
+            end
+        end
+        params=struct("E",cfg.E,"R1",cfg.R1,"R2",cfg.R2,"R3",cfg.R3);
+        evidence.wiring=struct();
+        evidence.wiring("s1")=struct("pairs",bench_pairs(LD8.report_wires(1)),"meter","DC");
+        evidence.wiring("s3")=struct("pairs",bench_pairs(LD8.report_wires(2)),"meter","DC");
+        evidence.wiring("s4")=struct("pairs",bench_pairs(LD8.report_wires(3)),"meter","DC");
+        note="";
     else
         if LD2.example_active then error("Grįžkite iš pavyzdžio į savo darbą prieš išsaugodami ataskaitą."); end
         s=LD2.state; st=s.student; cfg=LD2.cfg;
@@ -234,7 +261,7 @@ function path=bench_export_report(lab,folder)
 endfunction
 
 function path=bench_export_current(lab)
-    global LD1 LD2 LD3 LD4 LD5 LD6 LD7;
+    global LD1 LD2 LD3 LD4 LD5 LD6 LD7 LD8;
     path="";
     try
         if lab=="LD1" then ld1_save_step_inputs();
@@ -243,6 +270,7 @@ function path=bench_export_current(lab)
         elseif lab=="LD5" then ld5_save_answers();
         elseif lab=="LD6" then ld6_save_answers();
         elseif lab=="LD7" then ld7_save_answers();
+        elseif lab=="LD8" then ld8_save_answers();
         else ld2_save_answers(); end
         path=bench_export_report(lab);
         if lab=="LD1" then ld1_set_status("Ataskaita išsaugota: "+path,"ok","Persiųskite šį HTML failą dėstytojui.");
@@ -250,6 +278,7 @@ function path=bench_export_current(lab)
         elseif lab=="LD4" then ld4_set_status("Ataskaita išsaugota: "+path,"ok","Persiųskite šį HTML failą dėstytojui.");
         elseif lab=="LD5" then ld5_set_status("Ataskaita išsaugota: "+path,"ok","Persiūskite šį HTML failą dėstytojui.");
         elseif lab=="LD6" then ld6_set_status("Ataskaita išsaugota: "+path,"ok","Persiųskite šį HTML failą dėstytojui.");
+        elseif lab=="LD8" then ld8_set_status("Ataskaita išsaugota: "+path,"ok","Persiųskite šį HTML failą dėstytojui.");
         elseif lab=="LD7" then ld7_set_status("Ataskaita išsaugota: "+path,"ok","Persiųskite šį HTML failą dėstytojui.");
         else ld2_set_status("Ataskaita išsaugota: "+path+". Persiųskite šį HTML failą dėstytojui.","ok"); end
         bench_report_saved(path,"Ataskaita išsaugota");
@@ -260,6 +289,7 @@ function path=bench_export_current(lab)
         elseif lab=="LD5" then ld5_set_status(strcat(lasterror()," "),"error","");
         elseif lab=="LD6" then ld6_set_status(strcat(lasterror()," "),"error","");
         elseif lab=="LD7" then ld7_set_status(strcat(lasterror()," "),"error","");
+        elseif lab=="LD8" then ld8_set_status(strcat(lasterror()," "),"error","");
         else ld2_set_status(strcat(lasterror()," "),"error"); end
     end
 endfunction

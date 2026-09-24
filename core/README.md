@@ -1,6 +1,6 @@
 # Bendras C++ branduolys ir automatinis vertinimas
 
-Versija 0.3.0. Įgyvendintas **LD1–LD7** ataskaitų vertinimas, kiekvienam po 64 pastovius variantus. Kitų 6 darbų ši versija dar nevertina. [Ankstesnis 2026-09-13 patikros protokolas](../audits/closure-2026-09-13/README.md). Tai vidiniams priėmimo bandymams skirtas leidimas, ne išorinė aprobacija.
+Versija 0.3.0. Įgyvendintas **LD1–LD8** ataskaitų vertinimas, kiekvienam po 64 pastovius variantus. Kitų 5 darbų ši versija dar nevertina. [Ankstesnis 2026-09-13 patikros protokolas](../audits/closure-2026-09-13/README.md). Tai vidiniams priėmimo bandymams skirtas leidimas, ne išorinė aprobacija.
 
 Studentas atveria `STENDAS.sce`, įveda vardą, grupę ir eilės numerį. Atsiskaitymo režime mygtukas **Įrašyti ir toliau** išsaugo ir klaidingus atsakymus. Pabaigoje **Išsaugoti ataskaitą** sukuria vieną HTML failą naudotojo aplanke `Grandiniu_LD_darbai`. Tą failą studentas persiunčia dėstytojui. Ataskaitą galima sukurti ir nebaigus darbo, per Pagalbą. Mokymosi režimas, pavyzdžiai ir juodraščio atvėrimas yra Pagalboje.
 
@@ -17,6 +17,8 @@ Originalūs failai nekeičiami. Po kiekvienų 25 failų įrašomas tarpinis rezu
 LD6 revizija 2, bankas `LD6-64-B-2026`, rubrika `LD6-2`: 25 vienodo svorio kriterijai – 11 atsakymų, 10 matavimo reikšmių ir keturių režimų laidų įrodymai. MNA skaičiuoja E1, nuoseklų, priešpriešinį ir lygiagretų jungimą su r1 = r2 = 10 Ω. Apkrovos įtampos ir srovės ženklas išlaikomas, šaltinio srovė teigiama atiduodant energiją. LD6 atsakymų tolerancijos: 1 % įtampai ir E1 srovei, 2 % kitoms srovėms, papildomai 1e-9 atsakymo vienetais; pasirinkimai tikslūs. Ankstesnis LD6 bankas A ir revizija 1 toliau vertinami pagal seną 14 kriterijų rubriką.
 
 LD7, bankas `LD7-64-A-2026`, rubrika `LD7-1`: 27 vienodo svorio kriterijai – 12 atsakymų, 12 matavimo reikšmių (penkios padėtys U ir I, tuščiosios eigos U0, trumpojo jungimo Ik) ir trijų sujungimų laidų įrodymai. MNA skaičiuoja tą pačią išorinę charakteristiką U = E − r·I per visą padėčių diapazoną; tuščioji eiga modeliuojama 1 MΩ, trumpasis jungimas – 1 µΩ apkrova. LD7 atsakymų tolerancijos: 3 % vidinei varžai r (du taškai), 1 % įtampai ir E patikrai, 2 % galiai bei srovei, pasirinkimai tikslūs.
+
+LD8, bankas `LD8-64-A-2026`, rubrika `LD8-1`: 21 vienodo svorio kriterijus – 12 atsakymų (teorinės ir eksperimentinėms varžoms trims grandinėms, šakų srovės, išvados), 6 matavimo reikšmės (U ir I kiekvienai grandinei) ir 3 sujungimų laidų įrodymai. Matavimai skaičiuojami tikru trijų varžų MNA tinklu per `bench_cpp_dc`: nuoseklioji, lygiagretė ir mišrioji topologija. Tolerancijos: 1 % teorinėms varžoms, 2 % eksperimentinėms ir srovėms, U matuojama 0,005 V; pasirinkimai tikslūs.
 
 `LD1-2` (automatinis stendo paruošimas): 15 studento atsakymų kriterijų. Penki matavimai ir du sujungimai išlieka diagnostikoje, tačiau turi 0 balų svorį.
 

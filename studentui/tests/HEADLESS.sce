@@ -2,9 +2,9 @@ mode(-1);
 root=get_absolute_file_path("HEADLESS.sce")+"../";
 try
     if ~isdir(root+"tests/results") then mkdir(root+"tests/results"); end
-    exec(root+"LD1/LD1_LOAD.sce",-1); exec(root+"LD2/LD2_LOAD.sce",-1); exec(root+"LD3/LD3_LOAD.sce",-1); exec(root+"LD4/LD4_LOAD.sce",-1); exec(root+"LD5/LD5_LOAD.sce",-1); exec(root+"LD6/LD6_LOAD.sce",-1); exec(root+"LD7/LD7_LOAD.sce",-1);
+    exec(root+"LD1/LD1_LOAD.sce",-1); exec(root+"LD2/LD2_LOAD.sce",-1); exec(root+"LD3/LD3_LOAD.sce",-1); exec(root+"LD4/LD4_LOAD.sce",-1); exec(root+"LD5/LD5_LOAD.sce",-1); exec(root+"LD6/LD6_LOAD.sce",-1); exec(root+"LD7/LD7_LOAD.sce",-1); exec(root+"LD8/LD8_LOAD.sce",-1);
     exec(root+"tests/workflows.sci",-1);
-    global LD1 LD2 LD3 LD4 LD5 LD6 LD7;
+    global LD1 LD2 LD3 LD4 LD5 LD6 LD7 LD8;
     [ok,log]=ld2_selftest(); mputl(log,root+"LD2/LD2_SELFTEST_LAST.txt");
     if ~ok then disp(log); error("LD2 bazinė savikontrolė nepraėjo."); end
     for invalid=["0" "65" "1.5" "1+2" "1e1" "%nan" "" "abc"]
@@ -112,8 +112,22 @@ try
         table7($+1)=msprintf("LD7-V%02d;%g;%g;%g;%g;%g;%g;%g",n,c.E,c.r,c.R1,c.R2,c.R3,c.R4,c.R5);
     end
     mputl(table7,root+"LD7/VARIANTAI.csv");
+    table8="Variantas;E;R1;R2;R3;R1nom;R2nom;R3nom";
+    for n=1:64
+        c=ld8_variant_config(n); [v8,w8]=ld8_validate_config(c);
+        assert_checktrue(v8);
+        // Varžų jungimo dėsniai: serija didžiausia, lygiagretė mažiausia, mišri tarp jų.
+        ser=c.R1+c.R2+c.R3;
+        par=1/(1/c.R1+1/c.R2+1/c.R3);
+        mis=c.R1+c.R2*c.R3/(c.R2+c.R3);
+        assert_checktrue(ser>max([c.R1 c.R2 c.R3]));
+        assert_checktrue(par<min([c.R1 c.R2 c.R3]));
+        assert_checktrue(par<mis & mis<ser);
+        table8($+1)=msprintf("LD8-V%02d;%g;%g;%g;%g;%g;%g;%g",n,c.E,c.R1,c.R2,c.R3,c.R1nom,c.R2nom,c.R3nom);
+    end
+    mputl(table8,root+"LD8/VARIANTAI.csv");
     // Instrukcijų <-> registrų konsistencija (analogas: tools/check_instruction_registry.py).
-    codes1=ld1_all_codes(); codes2=ld2_all_codes(); codes3=ld3_all_codes(); codes4=ld4_all_codes(); codes5=ld5_all_codes(); codes6=ld6_all_codes(); codes7=ld7_all_codes();
+    codes1=ld1_all_codes(); codes2=ld2_all_codes(); codes3=ld3_all_codes(); codes4=ld4_all_codes(); codes5=ld5_all_codes(); codes6=ld6_all_codes(); codes7=ld7_all_codes(); codes8=ld8_all_codes();
     n1=size(codes1,1); n2=size(codes2,1); n3=size(codes3,1);
     if n1<40 then error("LD1 registras per mažas: "+string(n1)+" kodų (tikėtasi ne mažiau 40)."); end
     if n2<50 then error("LD2 registras per mažas: "+string(n2)+" kodų (tikėtasi ne mažiau 50)."); end
@@ -140,6 +154,10 @@ try
     if n7<35 then error("LD7 registras per mažas: "+string(n7)); end
     if size(unique(codes7),1)<>n7 then error("LD7 registre pasikartoja kodai."); end
     if size(find(codes7=="T01"),"*")==0 | size(find(codes7=="B01"),"*")==0 then error("LD7 registre trūksta T01/B01."); end
+    n8=size(codes8,1);
+    if n8<35 then error("LD8 registras per mažas: "+string(n8)); end
+    if size(unique(codes8),1)<>n8 then error("LD8 registre pasikartoja kodai."); end
+    if size(find(codes8=="T01"),"*")==0 | size(find(codes8=="B01"),"*")==0 then error("LD8 registre trūksta T01/B01."); end
     // Deklaracijos (REGISTRY-CODES) ir generatoriaus (ld*_all_codes) tapatumas abi kryptimis.
     function r=ldx_digit(ch)
         r=%f;
@@ -186,6 +204,7 @@ try
     [decl5,pb5]=ldx_declared(root+"LD5/ld5_ids.sci");
     [decl6,pb6]=ldx_declared(root+"LD6/ld6_ids.sci");
     [decl7,pb7]=ldx_declared(root+"LD7/ld7_ids.sci");
+    [decl8,pb8]=ldx_declared(root+"LD8/ld8_ids.sci");
     if pb1<>[] then error("LD1 deklaracijos klaida: "+strcat(pb1,"; ")); end
     if pb2<>[] then error("LD2 deklaracijos klaida: "+strcat(pb2,"; ")); end
     if pb3<>[] then error("LD3 deklaracijos klaida: "+strcat(pb3,"; ")); end
@@ -193,6 +212,7 @@ try
     if pb5<>[] then error("LD5 deklaracijos klaida: "+strcat(pb5,"; ")); end
     if pb6<>[] then error("LD6 deklaracijos klaida: "+strcat(pb6,"; ")); end
     if pb7<>[] then error("LD7 deklaracijos klaida: "+strcat(pb7,"; ")); end
+    if pb8<>[] then error("LD8 deklaracijos klaida: "+strcat(pb8,"; ")); end
     for c=1:n1
         if size(find(decl1==codes1(c)),"*")==0 then error("LD1 generuotas kodas "+codes1(c)+" nėra REGISTRY-CODES deklaracijoje."); end
     end
@@ -229,8 +249,14 @@ try
     for c=1:size(decl7,"*")
         if size(find(codes7==decl7(c)),"*")==0 then error("LD7 deklaruotas kodas "+decl7(c)+" negeneruojamas."); end
     end
-    mprintf("REGISTRY_OK: LD1 %d, LD2 %d, LD3 %d, LD4 %d, LD5 %d, LD6 %d, LD7 %d kodų — unikalūs, pavyzdiniai T01/B01 rasti\n",n1,n2,n3,n4,n5,n6,n7);
-    mprintf("HEADLESS_PASS: 64 LD1 + 64 LD2 + 64 LD3 + 64 LD4 + 64 LD5 + 64 LD6 + 64 LD7 variantai, įvesties atmetimas, 768 LD2 etapų, Ohmo modelis, sesijos atkūrimas\n");
+    for c=1:n8
+        if size(find(decl8==codes8(c)),"*")==0 then error("LD8 generuotas kodas "+codes8(c)+" nėra deklaracijoje."); end
+    end
+    for c=1:size(decl8,"*")
+        if size(find(codes8==decl8(c)),"*")==0 then error("LD8 deklaruotas kodas "+decl8(c)+" negeneruojamas."); end
+    end
+    mprintf("REGISTRY_OK: LD1 %d, LD2 %d, LD3 %d, LD4 %d, LD5 %d, LD6 %d, LD7 %d, LD8 %d kodų — unikalūs, pavyzdiniai T01/B01 rasti\n",n1,n2,n3,n4,n5,n6,n7,n8);
+    mprintf("HEADLESS_PASS: 64 LD1 + 64 LD2 + 64 LD3 + 64 LD4 + 64 LD5 + 64 LD6 + 64 LD7 + 64 LD8 variantai, įvesties atmetimas, 768 LD2 etapų, Ohmo modelis, sesijos atkūrimas\n");
     exit(0);
 catch
     mprintf("HEADLESS_FAIL: %s\n",strcat(lasterror()," | ")); exit(1);

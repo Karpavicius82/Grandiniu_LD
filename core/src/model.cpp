@@ -36,12 +36,21 @@ Bank bank(int variant) {
     const double m7[]={0.33,0.56,1.0,1.8,3.0};
     double w7[5];
     for(int k=0;k<5;++k) w7[k]=std::round(m7[k]*rv7[a]*10)/10.0;
+    // LD8-64-A-2026: varžų jungimo tyrimas — trys rezistoriai E24 nominalais
+    // (R1 pagal eilutę, R2 pagal stulpelį, R3 pagal (a+b)%8) su ±5 % nuokrypiais.
+    const double n8a[]={100,120,150,180,220,270,330,390};
+    const double n8b[]={470,560,680,820,1000,1200,1500,1800};
+    const double n8c[]={220,270,330,390,470,560,680,820};
+    const double d8a=(variant%11)-5,d8b=((3*variant)%11)-5,d8c=((5*variant)%11)-5;
+    const double e8a=std::round(n8a[a]*(1+d8a/100.0)*10)/10.0;
+    const double e8b=std::round(n8b[b]*(1+d8b/100.0)*10)/10.0;
+    const double e8c=std::round(n8c[(a+b)%8]*(1+d8c/100.0)*10)/10.0;
     return {dc[a],dc[b],dc[(a+b)%8],rc[a],35+5.0*(b+1),rl[b],35+5.0*(a+1),
             std::round(std::sqrt(l/c)/(2.8+.35*(a+1)+.20*(b+1))),l,c,
             uu[b][0],uu[b][1],uu[b][2],rld[a],
             n1[a],n2[b],a1,a2,
             pp[b][0],pp[b][1],pp[b][2],
-            (double)e2v[b],r6,(double)r6n[a],ev7[b],(double)rv7[a],w7[0],w7[1],w7[2],w7[3],w7[4]};
+            (double)e2v[b],r6,(double)r6n[a],ev7[b],(double)rv7[a],w7[0],w7[1],w7[2],w7[3],w7[4],e8a,e8b,e8c};
 }
 Values ac(int kind,double E,double f,double R,double L,double C) {
     for(double v:{E,f,R,L,C}) if(!std::isfinite(v)) throw std::runtime_error("non_finite");

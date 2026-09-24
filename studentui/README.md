@@ -33,6 +33,13 @@ Pavyzdžio peržiūra nekeičia jūsų matavimų ir jos negalima pateikti kaip a
 LD5 skaičiavimams ir ataskaitų vertinimui naudojamas bendras C++ branduolys.
 LD5 turi 64 pastovius variantus: `LD5/VARIANTAI.csv`.
 
+**LD8 – varžų nuoseklus, lygiagretus ir mišrus jungimas:** šeši etapai, trys studento
+sujungiamos grandinės: nuoseklioji (R1→R2→R3), lygiagretė (visos varžos tarp tų pačių
+mazgų) ir mišrioji (R1 nuosekliai su lygiagrečiais R2 ir R3). Voltmetro zondai prie
+šaltinio galų; kiekvienoje grandinėje matuojami U ir I, žurnale rodoma Re = U/I.
+Skaičiuojamos teorinės ir eksperimentinės varžos bei lygiagretės grandinės šakų srovės.
+64 variantai: `LD8/VARIANTAI.csv`, bankas `LD8-64-A-2026`, ataskaitos revizija 1.
+
 **LD7 – įtampos, srovės ir galios suderinamumas:** šeši etapai, trys sujungimai:
 darbinė grandinė E → jungiklis → ampermetras → reostatas R (penkios padėtys P1–P5),
 tuščioji eiga (voltmetras prie šaltinio) ir trumpasis jungimas (ampermetras vietoj krovinio).
@@ -75,7 +82,7 @@ Paketai nėra pasirašyti Apple Developer sertifikatu ar notarizuoti.
 Linux: `./PALEISTI.sh`. Scilab aplinkoje: vykdykite `STENDAS.sce` ir pasirinkite darbą.
 Windows: dukart paspauskite `PALEISTI.bat` arba vykdykite `STENDAS.sce` grafiniame
 Scilab lange. `bin/ldcheck.exe` skirtas dėstytojo ataskaitų tikrinimui.
-Atskirai galima vykdyti atitinkamą `LD1/LD1.sce`–`LD7/LD7.sce` failą.
+Atskirai galima vykdyti atitinkamą `LD1/LD1.sce`–`LD8/LD8.sce` failą.
 Paleidiklis ieško įdiegto Scilab; prireikus nurodykite `SCILAB_BIN=/visas/kelias/bin/scilab`.
 
 Paketą platinkite atsisiuntimo nuoroda. Gmail gali blokuoti archyvą dėl jame esančių

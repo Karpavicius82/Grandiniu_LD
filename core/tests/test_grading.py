@@ -153,6 +153,28 @@ def fixture(lab, n, identity):
                              ["V_P", "R_A"], ["V_N", "R_B"]], "meter": "DC"},
             "s5te": {"pairs": [["V_P", "E_P"], ["V_N", "E_N"]], "meter": "DC"},
             "s5tj": {"pairs": [["E_P", "K1"], ["K2", "A_P"], ["A_N", "E_N"]], "meter": "DC"}})
+    elif lab == "LD8":
+        a8 = round([100, 120, 150, 180, 220, 270, 330, 390][a] * (1 + (n % 11 - 5) / 100) * 10) / 10
+        b8 = round([470, 560, 680, 820, 1000, 1200, 1500, 1800][b] * (1 + ((3 * n) % 11 - 5) / 100) * 10) / 10
+        c8 = round([220, 270, 330, 390, 470, 560, 680, 820][(a + b) % 8] * (1 + ((5 * n) % 11 - 5) / 100) * 10) / 10
+        report["parameters"] = dict(E=12, R1=a8, R2=b8, R3=c8)
+        series = a8 + b8 + c8
+        parallel = 1 / (1 / a8 + 1 / b8 + 1 / c8)
+        mixed = a8 + b8 * c8 / (b8 + c8)
+        for k, rr in [(1, series), (2, parallel), (3, mixed)]:
+            observation(f"u{k}", 12, "V")
+            observation(f"i{k}", 12 / rr * 1000, "mA")
+        vector(2, [series, series], ["Ohm", "Ohm"])
+        vector(3, [parallel, parallel], ["Ohm", "Ohm"])
+        vector(4, [mixed, mixed], ["Ohm", "Ohm"])
+        vector(5, [12 / a8 * 1000, 12 / b8 * 1000, 12 / c8 * 1000], ["mA"] * 3)
+        vector(6, [1, 1, 1], ["choice", "choice", "choice"])
+        base = [["E_P", "K1"], ["K2", "A_P"], ["A_N", "R1_A"], ["V_P", "E_P"], ["V_N", "E_N"]]
+        wirings = {1: base + [["R1_B", "R2_A"], ["R2_B", "R3_A"], ["R3_B", "E_N"]],
+                   3: base + [["R1_A", "R2_A"], ["R2_A", "R3_A"], ["R1_B", "E_N"], ["R1_B", "R2_B"], ["R2_B", "R3_B"]],
+                   4: base + [["R1_B", "R2_A"], ["R2_A", "R3_A"], ["R2_B", "R3_B"], ["R3_B", "E_N"]]}
+        report["evidence"] = dict(wiring={f"s{stage}": dict(pairs=copy.deepcopy(wirings[stage]), meter="DC")
+                                        for stage in [1, 3, 4]})
     else:
         report["parameters"] = dict(E_RC=9,F_RC=frc,R8=r8,C2=4.7e-6,E_RL=9,F_RL=frl,R9=r9,L1=.5,
                                     E_RLC=5,R13=r13,L3=l,C4=c)

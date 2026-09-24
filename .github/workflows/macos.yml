@@ -49,6 +49,7 @@ jobs:
           python tools/test_ld5.py --scilab "$SCILAB_BIN" --checker build/layoutcheck --grader build/ldcheck --output "$RUNNER_TEMP/ld5-ui"
           python tools/test_ld6.py --scilab "$SCILAB_BIN" --checker build/layoutcheck --grader build/ldcheck --output "$RUNNER_TEMP/ld6-ui"
           python tools/test_ld7.py --scilab "$SCILAB_BIN" --checker build/layoutcheck --grader build/ldcheck --output "$RUNNER_TEMP/ld7-ui"
+          python tools/test_ld8.py --scilab "$SCILAB_BIN" --checker build/layoutcheck --grader build/ldcheck --output "$RUNNER_TEMP/ld8-ui"
           python tools/test_student_delivery.py --scilab "$SCILAB_BIN" --grader build/ldcheck --output "$RUNNER_TEMP/delivery"
       - uses: actions/upload-artifact@v4
         if: always()

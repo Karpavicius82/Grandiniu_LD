@@ -740,3 +740,98 @@ function bench_ld7_workflow(number,root,gui)
         delete(LD7.fig);
     end
 endfunction
+
+
+// ------------------------------- LD8 ----------------------------------------
+function bench_ld8_action(callback)
+    global LD8;
+    if LD8.ui.headless then execstr(callback); return; end
+    for k=1:size(LD8.ui.dynamic,"*")
+        h=LD8.ui.dynamic(k);
+        if h.callback==callback then bench_button(h); return; end
+    end
+    error("Nėra matomo LD8 mygtuko: "+callback);
+endfunction
+
+function bench_ld8_click(id)
+    bench_ld8_action(msprintf("ld8_terminal_click(""%s"")",id));
+endfunction
+
+function bench_ld8_primary()
+    global LD8;
+    if LD8.ui.headless then ld8_student_primary();
+    else bench_button(LD8.ui.studentPrimary); end
+endfunction
+
+function bench_ld8_answers(step,values)
+    global LD8;
+    if LD8.ui.headless then ld8_test_answers(step,values); return; end
+    value_index=1;
+    for index=1:12
+        [answer_step,slot]=ld8_answer_slot(index);
+        if answer_step==step then
+            LD8.ui.answerEdits(index).string=msprintf("%.17g",values(value_index));
+            value_index=value_index+1;
+        end
+    end
+endfunction
+
+function bench_ld8_connect(mode)
+    global LD8;
+    wires=ld8_canonical_wires(mode);
+    assert_checkequal(size(LD8.wires,1),0);
+    for index=1:size(wires,1)
+        bench_ld8_click(wires(index,1)); bench_ld8_click(wires(index,2));
+    end
+    bench_ld8_click(wires($,1)); bench_ld8_click(wires($,2));
+    [valid,message]=ld8_wiring_valid(LD8.wires); assert_checkfalse(valid);
+    bench_ld8_click(wires($,2)); bench_ld8_click(wires($,1));
+    [valid,message]=ld8_wiring_valid(LD8.wires); assert_checktrue(valid);
+endfunction
+
+function bench_ld8_workflow(number,root,gui)
+    global LD8;
+    if argn(2)<3 then gui=%f; end
+    cfg=ld8_variant_config(number); [valid,message]=ld8_validate_config(cfg); assert_checktrue(valid);
+    LD8=struct("cfg",cfg,"student",student_profile(number,"Automatinė Patikra","TEST","LD8"),"ui",struct("headless",~gui));
+    ld8_start();
+    series=cfg.R1+cfg.R2+cfg.R3;
+    parallel=1/(1/cfg.R1+1/cfg.R2+1/cfg.R3);
+    mixed=cfg.R1+cfg.R2*cfg.R3/(cfg.R2+cfg.R3);
+    for step=1:6
+        assert_checkequal(LD8.step,step);
+        select step
+        case 1 then
+            bench_ld8_connect(1);
+            bench_ld8_action("ld8_toggle_power()"); bench_ld8_action("ld8_toggle_switch()"); bench_ld8_action("ld8_measure()");
+            bench_ld8_action("ld8_toggle_power()");
+        case 2 then
+            bench_ld8_answers(step,[series series]);
+        case 3 then
+            bench_ld8_connect(2);
+            bench_ld8_action("ld8_toggle_power()"); bench_ld8_action("ld8_toggle_switch()"); bench_ld8_action("ld8_measure()");
+            bench_ld8_action("ld8_toggle_power()");
+            bench_ld8_answers(step,[parallel parallel]);
+        case 4 then
+            bench_ld8_connect(3);
+            bench_ld8_action("ld8_toggle_power()"); bench_ld8_action("ld8_toggle_switch()"); bench_ld8_action("ld8_measure()");
+            bench_ld8_action("ld8_toggle_power()");
+            bench_ld8_answers(step,[mixed mixed]);
+        case 5 then
+            bench_ld8_answers(step,[12/cfg.R1*1000 12/cfg.R2*1000 12/cfg.R3*1000]);
+        case 6 then
+            bench_ld8_answers(step,[1 1 1]);
+        end
+        bench_ld8_primary();
+        if ~LD8.done(step) then error("LD8 variantas "+string(number)+", etapas "+string(step)); end
+        if gui then mprintf("PASS LD8 V%02d: etapas %d\n",number,step); end
+    end
+    assert_checktrue(and(LD8.done)); assert_checkequal(size(LD8.journal,1),3);
+    if gui then
+        before=size(listfiles(bench_documents()+"/*.html"),"*");
+        bench_ld8_primary();
+        assert_checkequal(size(listfiles(bench_documents()+"/*.html"),"*"),before+1);
+        assert_checktrue(strindex(LD8.ui.statusMain.string,"Ataskaita išsaugota")<>[]);
+        delete(LD8.fig);
+    end
+endfunction
