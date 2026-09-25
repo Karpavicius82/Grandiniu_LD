@@ -751,6 +751,64 @@ void grade_ld11(Grader& grader,const Json& report,const Bank& variant) {
             valid?"Patikrinkite seką ir zondus prie generatoriaus.":"Trūksta tinkamo sujungimo įrodymo.",valid?"":"missing_evidence");
     }
 }
+bool ld12_wiring(const Json& pairs,bool& valid,int mode=1) {
+    // Terminalai: L1 L2 L3 N; imtuvai R1(a/b), R2, R3.
+    // Žvaigždė (4): L1–R1a, L2–R2a, L3–R3a, R1b–N, R2b–N, R3b–N → 6 laidai.
+    // Trikampis: R1 tarp L1–L2, R2 tarp L2–L3, R3 tarp L3–L1 → 6 laidai.
+    std::vector<std::pair<std::string,std::string>> required;
+    if(mode==1) required={{"L1","R1_A"},{"L2","R2_A"},{"L3","R3_A"},{"R1_B","R2_B"},{"R2_B","R3_B"},{"R3_B","N"}};
+    else required={{"L1","R1_A"},{"R1_B","L2"},{"L2","R2_A"},{"R2_B","L3"},{"L3","R3_A"},{"R3_B","L1"}};
+    try {
+        if(!pairs.is_array()) {valid=false;return false;}
+        if(pairs.size()!=required.size()) return false;
+        std::set<std::pair<std::string,std::string>> unique,canonical;
+        for(const auto& wire:required) canonical.insert({std::min(wire.first,wire.second),std::max(wire.first,wire.second)});
+        for(auto& w:pairs) {
+            if(!w.is_array()||w.size()!=2) {valid=false;return false;}
+            const auto a=text(w.at(0)),b2=text(w.at(1));
+            if(a.empty()||b2.empty()) {valid=false;return false;}
+            if(!unique.insert({std::min(a,b2),std::max(a,b2)}).second) return false;
+        }
+        return unique==canonical;
+    } catch(const std::exception&) {valid=false;return false;}
+}
+void grade_ld12(Grader& grader,const Json& report,const Bank& variant) {
+    parameters(report,{{"Ul",variant.e12u},{"R",variant.e12r}});
+    const double Ul=variant.e12u,R=variant.e12r;
+    const double phase=Ul/std::sqrt(3.0);
+    const double i_star=phase/R*1000;         // žvaigždė: fazinė = linijinė srovė
+    const double i_ph_delta=Ul/R*1000;        // trikampis: fazinė srovė
+    const double i_line_delta=i_ph_delta*std::sqrt(3.0);
+    const double p_star=Ul*Ul/R;
+    const double p_delta=3.0*Ul*Ul/R;   // P = 3·Uf²/R abiem jungimais
+    grader.measured("i1s","Matavimas (žvaigždė): I1 linijinė",i_star,"mA",.02);
+    grader.measured("i2s","Matavimas (žvaigždė): I2",i_star,"mA",.02);
+    grader.measured("i3s","Matavimas (žvaigždė): I3",i_star,"mA",.02);
+    grader.measured("i1d","Matavimas (trikampis): fazinė I12",i_ph_delta,"mA",.02);
+    grader.measured("i2d","Matavimas (trikampis): fazinė I23",i_ph_delta,"mA",.02);
+    grader.measured("i3d","Matavimas (trikampis): fazinė I31",i_ph_delta,"mA",.02);
+    grader.measured("ild","Matavimas (trikampis): linijinė I1",i_line_delta,"mA",.02);
+    grader.answer("s1.q1","Fazinė įtampa žvaigždėje: Uf = Ul/√3",phase,"V","Uf = Ul/√3.",.01,1e-9);
+    grader.answer("s2.q1","Žvaigždės fazinė srovė: If = Uf/R",i_star,"mA","If = Uf/R, mA.",.02,1e-9);
+    grader.answer("s3.q1","Trikampio fazinė įtampa",Ul,"V","Trikampyje Uf = Ul.",0,.005);
+    grader.answer("s4.q1","Trikampio fazinė srovė: If = Ul/R",i_ph_delta,"mA","If = Ul/R, mA.",.02,1e-9);
+    grader.answer("s5.q1","Trikampio linijinė srovė: Il = √3·If",i_line_delta,"mA","Il = √3·If, mA.",.02,1e-9);
+    grader.answer("s5.q2","Trikampio galia: P = √3·Ul·Il",p_delta*1000,"mW","P = √3·Ul·Il, W → mW.",.02,1e-9);
+    grader.answer("s5.q3","Žvaigždės galia: P = 3·Uf·If",p_star*1000,"mW","P = 3·Uf·If, W → mW.",.02,1e-9);
+    grader.answer("s6.q1","Išvada: žvaigždėje fazinė ir linijinė srovės vienodos",1,"choice","1 – Taip, 2 – Ne.",0,0);
+    grader.answer("s6.q2","Išvada: trikampyje Il = √3·If",1,"choice","1 – Taip, 2 – Ne.",0,0);
+    grader.answer("s6.q3","Išvada: trikampio galia tris kartus didesnė už žvaigždės",1,"choice","1 – Taip, 2 – Ne.",0,0);
+    const std::pair<const char*,int> wiring_stages[]={{"s1",1},{"s3",2}};
+    const char* wiring_labels[2]={"Sujungimas (žvaigždė): L1/L2/L3 → imtuvai → bendras neutralis N",
+                                  "Sujungimas (trikampis): imtuvai tarp linijų L1–L2, L2–L3, L3–L1"};
+    for(auto& entry:wiring_stages) {
+        bool valid=true,correct=false;
+        try {correct=ld12_wiring(report.at("evidence").at("wiring").at(entry.first).at("pairs"),valid,entry.second);}
+        catch(const std::exception&) {valid=false;}
+        grader.add(std::string(entry.first)+".wiring",wiring_labels[entry.second-1],correct,
+            valid?"Patikrinkite, ar kiekvienas imtuvas jungiamas pagal schemą.":"Trūksta tinkamo sujungimo įrodymo.",valid?"":"missing_evidence");
+    }
+}
 void grade_ld3(Grader& g,const Json& r,const Bank& b) {
     parameters(r,{{"R",b.r},{"U1",b.u1},{"U2",b.u2},{"U3",b.u3}});
     const double uu[3]={b.u1,b.u2,b.u3},im[3]={b.u1/b.r*1000,b.u2/b.r*1000,b.u3/b.r*1000};
@@ -804,7 +862,7 @@ Json read_report(const std::filesystem::path& path) {
 }
 Json grade(const Json& r) {
     require(r.at("schema_version").is_number_integer()&&r.at("schema_version")==1,"unsupported_schema");
-    auto lab=text(r.at("lab_id"));require(lab=="LD1"||lab=="LD2"||lab=="LD3"||lab=="LD4"||lab=="LD5"||lab=="LD6"||lab=="LD7"||lab=="LD8"||lab=="LD9"||lab=="LD10"||lab=="LD11","unsupported_lab");
+    auto lab=text(r.at("lab_id"));require(lab=="LD1"||lab=="LD2"||lab=="LD3"||lab=="LD4"||lab=="LD5"||lab=="LD6"||lab=="LD7"||lab=="LD8"||lab=="LD9"||lab=="LD10"||lab=="LD11"||lab=="LD12","unsupported_lab");
     const bool sources_revision=lab=="LD6"&&r.at("lab_revision")=="2"&&r.at("rubric_version")=="LD6-2"&&r.at("bank_id")=="LD6-64-B-2026";
     const bool guided_revision=lab=="LD1"&&r.at("lab_revision")=="2"&&r.at("rubric_version")=="LD1-2"&&r.at("bank_id")=="LD1-64-A-2026";
     require(sources_revision||guided_revision||(r.at("lab_revision")=="1"&&r.at("rubric_version")==lab+"-1"&&r.at("bank_id")==lab+"-64-A-2026"),"unsupported_version");
@@ -818,7 +876,7 @@ Json grade(const Json& r) {
     auto id=text(r.at("submission_id"),128);require(!id.empty(),"submission_identity");
     require(r.at("mode")=="learning"||r.at("mode")=="assessment","mode");
     text(r.at("note"),32000);
-    Grader g(r);if(lab=="LD1") grade_dc(g,r,b);else if(lab=="LD2") grade_ac(g,r,b);else if(lab=="LD3") grade_ld3(g,r,b);else if(lab=="LD4") grade_ld4(g,r,b);else if(lab=="LD5") grade_ld5(g,r,b);else if(lab=="LD7") grade_ld7(g,r,b);else if(lab=="LD8") grade_ld8(g,r,b);else if(lab=="LD9") grade_ld9(g,r,b);else if(lab=="LD10") grade_ld10(g,r,b);else if(lab=="LD11") grade_ld11(g,r,b);else if(sources_revision) grade_ld6_sources(g,r,b);else grade_ld6(g,r,b);g.finish();
+    Grader g(r);if(lab=="LD1") grade_dc(g,r,b);else if(lab=="LD2") grade_ac(g,r,b);else if(lab=="LD3") grade_ld3(g,r,b);else if(lab=="LD4") grade_ld4(g,r,b);else if(lab=="LD5") grade_ld5(g,r,b);else if(lab=="LD7") grade_ld7(g,r,b);else if(lab=="LD8") grade_ld8(g,r,b);else if(lab=="LD9") grade_ld9(g,r,b);else if(lab=="LD10") grade_ld10(g,r,b);else if(lab=="LD11") grade_ld11(g,r,b);else if(lab=="LD12") grade_ld12(g,r,b);else if(sources_revision) grade_ld6_sources(g,r,b);else grade_ld6(g,r,b);g.finish();
     int points=0,maximum=0;
     for(auto& item:g.items) {
         auto key=item.at("id").get<std::string>();

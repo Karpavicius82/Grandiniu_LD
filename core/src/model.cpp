@@ -67,18 +67,44 @@ Bank bank(int variant) {
     const double w11=100.0*std::acos(-1.0);
     const double xl11=w11*e11l;
     const double e11c=std::round(xl11/(w11*(e11r*e11r+xl11*xl11))*1e8)/1e8;
+    // LD12-64-A-2026: trifazės grandinės — linijinė įtampa pagal stulpelį
+    // (30–220 V), imtuvų varža pagal eilutę (10–100 Ω, simetriška žvaigždė/trikampis).
+    const double e12v[]={30,40,50,60,100,110,127,220};
+    const double e12r0[]={10,15,22,33,47,68,82,100};
+    const double e12u=e12v[b];
+    const double e12r=e12r0[a];
     return {dc[a],dc[b],dc[(a+b)%8],rc[a],35+5.0*(b+1),rl[b],35+5.0*(a+1),
             std::round(std::sqrt(l/c)/(2.8+.35*(a+1)+.20*(b+1))),l,c,
             uu[b][0],uu[b][1],uu[b][2],rld[a],
             n1[a],n2[b],a1,a2,
             pp[b][0],pp[b][1],pp[b][2],
-            (double)e2v[b],r6,(double)r6n[a],ev7[b],(double)rv7[a],w7[0],w7[1],w7[2],w7[3],w7[4],e8a,e8b,e8c,l9,c9,e9r,l10,c10,e10r,e11e,e11r,e11l,e11c};
+            (double)e2v[b],r6,(double)r6n[a],ev7[b],(double)rv7[a],w7[0],w7[1],w7[2],w7[3],w7[4],e8a,e8b,e8c,l9,c9,e9r,l10,c10,e10r,e11e,e11r,e11l,e11c,e12u,e12r};
 }
 Values ac(int kind,double E,double f,double R,double L,double C) {
     for(double v:{E,f,R,L,C}) if(!std::isfinite(v)) throw std::runtime_error("non_finite");
-    if(kind<1 || kind>5 || E<0 || E>1e6 || f<0 || f>1e9 || R<=0 ||
-       (kind!=1 && L<=0) || (kind!=2 && kind!=5 && C<=0) || (kind==5 && C<0))
+    if(kind<1 || kind>6 || E<0 || E>1e6 || f<0 || f>1e9 || R<=0 ||
+       (kind!=1 && kind!=6 && L<=0) || (kind!=2 && kind!=5 && kind!=6 && C<=0) || (kind==5 && C<0))
         throw std::runtime_error("model_input");
+    if(kind==6) {
+        // Simetrinė trifazė: [Uf_Y, If_Y, Uf_D, If_D, Il_D, P_Y, P_D, Ul, 0, 0].
+        // MNA su trimis EV šaltiniais (Ul/√3 ∠0/−120/+120 Hz f) ir trimis R.
+        const double uf=E/std::sqrt(3.0);
+        const double phase=E/std::sqrt(3.0);
+        const std::complex<double> e1(phase,0.0);
+        const std::complex<double> w2(std::cos(-2.0*std::acos(-1.0)/3.0),std::sin(-2.0*std::acos(-1.0)/3.0));
+        const std::complex<double> w3(std::cos(2.0*std::acos(-1.0)/3.0),std::sin(2.0*std::acos(-1.0)/3.0));
+        std::vector<std::array<double,5>> rows={{{4,1,0,e1.real(),e1.imag()}},
+                                                {{4,2,0,(phase*w2).real(),(phase*w2).imag()}},
+                                                {{4,3,0,(phase*w3).real(),(phase*w3).imag()}},
+                                                {{1,1,0,R,0}},{{1,2,0,R,0}},{{1,3,0,R,0}}};
+        int m=6,n=3,st=1;
+        std::vector<double> table(m*5),v((n+1)*2),i(m*2);
+        for(int k=0;k<m;++k) for(int col=0;col<5;++col) table[col*m+k]=rows[k][col];
+        ld_mna(table.data(),&m,&n,&f,v.data(),i.data(),&st);
+        if(st!=0) throw std::runtime_error("reference_model_"+std::to_string(st));
+        return {uf,phase/R*1000,E,E/R*1000,E/R*1000*std::sqrt(3.0),
+                3.0*uf*uf/R,3.0*E*E/R,E,0.0,0.0};
+    }
     if(kind==5) {
         // RL ∥ C: [XL, Z_RL, cosφ0, I_bendra, I_RL, P, Q, S, φ°, IC].
         // Analitinis tikslus sprendimas: G = R/Z², B = ωC − XL/Z².

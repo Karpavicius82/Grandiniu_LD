@@ -278,6 +278,32 @@ def fixture(lab, n, identity):
         base1 = [["GEN_P", "K1"], ["K2", "A_P"], ["A_N", "RL_A"], ["RL_B", "GEN_N"]]
         wirings = {"s1": base1, "s4": base1 + [["RL_A", "C_A"], ["C_B", "GEN_N"]]}
         report["evidence"] = dict(wiring={k: dict(pairs=copy.deepcopy(v), meter="AC") for k, v in wirings.items()})
+    elif lab == "LD12":
+        import math as m12
+        ul12_ = [30, 40, 50, 60, 100, 110, 127, 220][b]
+        r12_ = [10, 15, 22, 33, 47, 68, 82, 100][a]
+        report["parameters"] = dict(Ul=ul12_, R=r12_)
+        phase = ul12_ / m12.sqrt(3)
+        i_star = phase / r12_ * 1000
+        i_ph = ul12_ / r12_ * 1000
+        i_line = i_ph * m12.sqrt(3)
+        p_star = ul12_ * ul12_ / r12_
+        p_delta = 3 * ul12_ * ul12_ / r12_
+        for k in range(3):
+            observation(f"i{k+1}s", i_star, "mA")
+        for k in range(3):
+            observation(f"i{k+1}d", i_ph, "mA")
+        observation("ild", i_line, "mA")
+        vector(1, [phase], ["V"])
+        vector(2, [i_star], ["mA"])
+        vector(3, [ul12_], ["V"])
+        vector(4, [i_ph], ["mA"])
+        vector(5, [i_line, p_delta * 1000, p_star * 1000], ["mA", "mW", "mW"])
+        vector(6, [1, 1, 1], ["choice", "choice", "choice"])
+        star = [["L1", "R1_A"], ["L2", "R2_A"], ["L3", "R3_A"], ["R1_B", "R2_B"], ["R2_B", "R3_B"], ["R3_B", "N"]]
+        delta = [["L1", "R1_A"], ["R1_B", "L2"], ["L2", "R2_A"], ["R2_B", "L3"], ["L3", "R3_A"], ["R3_B", "L1"]]
+        report["evidence"] = dict(wiring={"s1": dict(pairs=copy.deepcopy(star), meter="AC"),
+                                          "s3": dict(pairs=copy.deepcopy(delta), meter="AC")})
     else:
         report["parameters"] = dict(E_RC=9,F_RC=frc,R8=r8,C2=4.7e-6,E_RL=9,F_RL=frl,R9=r9,L1=.5,
                                     E_RLC=5,R13=r13,L3=l,C4=c)

@@ -3,15 +3,15 @@ mode(-1);
 root=get_absolute_file_path("GUI_PATIKRA.sce");
 try
     if ~isdir(root+"tests/results") then mkdir(root+"tests/results"); end
-    exec(root+"LD1/LD1_LOAD.sce",-1); exec(root+"LD2/LD2_LOAD.sce",-1); exec(root+"LD3/LD3_LOAD.sce",-1); exec(root+"LD4/LD4_LOAD.sce",-1); exec(root+"LD5/LD5_LOAD.sce",-1); exec(root+"LD6/LD6_LOAD.sce",-1); exec(root+"LD7/LD7_LOAD.sce",-1); exec(root+"LD8/LD8_LOAD.sce",-1); exec(root+"LD9/LD9_LOAD.sce",-1); exec(root+"LD10/LD10_LOAD.sce",-1); exec(root+"LD11/LD11_LOAD.sce",-1);
+    exec(root+"LD1/LD1_LOAD.sce",-1); exec(root+"LD2/LD2_LOAD.sce",-1); exec(root+"LD3/LD3_LOAD.sce",-1); exec(root+"LD4/LD4_LOAD.sce",-1); exec(root+"LD5/LD5_LOAD.sce",-1); exec(root+"LD6/LD6_LOAD.sce",-1); exec(root+"LD7/LD7_LOAD.sce",-1); exec(root+"LD8/LD8_LOAD.sce",-1); exec(root+"LD9/LD9_LOAD.sce",-1); exec(root+"LD10/LD10_LOAD.sce",-1); exec(root+"LD11/LD11_LOAD.sce",-1); exec(root+"LD12/LD12_LOAD.sce",-1);
     exec(root+"tests/workflows.sci",-1);
     bench_core_require();
     for n=[1 17 64]
         bench_ld1_workflow(n,root);
         bench_ld2_workflow(n,root,%t);
-        bench_ld3_workflow(n,root,%t); bench_ld4_workflow(n,root,%t); bench_ld5_workflow(n,root,%t); bench_ld6_workflow(n,root,%t); bench_ld7_workflow(n,root,%t); bench_ld8_workflow(n,root,%t); bench_ld9_workflow(n,root,%t); bench_ld10_workflow(n,root,%t); bench_ld11_workflow(n,root,%t);
+        bench_ld3_workflow(n,root,%t); bench_ld4_workflow(n,root,%t); bench_ld5_workflow(n,root,%t); bench_ld6_workflow(n,root,%t); bench_ld7_workflow(n,root,%t); bench_ld8_workflow(n,root,%t); bench_ld9_workflow(n,root,%t); bench_ld10_workflow(n,root,%t); bench_ld11_workflow(n,root,%t); bench_ld12_workflow(n,root,%t);
     end
-    verdict="GUI_PASS: LD1 9, LD2 12, LD3 6, LD4 7 ir LD5 6 ir LD6 6 ir LD7 6 ir LD8 6 ir LD9 6 ir LD10 6 ir LD11 6 etapai, variantai 1/17/64, mygtukų funkcijos, matavimai, duomenų išlaikymas, eksportas";
+    verdict="GUI_PASS: LD1 9, LD2 12, LD3 6, LD4 7 ir LD5 6 ir LD6 6 ir LD7 6 ir LD8 6 ir LD9 6 ir LD10 6 ir LD11 6 ir LD12 6 etapai, variantai 1/17/64, mygtukų funkcijos, matavimai, duomenų išlaikymas, eksportas";
     mputl(verdict,root+"GUI_PATIKRA_LAST.txt"); disp(verdict); exit(0);
 catch
     verdict="GUI_FAIL: "+strcat(lasterror()," | ");
