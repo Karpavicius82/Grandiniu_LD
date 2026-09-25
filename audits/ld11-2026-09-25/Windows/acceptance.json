@@ -1,0 +1,22 @@
+{
+  "status": "PASS",
+  "tolerance_cases": 146,
+  "actual_gui_reports": 3,
+  "variants": [
+    1,
+    17,
+    64
+  ],
+  "geometry_cases": 23,
+  "assessment_reports_selected": true,
+  "close_autosave_restore": true,
+  "edge_cases": true,
+  "malformed_drafts_rejected": 6,
+  "report_traceability": true,
+  "submission_sha256": {
+    "LD11-V01-20260925T125022-5764-65-83.html": "0e3785c98e707d10a6d8eaf6ebd5cb49855acd6b5353befbdcf88c25df1b88b4",
+    "LD11-V17-20260925T125032-5764-620-166.html": "7a35a188e372c747b5005e302eae8f458c85ac98e6e40bfddf5fce96f3ecefec",
+    "LD11-V64-20260925T125042-5764-856-249.html": "8fb374af81b43af380bd56d78b72a115ea4275cf89afe42a47d2ff6ce0657238"
+  },
+  "platform": "nt"
+}

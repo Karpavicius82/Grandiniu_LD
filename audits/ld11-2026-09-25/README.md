@@ -61,4 +61,23 @@ Pakartotinei Windows patikrai naudojamas LD11 filtras: branduolys, visos
 705 ataskaitos, visas LD11 GUI ir bendras 11 stendų paketo bandymas;
 praėjusių ankstesnių LD GUI testų pakartotinai nevykdome.
 
-Galutiniai platformų rezultatai ir paketų SHA256 bus pridėti po CI.
+## Galutinis platformų rezultatas
+
+Galutinė versija: `68a34ae418f6f56ab4651af3635540edbb8c23af`.
+Studento programos ir C++ branduolio failai sutampa su `afa6a527ac766457dfc4a1d5f8906bef6656cfdd`.
+Tai patvirtinta Git diff ir visų paketų failų turinio patikra; tarp commitų
+keistas tik vidinis testavimas, CI filtras ir audito aprašas.
+[Linux](https://github.com/Karpavicius82/Grandiniu_LD/actions/runs/36135193103/job/108071480498),
+[Windows](https://github.com/Karpavicius82/Grandiniu_LD/actions/runs/36136848507)
+ir [macOS ARM / Intel](https://github.com/Karpavicius82/Grandiniu_LD/actions/runs/36135193136): **PASS**.
+Visose keturiose aplinkose praėjo 14 CTest rinkinių, 705 tikrų ataskaitų,
+LD11 trijų studento eigų, 146 vertinimo palyginimų, 23 geometrijos scenarijų
+ir papildomų klaidų atkūrimo patikros. Bendras bandymas atidarė visus vienuolika
+stendų. Naudoti Windows Server 2022, Ubuntu 22.04, macOS 15 ARM ir Intel.
+
+`verified-packages.json` sieja CI archyvų ir C++ failų SHA256 su patikrinta
+versija. `137` Scilab bei paleidimo failų ir visų
+vienuolikos variantų bankų turinys sutikrintas su šaltiniu. Pateikiamų paketų
+SHA256 yra `distributed-sha256.json`; macOS ZIP pateikti nepakeisti iš CI.
+Linux PNG užfiksuoti galutinės versijos bandyme. Windows / Linux jungtinis
+ZIP papildomai patikrintas dėl failų SHA256 ir vykdymo teisių.

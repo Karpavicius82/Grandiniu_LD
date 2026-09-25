@@ -1,0 +1,135 @@
+{
+  "source_commit": "68a34ae418f6f56ab4651af3635540edbb8c23af",
+  "runtime_commit": "afa6a527ac766457dfc4a1d5f8906bef6656cfdd",
+  "runtime_files": 137,
+  "platforms": {
+    "Windows": {
+      "ci_commit": "68a34ae418f6f56ab4651af3635540edbb8c23af",
+      "ci_url": "https://github.com/Karpavicius82/Grandiniu_LD/actions/runs/36136848507",
+      "ci_archive_sha256": "993fd4fb397b06c7369fef2c47d8a1ea18a366f2cf41d2cee3c15a6ca2022f4c",
+      "native_sha256": {
+        "ldcheck.exe": "88b9fa78fee6f9d00d577a9861a51e4b95fe531080d49dcd01306273cd2aec8a",
+        "ldcore.dll": "c5169b397280977e90f06d2e6547f0644a12b4be7ede9977e630aaf4591a0b3f",
+        "mokytojas.exe": "34732e50b42ba34f72b9dac4924b6d741a1c89e184a85a3151b168c4a13d392b"
+      },
+      "ld11": {
+        "status": "PASS",
+        "tolerance_cases": 146,
+        "actual_gui_reports": 3,
+        "variants": [
+          1,
+          17,
+          64
+        ],
+        "geometry_cases": 23,
+        "assessment_reports_selected": true,
+        "close_autosave_restore": true,
+        "edge_cases": true,
+        "malformed_drafts_rejected": 6,
+        "report_traceability": true,
+        "submission_sha256": {
+          "LD11-V01-20260925T125022-5764-65-83.html": "0e3785c98e707d10a6d8eaf6ebd5cb49855acd6b5353befbdcf88c25df1b88b4",
+          "LD11-V17-20260925T125032-5764-620-166.html": "7a35a188e372c747b5005e302eae8f458c85ac98e6e40bfddf5fce96f3ecefec",
+          "LD11-V64-20260925T125042-5764-856-249.html": "8fb374af81b43af380bd56d78b72a115ea4275cf89afe42a47d2ff6ce0657238"
+        },
+        "platform": "nt"
+      }
+    },
+    "Linux": {
+      "ci_commit": "afa6a527ac766457dfc4a1d5f8906bef6656cfdd",
+      "ci_url": "https://github.com/Karpavicius82/Grandiniu_LD/actions/runs/36135193103",
+      "ci_archive_sha256": "6ce2888e9345c278224fc0512f23a1909b0651a448670b04e6bf89235bb7df17",
+      "native_sha256": {
+        "ldcheck": "023479d1d8ef2bd7667bd2bf00c402610b6bad55df120ce798c4d867bbedb774",
+        "ldcore.so": "c6ac5a80f84ee0b18342c6e184968fcfdf4fcf1e574db6fa79043e9163fcae66",
+        "mokytojas": "059b7dfdaff25b505acc1d42b29726c553e4d788e613c35284c1c0a86cd92411"
+      },
+      "ld11": {
+        "status": "PASS",
+        "tolerance_cases": 146,
+        "actual_gui_reports": 3,
+        "variants": [
+          1,
+          17,
+          64
+        ],
+        "geometry_cases": 23,
+        "assessment_reports_selected": true,
+        "close_autosave_restore": true,
+        "edge_cases": true,
+        "malformed_drafts_rejected": 6,
+        "report_traceability": true,
+        "submission_sha256": {
+          "LD11-V17-20260925T123708-5822-110-166.html": "5165cd321d39570c1007b91e0aaff94821eb7d110796c73bd8dd9b42d60a977a",
+          "LD11-V01-20260925T123701-5822-718-83.html": "76ba55c2cb6e196ec0a9bfcfdf9b91ef446bc7dd1f0b3709f23b9a7c9ca5fc5f",
+          "LD11-V64-20260925T123714-5822-186-249.html": "682a362fd02879f24c4d3658dd77be31f445f768aa30cbb7c9dc3bb7e4ec4cf7"
+        },
+        "platform": "posix"
+      }
+    },
+    "macOS-arm64": {
+      "ci_commit": "afa6a527ac766457dfc4a1d5f8906bef6656cfdd",
+      "ci_url": "https://github.com/Karpavicius82/Grandiniu_LD/actions/runs/36135193136",
+      "ci_archive_sha256": "449c8fb704ffe117cf96480403e2630d7edfa31b2c0d95559f79a27dfb2c8618",
+      "native_sha256": {
+        "ldcheck": "e5e8595cdb045308dcdc847323f42365d390a0eefaf814e53825ce3b363cff2d",
+        "ldcore.dylib": "dd233cd6b0691e25fcb52a58c064895c4a490088ea87f231775da1685c61908c",
+        "mokytojas": "096c1a926398a4707408eb518897b9a6e0e4eda24ed2d7faabd6b13a8fe5c5dc"
+      },
+      "ld11": {
+        "status": "PASS",
+        "tolerance_cases": 146,
+        "actual_gui_reports": 3,
+        "variants": [
+          1,
+          17,
+          64
+        ],
+        "geometry_cases": 23,
+        "assessment_reports_selected": true,
+        "close_autosave_restore": true,
+        "edge_cases": true,
+        "malformed_drafts_rejected": 6,
+        "report_traceability": true,
+        "submission_sha256": {
+          "LD11-V17-20260925T123856-11538-577-166.html": "e41db766e6f6e11ccd29766e685d37519470f812d7fd3528013c62449de93a3f",
+          "LD11-V01-20260925T123847-11538-366-83.html": "63295dcf35ba4af0cb8ace47e8bae07f3da9dab73458579a44a8a674c049dc3d",
+          "LD11-V64-20260925T123904-11538-840-249.html": "0e5832578935cb61262e102e15b2a1163dc6f9b45445b4318c484ba582afc1e6"
+        },
+        "platform": "posix"
+      }
+    },
+    "macOS-x86_64": {
+      "ci_commit": "afa6a527ac766457dfc4a1d5f8906bef6656cfdd",
+      "ci_url": "https://github.com/Karpavicius82/Grandiniu_LD/actions/runs/36135193136",
+      "ci_archive_sha256": "3304beef1211bda7abf0e4b6b1c1b83d4a5654c6e67556fffdccfb8cc299c351",
+      "native_sha256": {
+        "ldcheck": "96a1d7c6916009b17b118a0755211c19d0bd0578cf976bbc5645662c352e25f2",
+        "ldcore.dylib": "50fdb7c1677024e2ff1f10c6fdcdb4921ab4337f39082f1019db7f8c10f8855b",
+        "mokytojas": "25f9b84343ae77fa8ac8a846d868018c0b8bacefd0acc476c96af17d33ac0e65"
+      },
+      "ld11": {
+        "status": "PASS",
+        "tolerance_cases": 146,
+        "actual_gui_reports": 3,
+        "variants": [
+          1,
+          17,
+          64
+        ],
+        "geometry_cases": 23,
+        "assessment_reports_selected": true,
+        "close_autosave_restore": true,
+        "edge_cases": true,
+        "malformed_drafts_rejected": 6,
+        "report_traceability": true,
+        "submission_sha256": {
+          "LD11-V64-20260925T124555-29272-732-249.html": "3abacfbbc67c045af56e62193d63de189d34d8a35de46c2cf69d9a038cd9ba2d",
+          "LD11-V01-20260925T124531-29272-96-83.html": "7ede49650fceeb92653fc41fde6a3bd9eb9c8c3021a9efa2aa8b4f346d7e2ee2",
+          "LD11-V17-20260925T124543-29272-774-166.html": "7be44963c884492f6ee2f995e272564ea365c880552eef9410ef5a068c63631f"
+        },
+        "platform": "posix"
+      }
+    }
+  }
+}
