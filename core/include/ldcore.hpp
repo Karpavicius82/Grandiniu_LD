@@ -11,7 +11,7 @@
 // ABI 1: scalars and caller-owned arrays only; SI, RMS, exp(+jwt).
 LD_API void ld_mna(const double*,const int*,const int*,const double*,double*,double*,int*) noexcept;
 // Input [E,f,R,L,C], output [XL,XC,|Z|,I,UR,UL,UC,ULC,P,phi_Z_deg].
-// kind 1=RC, 2=RL, 3=series RLC, 4=parallel RLC; finite positive components, f >= 0.
+// kind 1=RC, 2=RL, 3=series RLC, 4=parallel RLC, 5=RL∥C (C=0 – be kondensatoriaus); f >= 0.
 LD_API void ld_ac(const int*,const double*,double*,int*) noexcept;
 // UTF-8 paths represented as int arrays (0..255), no shell invocation.
 // command 1=start, 2=process up to 25, 3=cancel, 4=finish.
@@ -24,7 +24,7 @@ LD_API void ld_sources(const int*,const double*,double*,int*) noexcept;
 namespace ld {
 using Values=std::array<double,10>;
 Values ac(int kind,double E,double f,double R,double L,double C);
-struct Bank {double r1,r2,r3,r8,frc,r9,frl,r13,l3,c4,u1,u2,u3,r,r1n,r2n,r1a,r2a,p1,p2,p3,e2,r6,r6n,e7,r7,w71,w72,w73,w74,w75,e8a,e8b,e8c,e9l,e9c,e9r,e10l,e10c,e10r;};
+struct Bank {double r1,r2,r3,r8,frc,r9,frl,r13,l3,c4,u1,u2,u3,r,r1n,r2n,r1a,r2a,p1,p2,p3,e2,r6,r6n,e7,r7,w71,w72,w73,w74,w75,e8a,e8b,e8c,e9l,e9c,e9r,e10l,e10c,e10r,e11e,e11r,e11l,e11c;};
 Bank bank(int variant);
 void write_new(const std::filesystem::path&,const std::string&);
 int run_batch(const std::filesystem::path&,const std::filesystem::path&);

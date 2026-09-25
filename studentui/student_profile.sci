@@ -56,6 +56,10 @@ function lines=student_parameter_lines(lab,cfg)
         lines=[msprintf("Generatorius: E = %.0f V RMS. Lygiagretė RLC grandinė:",cfg.E); ...
             msprintf("R = %.2f Ω; L = %g mH; C = %g nF.",cfg.R,cfg.LmH,cfg.CnF); ...
             "Rezonanso dažnį f0 apskaičiuosite pirmajame etape."];
+    elseif lab=="LD11" then
+        lines=[msprintf("Generatorius: E = %.0f V RMS, f = 50 Hz. Rišlė (R, L nuosekliai):",cfg.E); ...
+            msprintf("R = %g Ω; L = %g mH. Kompensuojantis kondensatorius Ck stende paruoštas.",cfg.R,cfg.LmH); ...
+            "Pradinį cos φ0 ir Ck apskaičiuosite patys."];
     else
         lines=[msprintf("RC: %.1f V RMS; %.1f Hz; R8 = %.0f Ω; C2 = %.2f µF.",cfg.E_RC,cfg.F_RC,cfg.R8,cfg.C2*1e6); ...
             msprintf("RL: %.1f V RMS; %.1f Hz; R9 = %.0f Ω; L1 = %.3f H.",cfg.E_RL,cfg.F_RL,cfg.R9,cfg.L1); ...
@@ -108,6 +112,9 @@ function [ok,st,cfg]=student_enroll(lab,previous)
             elseif lab=="LD10" then
                 cfg=ld10_variant_config(st.number);
                 [valid,why]=ld10_validate_config(cfg); if ~valid then error(why); end
+            elseif lab=="LD11" then
+                cfg=ld11_variant_config(st.number);
+                [valid,why]=ld11_validate_config(cfg); if ~valid then error(why); end
             else
                 cfg=ld2_variant_config(st.number);
                 [valid,why]=ld2_validate_config(cfg); if ~valid then error(why); end

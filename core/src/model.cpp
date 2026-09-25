@@ -56,17 +56,40 @@ Bank bank(int variant) {
     const double l10=ls[b]*1e-3, c10=cs[a]*1e-9;
     const double qt10=2.0+0.5*((a+b)%4);
     const double e10r=std::round(100.0*qt10*std::sqrt(l10/c10))/100.0;
+    // LD11-64-A-2026: galios tyrimas ir cos φ gerinimas — E pagal stulpelį,
+    // R ir L pagal eilutę (L iš (a+b)%8); Ck = XL/(ω(R²+XL²)), ω = 2π·50.
+    const double e11v[]={5,6,7,8,9,10,11,12};
+    const double e11r0[]={10,15,22,33,47,68,82,100};
+    const double e11l0[]={100,150,220,330,470,680,1000,1500};
+    const double e11e=e11v[b];
+    const double e11r=e11r0[a];
+    const double e11l=e11l0[(a+b)%8]*1e-3;
+    const double w11=100.0*std::acos(-1.0);
+    const double xl11=w11*e11l;
+    const double e11c=std::round(xl11/(w11*(e11r*e11r+xl11*xl11))*1e8)/1e8;
     return {dc[a],dc[b],dc[(a+b)%8],rc[a],35+5.0*(b+1),rl[b],35+5.0*(a+1),
             std::round(std::sqrt(l/c)/(2.8+.35*(a+1)+.20*(b+1))),l,c,
             uu[b][0],uu[b][1],uu[b][2],rld[a],
             n1[a],n2[b],a1,a2,
             pp[b][0],pp[b][1],pp[b][2],
-            (double)e2v[b],r6,(double)r6n[a],ev7[b],(double)rv7[a],w7[0],w7[1],w7[2],w7[3],w7[4],e8a,e8b,e8c,l9,c9,e9r,l10,c10,e10r};
+            (double)e2v[b],r6,(double)r6n[a],ev7[b],(double)rv7[a],w7[0],w7[1],w7[2],w7[3],w7[4],e8a,e8b,e8c,l9,c9,e9r,l10,c10,e10r,e11e,e11r,e11l,e11c};
 }
 Values ac(int kind,double E,double f,double R,double L,double C) {
     for(double v:{E,f,R,L,C}) if(!std::isfinite(v)) throw std::runtime_error("non_finite");
-    if(kind<1 || kind>4 || E<0 || E>1e6 || f<0 || f>1e9 || R<=0 ||
-       (kind!=1 && L<=0) || (kind!=2 && C<=0)) throw std::runtime_error("model_input");
+    if(kind<1 || kind>5 || E<0 || E>1e6 || f<0 || f>1e9 || R<=0 ||
+       (kind!=1 && L<=0) || (kind!=2 && kind!=5 && C<=0) || (kind==5 && C<0))
+        throw std::runtime_error("model_input");
+    if(kind==5) {
+        // RL ∥ C: [XL, Z_RL, cosφ0, I_bendra, I_RL, P, Q, S, φ°, IC].
+        // Analitinis tikslus sprendimas: G = R/Z², B = ωC − XL/Z².
+        if(f==0) throw std::runtime_error("model_input");
+        const double w=2*std::acos(-1.0)*f, xl=w*L, zrl=std::hypot(R,xl);
+        const double g=R/(zrl*zrl), b=w*C-xl/(zrl*zrl);
+        const double it=E*std::hypot(g,b);
+        const double p=E*E*g, q=E*E*b;
+        return {xl,zrl,R/zrl,it,E/zrl,p,q,E*it,
+                std::atan2(b,g)*180/std::acos(-1.0),C>0?E*w*C:0.0};
+    }
     if(kind==4) {
         // Lygiagretus RLC: [XL, XC, |Z|, I_bendra, IR, IL, IC, |IL−IC|, P, phi].
         const double w=2*std::acos(-1.0)*f;

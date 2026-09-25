@@ -1031,3 +1031,95 @@ function bench_ld10_workflow(number,root,gui)
         delete(LD10.fig);
     end
 endfunction
+
+
+// ------------------------------- LD11 ---------------------------------------
+function bench_ld11_action(callback)
+    global LD11;
+    if LD11.ui.headless then execstr(callback); return; end
+    for k=1:size(LD11.ui.dynamic,"*")
+        h=LD11.ui.dynamic(k);
+        if h.callback==callback then bench_button(h); return; end
+    end
+    error("Nėra matomo LD11 mygtuko: "+callback);
+endfunction
+
+function bench_ld11_click(id)
+    bench_ld11_action(msprintf("ld11_terminal_click(""%s"")",id));
+endfunction
+
+function bench_ld11_primary()
+    global LD11;
+    if LD11.ui.headless then ld11_student_primary();
+    else bench_button(LD11.ui.studentPrimary); end
+endfunction
+
+function bench_ld11_answers(step,values)
+    global LD11;
+    if LD11.ui.headless then ld11_test_answers(step,values); return; end
+    value_index=1;
+    for index=1:12
+        [answer_step,slot]=ld11_answer_slot(index);
+        if answer_step==step then
+            LD11.ui.answerEdits(index).string=msprintf("%.17g",values(value_index));
+            value_index=value_index+1;
+        end
+    end
+endfunction
+
+function bench_ld11_connect(mode)
+    global LD11;
+    wires=ld11_canonical_wires(mode);
+    assert_checkequal(size(LD11.wires,1),0);
+    for index=1:size(wires,1)
+        bench_ld11_click(wires(index,1)); bench_ld11_click(wires(index,2));
+    end
+    bench_ld11_click(wires($,1)); bench_ld11_click(wires($,2));
+    [valid,message]=ld11_wiring_valid(LD11.wires); assert_checkfalse(valid);
+    bench_ld11_click(wires($,2)); bench_ld11_click(wires($,1));
+    [valid,message]=ld11_wiring_valid(LD11.wires); assert_checktrue(valid);
+endfunction
+
+function bench_ld11_workflow(number,root,gui)
+    global LD11;
+    if argn(2)<3 then gui=%f; end
+    cfg=ld11_variant_config(number); [valid,message]=ld11_validate_config(cfg); assert_checktrue(valid);
+    LD11=struct("cfg",cfg,"student",student_profile(number,"Automatinė Patikra","TEST","LD11"),"ui",struct("headless",~gui));
+    ld11_start();
+    expected=ld11_expected_answers();
+    for step=1:6
+        assert_checkequal(LD11.step,step);
+        select step
+        case 1 then
+            bench_ld11_connect(1);
+            bench_ld11_answers(step,expected(1,1));
+        case 2 then
+            bench_ld11_action("ld11_toggle_power()"); bench_ld11_action("ld11_toggle_switch()"); bench_ld11_action("ld11_measure()");
+            bench_ld11_action("ld11_toggle_power()");
+            bench_ld11_answers(step,expected(2,1:3));
+        case 3 then
+            bench_ld11_answers(step,expected(3,1));
+        case 4 then
+            bench_ld11_action("ld11_set_mode(2)");
+            bench_ld11_connect(2);
+            bench_ld11_action("ld11_toggle_power()"); bench_ld11_action("ld11_toggle_switch()"); bench_ld11_action("ld11_measure()");
+            bench_ld11_action("ld11_toggle_power()");
+        case 5 then
+            bench_ld11_answers(step,expected(5,1:4));
+        case 6 then
+            bench_ld11_answers(step,[1 1 1]);
+        end
+        bench_ld11_primary();
+        if ~LD11.done(step) then error("LD11 variantas "+string(number)+", etapas "+string(step)); end
+        if gui then mprintf("PASS LD11 V%02d: etapas %d\n",number,step); end
+    end
+    assert_checktrue(and(LD11.done)); assert_checkequal(size(LD11.journal,1),2);
+    if gui then
+        LD11.assessment=%t;
+        before=size(listfiles(bench_documents()+"/*.html"),"*");
+        bench_ld11_primary();
+        assert_checkequal(size(listfiles(bench_documents()+"/*.html"),"*"),before+1);
+        assert_checktrue(strindex(LD11.ui.statusMain.string,"Ataskaita išsaugota")<>[]);
+        delete(LD11.fig);
+    end
+endfunction
