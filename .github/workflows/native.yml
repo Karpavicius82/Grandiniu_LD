@@ -104,6 +104,17 @@ jobs:
         if: runner.os == 'Windows'
         shell: pwsh
         run: python tools/test_ld9.py --scilab "$env:SCILAB_BIN" --checker build/Release/layoutcheck.exe --grader build/Release/ldcheck.exe --output "$env:RUNNER_TEMP/ld9-ui"
+      - name: Actual Linux LD10 interface and grading
+        if: runner.os == 'Linux'
+        shell: bash
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y xvfb x11-utils python3-gi gir1.2-gtk-3.0
+          xvfb-run --auto-servernum --server-args="-screen 0 1920x1080x24" python tools/test_ld10.py --scilab "$SCILAB_BIN" --checker build/layoutcheck --grader build/ldcheck --output "$RUNNER_TEMP/ld10-ui"
+      - name: Actual Windows LD10 interface and grading
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: python tools/test_ld10.py --scilab "$env:SCILAB_BIN" --checker build/Release/layoutcheck.exe --grader build/Release/ldcheck.exe --output "$env:RUNNER_TEMP/ld10-ui"
       - name: Actual Linux LD1 student interface and grading
         if: runner.os == 'Linux'
         shell: bash
@@ -202,6 +213,15 @@ jobs:
             ${{ runner.temp }}/ld9-ui/*.tsv
             ${{ runner.temp }}/ld9-ui/*.png
             ${{ runner.temp }}/ld9-ui/acceptance.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: LD10-interface-${{ runner.os }}
+          path: |
+            ${{ runner.temp }}/ld10-ui/*.log
+            ${{ runner.temp }}/ld10-ui/*.tsv
+            ${{ runner.temp }}/ld10-ui/*.png
+            ${{ runner.temp }}/ld10-ui/acceptance.json
       - name: Portable student and teacher package
         run: python tools/package_native.py --platform "${{ runner.os }}"
       - uses: actions/upload-artifact@v4
