@@ -10,10 +10,11 @@ function cfg = ld11_variant_config(number)
     ev = [5;6;7;8;9;10;11;12]; rv = [10;15;22;33;47;68;82;100];
     lv = [100;150;220;330;470;680;1000;1500];
     row = floor((number-1)/8)+1; column = modulo(number-1, 8)+1;
-    e = ev(column); r = rv(row); l = lv(modulo(row-1+column-1, 8)+1)*1e-3;
+    li = modulo(row-1+column-1, 8)+1;
+    e = ev(column); r = rv(row); l = lv(li)*1e-3;
     w = 2*%pi*50; xl = w*l;
     ck = round(xl/(w*(r*r+xl*xl))*1e8)/1e8;
-    cfg = struct("E", e, "R", r, "L", l, "Ck", ck, "LmH", l*1e3);
+    cfg = struct("E", e, "R", r, "L", l, "Ck", ck, "LmH", lv(li));
 endfunction
 
 function [valid, why] = ld11_validate_config(cfg)
