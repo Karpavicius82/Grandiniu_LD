@@ -68,4 +68,9 @@ OS pelės įvykių, DPI ir ekranų patikra ar išorinė aprobacija. Windows CI
 naudoja Server 2022, ne konkretų Win11 kompiuterį. Ataskaitos nėra
 skaitmeniškai pasirašytos ir neįrodo studento autorystės.
 
+Pirminėje CI Scilab eiga ir geometrija praėjo, bet papildomo persidengimų
+patikrinimo Python kintamasis `a` užgožė komandų parametrus. Vidinis testas
+pataisytas naudojant `wire_a` / `wire_b`; jo visa paskesnė vertinimo dalis
+patikrinta su jau išsaugotomis tikromis ataskaitomis. Studento kodas nesikeitė.
+
 Galutiniai platformų rezultatai ir paketų SHA256 bus pridėti po CI.

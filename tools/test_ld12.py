@@ -58,9 +58,9 @@ for line in (out/'geometry.tsv').read_text().splitlines():
     segments[fields[0]].append((horizontal,y+h/2 if horizontal else x+w/2,x if horizontal else y,(x+w) if horizontal else (y+h)))
 assert len(segments)==26,len(segments)
 for scenario,items in segments.items():
-    for a,b in combinations(items,2):
-        if a[0]==b[0] and abs(a[1]-b[1])<.5:
-            assert min(a[3],b[3])-max(a[2],b[2])<=3.01,(scenario,'collinear wire overlap',a,b)
+    for wire_a,wire_b in combinations(items,2):
+        if wire_a[0]==wire_b[0] and abs(wire_a[1]-wire_b[1])<.5:
+            assert min(wire_a[3],wire_b[3])-max(wire_a[2],wire_b[2])<=3.01,(scenario,'collinear wire overlap',wire_a,wire_b)
 
 # Compare the actual Scilab step decisions with C++ grading of the same reports.
 sys.path.insert(0, str(repo / 'core/tests'))
