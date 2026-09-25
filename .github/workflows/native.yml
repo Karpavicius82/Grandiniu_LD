@@ -8,6 +8,11 @@ on:
         type: choice
         default: all
         options: [all, windows, linux]
+      focus:
+        description: Full regression or LD11 plus core, reports and delivery
+        type: choice
+        default: all
+        options: [all, ld11]
 permissions:
   contents: read
 jobs:
@@ -53,66 +58,66 @@ jobs:
       - name: Scilab to C++ to HTML to folder grading
         run: python tools/test_automatic_reports.py --scilab "${{ env.SCILAB_BIN }}" --runtime studentui
       - name: Actual Windows LD4 interface
-        if: runner.os == 'Windows'
+        if: inputs.focus != 'ld11' && runner.os == 'Windows'
         shell: pwsh
         run: python tools/test_ld4.py --scilab "$env:SCILAB_BIN" --checker build/Release/layoutcheck.exe --output "$env:RUNNER_TEMP/ld4-ui"
       - name: Actual Windows LD5 interface and grading
-        if: runner.os == 'Windows'
+        if: inputs.focus != 'ld11' && runner.os == 'Windows'
         shell: pwsh
         run: python tools/test_ld5.py --scilab "$env:SCILAB_BIN" --checker build/Release/layoutcheck.exe --grader build/Release/ldcheck.exe --output "$env:RUNNER_TEMP/ld5-ui"
       - name: Actual Linux LD6 interface and grading
-        if: runner.os == 'Linux'
+        if: inputs.focus != 'ld11' && runner.os == 'Linux'
         shell: bash
         run: |
           sudo apt-get update
           sudo apt-get install -y xvfb x11-utils python3-gi gir1.2-gtk-3.0
           xvfb-run --auto-servernum --server-args="-screen 0 1920x1080x24" python tools/test_ld6.py --scilab "$SCILAB_BIN" --checker build/layoutcheck --grader build/ldcheck --output "$RUNNER_TEMP/ld6-ui"
       - name: Actual Windows LD6 interface and grading
-        if: runner.os == 'Windows'
+        if: inputs.focus != 'ld11' && runner.os == 'Windows'
         shell: pwsh
         run: python tools/test_ld6.py --scilab "$env:SCILAB_BIN" --checker build/Release/layoutcheck.exe --grader build/Release/ldcheck.exe --output "$env:RUNNER_TEMP/ld6-ui"
       - name: Actual Linux LD7 interface and grading
-        if: runner.os == 'Linux'
+        if: inputs.focus != 'ld11' && runner.os == 'Linux'
         shell: bash
         run: |
           sudo apt-get update
           sudo apt-get install -y xvfb x11-utils python3-gi gir1.2-gtk-3.0
           xvfb-run --auto-servernum --server-args="-screen 0 1920x1080x24" python tools/test_ld7.py --scilab "$SCILAB_BIN" --checker build/layoutcheck --grader build/ldcheck --output "$RUNNER_TEMP/ld7-ui"
       - name: Actual Windows LD7 interface and grading
-        if: runner.os == 'Windows'
+        if: inputs.focus != 'ld11' && runner.os == 'Windows'
         shell: pwsh
         run: python tools/test_ld7.py --scilab "$env:SCILAB_BIN" --checker build/Release/layoutcheck.exe --grader build/Release/ldcheck.exe --output "$env:RUNNER_TEMP/ld7-ui"
       - name: Actual Linux LD8 interface and grading
-        if: runner.os == 'Linux'
+        if: inputs.focus != 'ld11' && runner.os == 'Linux'
         shell: bash
         run: |
           sudo apt-get update
           sudo apt-get install -y xvfb x11-utils python3-gi gir1.2-gtk-3.0
           xvfb-run --auto-servernum --server-args="-screen 0 1920x1080x24" python tools/test_ld8.py --scilab "$SCILAB_BIN" --checker build/layoutcheck --grader build/ldcheck --output "$RUNNER_TEMP/ld8-ui"
       - name: Actual Windows LD8 interface and grading
-        if: runner.os == 'Windows'
+        if: inputs.focus != 'ld11' && runner.os == 'Windows'
         shell: pwsh
         run: python tools/test_ld8.py --scilab "$env:SCILAB_BIN" --checker build/Release/layoutcheck.exe --grader build/Release/ldcheck.exe --output "$env:RUNNER_TEMP/ld8-ui"
       - name: Actual Linux LD9 interface and grading
-        if: runner.os == 'Linux'
+        if: inputs.focus != 'ld11' && runner.os == 'Linux'
         shell: bash
         run: |
           sudo apt-get update
           sudo apt-get install -y xvfb x11-utils python3-gi gir1.2-gtk-3.0
           xvfb-run --auto-servernum --server-args="-screen 0 1920x1080x24" python tools/test_ld9.py --scilab "$SCILAB_BIN" --checker build/layoutcheck --grader build/ldcheck --output "$RUNNER_TEMP/ld9-ui"
       - name: Actual Windows LD9 interface and grading
-        if: runner.os == 'Windows'
+        if: inputs.focus != 'ld11' && runner.os == 'Windows'
         shell: pwsh
         run: python tools/test_ld9.py --scilab "$env:SCILAB_BIN" --checker build/Release/layoutcheck.exe --grader build/Release/ldcheck.exe --output "$env:RUNNER_TEMP/ld9-ui"
       - name: Actual Linux LD10 interface and grading
-        if: runner.os == 'Linux'
+        if: inputs.focus != 'ld11' && runner.os == 'Linux'
         shell: bash
         run: |
           sudo apt-get update
           sudo apt-get install -y xvfb x11-utils python3-gi gir1.2-gtk-3.0
           xvfb-run --auto-servernum --server-args="-screen 0 1920x1080x24" python tools/test_ld10.py --scilab "$SCILAB_BIN" --checker build/layoutcheck --grader build/ldcheck --output "$RUNNER_TEMP/ld10-ui"
       - name: Actual Windows LD10 interface and grading
-        if: runner.os == 'Windows'
+        if: inputs.focus != 'ld11' && runner.os == 'Windows'
         shell: pwsh
         run: python tools/test_ld10.py --scilab "$env:SCILAB_BIN" --checker build/Release/layoutcheck.exe --grader build/Release/ldcheck.exe --output "$env:RUNNER_TEMP/ld10-ui"
       - name: Actual Linux LD11 interface and grading
@@ -127,11 +132,11 @@ jobs:
         shell: pwsh
         run: python tools/test_ld11.py --scilab "$env:SCILAB_BIN" --checker build/Release/layoutcheck.exe --grader build/Release/ldcheck.exe --output "$env:RUNNER_TEMP/ld11-ui"
       - name: Actual Linux LD1 student interface and grading
-        if: runner.os == 'Linux'
+        if: inputs.focus != 'ld11' && runner.os == 'Linux'
         shell: bash
         run: xvfb-run --auto-servernum --server-args="-screen 0 1920x1080x24" python tools/test_ld1_student.py --scilab "$SCILAB_BIN" --checker build/layoutcheck --grader build/ldcheck --output "$RUNNER_TEMP/ld1-ui"
       - name: Actual Windows LD1 student interface and grading
-        if: runner.os == 'Windows'
+        if: inputs.focus != 'ld11' && runner.os == 'Windows'
         shell: pwsh
         run: python tools/test_ld1_student.py --scilab "$env:SCILAB_BIN" --checker build/Release/layoutcheck.exe --grader build/Release/ldcheck.exe --output "$env:RUNNER_TEMP/ld1-ui"
       - uses: actions/upload-artifact@v4
@@ -157,7 +162,7 @@ jobs:
             ${{ runner.temp }}/delivery/*.log
             ${{ runner.temp }}/delivery/*.json
       - name: Existing Linux bench geometry
-        if: runner.os == 'Linux'
+        if: inputs.focus != 'ld11' && runner.os == 'Linux'
         shell: bash
         run: |
           xvfb-run --auto-servernum --server-args="-screen 0 1920x1080x24" python tools/test_ld5.py --scilab "$SCILAB_BIN" --checker build/layoutcheck --grader build/ldcheck --output "$RUNNER_TEMP/ld5-ui"

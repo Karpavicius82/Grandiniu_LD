@@ -10,6 +10,9 @@ from pathlib import Path
 import shutil
 import subprocess
 
+# Windows CI may inherit cp1252; Scilab verdicts include Unicode symbols.
+sys.stdout.reconfigure(encoding="utf-8")
+
 p = argparse.ArgumentParser(description=__doc__)
 p.add_argument('--scilab', required=True, type=Path)
 p.add_argument('--checker', required=True, type=Path)

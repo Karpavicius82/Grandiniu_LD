@@ -54,4 +54,11 @@ OS pelės paspaudimų ar visų DPI ir ekranų bandymas. Windows CI naudoja
 Server 2022, ne konkretų Windows 11 įrenginį. Ataskaitos nėra skaitmeniškai
 pasirašytos ir neįrodo studento autorystės; bandymai neatstoja išorinės aprobacijos.
 
+Windows pirmoje CI patikroje Scilab eiga praėjo, bet Python testo žurnalo
+spausdinimas sustojo dėl cp1252 nepalaikomo φ simbolio. Vidinio testavimo
+įrankio stdout nustatytas UTF-8. Studentui skirtas kodas nepasikeitė.
+Pakartotinei Windows patikrai naudojamas LD11 filtras: branduolys, visos
+705 ataskaitos, visas LD11 GUI ir bendras 11 stendų paketo bandymas;
+praėjusių ankstesnių LD GUI testų pakartotinai nevykdome.
+
 Galutiniai platformų rezultatai ir paketų SHA256 bus pridėti po CI.
