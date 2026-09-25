@@ -1,0 +1,22 @@
+{
+  "status": "PASS",
+  "tolerance_cases": 146,
+  "actual_gui_reports": 3,
+  "variants": [
+    1,
+    17,
+    64
+  ],
+  "geometry_cases": 31,
+  "assessment_reports_selected": true,
+  "close_autosave_restore": true,
+  "edge_cases": true,
+  "malformed_drafts_rejected": 6,
+  "report_traceability": true,
+  "submission_sha256": {
+    "LD9-V01-20260924T154745-26358-2-61.html": "0524004b3bdfddd9bff3ed12be4b21400fcf2e24a3d384c97780e8b8c8a3730d",
+    "LD9-V64-20260924T154823-26358-141-183.html": "6feaa7b4eaf76cb88a3fd598a2ca0b8afefeeade60d69950265a0e2da3330c55",
+    "LD9-V17-20260924T154804-26358-360-122.html": "4068e6f189b16edcefae1e90860e22cfb3a61ae3a53605a7ce39d51b5c44421e"
+  },
+  "platform": "posix"
+}

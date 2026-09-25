@@ -55,4 +55,19 @@ vykdo tikrus Scilab mygtukų callback; OS pelės įvykiai neimituojami.
 Konkrečių Windows 11 įrenginių, antivirusinės reputacijos, DPI režimų ar
 pagalbinių prieinamumo priemonių sertifikavimas į šią patikrą neįtrauktas.
 
-Galutiniai platformų rezultatai ir paketų SHA256 bus pridėti po CI.
+## Galutinis platformų rezultatas
+
+Patikrinta programos versija: `a5c2097f846a6d4e049ac5e1ceb791dccb644a6a`.
+[Windows ir Linux](https://github.com/Karpavicius82/Grandiniu_LD/actions/runs/36020040014)
+ir [macOS ARM / Intel](https://github.com/Karpavicius82/Grandiniu_LD/actions/runs/36020040143): **PASS**.
+Visose keturiose aplinkose praėjo 12 CTest rinkinių, 577 tikrų ataskaitų,
+LD9 trijų studento eigų, 146 vertinimo palyginimų, 31 geometrijos scenarijaus
+ir papildomų klaidų atkūrimo patikros. Bendras bandymas atidarė visus devynis
+stendus. Naudoti Windows Server 2022, Ubuntu 22.04, macOS 15 ARM ir Intel.
+
+`verified-packages.json` sieja CI archyvų ir C++ failų SHA256 su patikrinta
+versija. `117` Scilab bei paleidimo failų ir visų
+devynių variantų bankų turinys sutikrintas su šaltiniu. Pateikiamų paketų
+SHA256 yra `distributed-sha256.json`; macOS ZIP pateikti nepakeisti iš CI.
+Linux PNG užfiksuoti galutinės versijos bandyme. Windows / Linux jungtinis
+ZIP papildomai patikrintas dėl failų SHA256 ir vykdymo teisių.

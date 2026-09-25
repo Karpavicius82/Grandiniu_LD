@@ -1,0 +1,126 @@
+{
+  "source_commit": "a5c2097f846a6d4e049ac5e1ceb791dccb644a6a",
+  "runtime_files": 117,
+  "platforms": {
+    "Windows": {
+      "ci_archive_sha256": "7d5e1bb8811a9c1f284dc9410d649778791a802bfd48ed4260b89c2aeb3053f1",
+      "native_sha256": {
+        "ldcheck.exe": "3c12e009349090df189520f96c52e6b6186cb908bb125d87e339d4b8abcd8c3c",
+        "ldcore.dll": "06dc43e62387b476e05f8190ae10618bf45e4385bfab9e8164725b4a864e5f15",
+        "mokytojas.exe": "03d033b1f5874ec78bf6ba42bc88e07b7b31a3b556a0534b6eee9c3311aec2d1"
+      },
+      "ld9": {
+        "status": "PASS",
+        "tolerance_cases": 146,
+        "actual_gui_reports": 3,
+        "variants": [
+          1,
+          17,
+          64
+        ],
+        "geometry_cases": 31,
+        "assessment_reports_selected": true,
+        "close_autosave_restore": true,
+        "edge_cases": true,
+        "malformed_drafts_rejected": 6,
+        "report_traceability": true,
+        "submission_sha256": {
+          "LD9-V01-20260924T153538-1048-214-61.html": "a2f555d61da20ef5aede24bd53c33531b683e29767a56a2c905f162cf5175338",
+          "LD9-V17-20260924T153547-1048-925-122.html": "d12fadf197c0654fb56966a381457a60b479017f76d533b44d2c6825d6102cb3",
+          "LD9-V64-20260924T153557-1048-275-183.html": "3ac8d73e53245e757bd03e225ffdcb7691198075e97d15c1e42bbe162efa48b3"
+        },
+        "platform": "nt"
+      }
+    },
+    "Linux": {
+      "ci_archive_sha256": "f630df9aacaad35e93ff0f23c45ce1001744256cf67fc0495dd4c315e934d4ab",
+      "native_sha256": {
+        "ldcheck": "023479d1d8ef2bd7667bd2bf00c402610b6bad55df120ce798c4d867bbedb774",
+        "ldcore.so": "0c1260e3b41bb3f119dcb45776c35f648489575ce036add11d42d422bf37cd99",
+        "mokytojas": "059b7dfdaff25b505acc1d42b29726c553e4d788e613c35284c1c0a86cd92411"
+      },
+      "ld9": {
+        "status": "PASS",
+        "tolerance_cases": 146,
+        "actual_gui_reports": 3,
+        "variants": [
+          1,
+          17,
+          64
+        ],
+        "geometry_cases": 31,
+        "assessment_reports_selected": true,
+        "close_autosave_restore": true,
+        "edge_cases": true,
+        "malformed_drafts_rejected": 6,
+        "report_traceability": true,
+        "submission_sha256": {
+          "LD9-V01-20260924T153136-4646-74-61.html": "ae12d5c585c6ec0d835e84c6ba06385b4c561860b9989b42045204edcd762b7b",
+          "LD9-V17-20260924T153142-4646-996-122.html": "5ccfcdcc5812a77e0d092a00013dcec4d1d1e151e5cc8ee92c2d2abfb833b303",
+          "LD9-V64-20260924T153149-4646-605-183.html": "ffff164ed87e027524c958220f328dd065a375b78ee153bde8f4e6ce4cfed294"
+        },
+        "platform": "posix"
+      }
+    },
+    "macOS-arm64": {
+      "ci_archive_sha256": "d53604b0112c1c12233d33ca469df3520a87bfa639ab18349b540340ca6c4d6c",
+      "native_sha256": {
+        "ldcheck": "e5e8595cdb045308dcdc847323f42365d390a0eefaf814e53825ce3b363cff2d",
+        "ldcore.dylib": "ba5e9c134561eb53b83dc179873bc465348b95320e0d68bdf7a5334f400dd357",
+        "mokytojas": "096c1a926398a4707408eb518897b9a6e0e4eda24ed2d7faabd6b13a8fe5c5dc"
+      },
+      "ld9": {
+        "status": "PASS",
+        "tolerance_cases": 146,
+        "actual_gui_reports": 3,
+        "variants": [
+          1,
+          17,
+          64
+        ],
+        "geometry_cases": 31,
+        "assessment_reports_selected": true,
+        "close_autosave_restore": true,
+        "edge_cases": true,
+        "malformed_drafts_rejected": 6,
+        "report_traceability": true,
+        "submission_sha256": {
+          "LD9-V17-20260924T153635-13045-791-122.html": "19e275cf913f5fdfc9b9a91008a364c7249bb3fcd4682a9549e4e24dbb6b12f0",
+          "LD9-V01-20260924T153621-13045-81-61.html": "9c43ef41733d55977386bf719dcb18029387e068a82668da6cc8086b571c986e",
+          "LD9-V64-20260924T153647-13045-535-183.html": "c4bab1008314e168dd19e045ff827c720ce0069c5fb6fb7560155dfdae2bc284"
+        },
+        "platform": "posix"
+      }
+    },
+    "macOS-x86_64": {
+      "ci_archive_sha256": "caecedb701550d223f4cfc1147d996dd499ba473139cf69ff5aab308a67682c9",
+      "native_sha256": {
+        "ldcheck": "96a1d7c6916009b17b118a0755211c19d0bd0578cf976bbc5645662c352e25f2",
+        "ldcore.dylib": "2940a3a9d5d8c8356c87b6d0983c80c65be5200de2052632a363555fa495bf92",
+        "mokytojas": "25f9b84343ae77fa8ac8a846d868018c0b8bacefd0acc476c96af17d33ac0e65"
+      },
+      "ld9": {
+        "status": "PASS",
+        "tolerance_cases": 146,
+        "actual_gui_reports": 3,
+        "variants": [
+          1,
+          17,
+          64
+        ],
+        "geometry_cases": 31,
+        "assessment_reports_selected": true,
+        "close_autosave_restore": true,
+        "edge_cases": true,
+        "malformed_drafts_rejected": 6,
+        "report_traceability": true,
+        "submission_sha256": {
+          "LD9-V01-20260924T154745-26358-2-61.html": "0524004b3bdfddd9bff3ed12be4b21400fcf2e24a3d384c97780e8b8c8a3730d",
+          "LD9-V64-20260924T154823-26358-141-183.html": "6feaa7b4eaf76cb88a3fd598a2ca0b8afefeeade60d69950265a0e2da3330c55",
+          "LD9-V17-20260924T154804-26358-360-122.html": "4068e6f189b16edcefae1e90860e22cfb3a61ae3a53605a7ce39d51b5c44421e"
+        },
+        "platform": "posix"
+      }
+    }
+  }
+}

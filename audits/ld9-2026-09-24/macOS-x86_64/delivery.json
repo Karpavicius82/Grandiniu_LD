@@ -1,0 +1,32 @@
+{
+  "status": "PASS",
+  "platform": "darwin",
+  "labs": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9
+  ],
+  "canvas": [
+    1280,
+    720
+  ],
+  "small_screens": [
+    [
+      1024,
+      768
+    ],
+    [
+      900,
+      600
+    ]
+  ],
+  "scrollable": true,
+  "report_buttons": 3,
+  "ld2_ld3_workflows": true
+}
