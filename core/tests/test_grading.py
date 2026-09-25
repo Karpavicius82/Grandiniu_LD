@@ -244,6 +244,40 @@ def fixture(lab, n, identity):
         wiring = [["GEN_P", "K1"], ["K2", "A_P"], ["A_N", "R_A"], ["R_A", "L_A"],
                   ["L_A", "C_A"], ["R_B", "GEN_N"], ["R_B", "L_B"], ["L_B", "C_B"]]
         report["evidence"] = dict(wiring={"s1": dict(pairs=copy.deepcopy(wiring), meter="AC")})
+    elif lab == "LD11":
+        import math as m11
+        e11_ = [5, 6, 7, 8, 9, 10, 11, 12][b]
+        r11_ = [10, 15, 22, 33, 47, 68, 82, 100][a]
+        l11_ = [100, 150, 220, 330, 470, 680, 1000, 1500][(a + b) % 8] * 1e-3
+        w11 = 2 * m11.pi * 50
+        xl11 = w11 * l11_
+        ck11 = round(xl11 / (w11 * (r11_ * r11_ + xl11 * xl11)) * 1e8) / 1e8
+        report["parameters"] = dict(E=e11_, f=50, R=r11_, L=l11_, Ck=ck11)
+        z11 = m11.hypot(r11_, xl11)
+        i1 = e11_ / z11
+        adm2 = complex(r11_ / (z11 * z11), xl11 / (z11 * z11) - w11 * ck11)
+        i2 = e11_ * abs(adm2)
+        p1 = e11_ * i1 * r11_ / z11
+        q1 = e11_ * i1 * xl11 / z11
+        s1 = e11_ * i1
+        p2 = e11_ * i2 * (p1 / s1)  # P išlieka: aktyvioji dalis nepakinta
+        p2 = p1
+        s2 = e11_ * i2
+        q2 = m11.sqrt(max(s2 * s2 - p2 * p2, 0.0))
+        observation("u1", e11_, "V")
+        observation("i1", i1 * 1000, "mA")
+        observation("p1", p1 * 1000, "mW")
+        observation("u2", e11_, "V")
+        observation("i2", i2 * 1000, "mA")
+        observation("p2", p2 * 1000, "mW")
+        vector(1, [r11_ / z11], ["1"])
+        vector(2, [s1 * 1000, q1 * 1000, p1 / s1], ["mVA", "mvar", "1"])
+        vector(3, [ck11 * 1e6], ["uF"])
+        vector(5, [s2 * 1000, q2 * 1000, p2 / s2, (s1 - s2) * 1000], ["mVA", "mvar", "1", "mVA"])
+        vector(6, [1, 1, 1], ["choice", "choice", "choice"])
+        base1 = [["GEN_P", "K1"], ["K2", "A_P"], ["A_N", "RL_A"], ["RL_B", "GEN_N"]]
+        wirings = {"s1": base1, "s4": base1 + [["RL_A", "C_A"], ["C_B", "GEN_N"]]}
+        report["evidence"] = dict(wiring={k: dict(pairs=copy.deepcopy(v), meter="AC") for k, v in wirings.items()})
     else:
         report["parameters"] = dict(E_RC=9,F_RC=frc,R8=r8,C2=4.7e-6,E_RL=9,F_RL=frl,R9=r9,L1=.5,
                                     E_RLC=5,R13=r13,L3=l,C4=c)

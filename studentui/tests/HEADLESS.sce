@@ -2,9 +2,9 @@ mode(-1);
 root=get_absolute_file_path("HEADLESS.sce")+"../";
 try
     if ~isdir(root+"tests/results") then mkdir(root+"tests/results"); end
-    exec(root+"LD1/LD1_LOAD.sce",-1); exec(root+"LD2/LD2_LOAD.sce",-1); exec(root+"LD3/LD3_LOAD.sce",-1); exec(root+"LD4/LD4_LOAD.sce",-1); exec(root+"LD5/LD5_LOAD.sce",-1); exec(root+"LD6/LD6_LOAD.sce",-1); exec(root+"LD7/LD7_LOAD.sce",-1); exec(root+"LD8/LD8_LOAD.sce",-1); exec(root+"LD9/LD9_LOAD.sce",-1); exec(root+"LD10/LD10_LOAD.sce",-1);
+    exec(root+"LD1/LD1_LOAD.sce",-1); exec(root+"LD2/LD2_LOAD.sce",-1); exec(root+"LD3/LD3_LOAD.sce",-1); exec(root+"LD4/LD4_LOAD.sce",-1); exec(root+"LD5/LD5_LOAD.sce",-1); exec(root+"LD6/LD6_LOAD.sce",-1); exec(root+"LD7/LD7_LOAD.sce",-1); exec(root+"LD8/LD8_LOAD.sce",-1); exec(root+"LD9/LD9_LOAD.sce",-1); exec(root+"LD10/LD10_LOAD.sce",-1); exec(root+"LD11/LD11_LOAD.sce",-1);
     exec(root+"tests/workflows.sci",-1);
-    global LD1 LD2 LD3 LD4 LD5 LD6 LD7 LD8 LD9 LD10;
+    global LD1 LD2 LD3 LD4 LD5 LD6 LD7 LD8 LD9 LD10 LD11;
     [ok,log]=ld2_selftest(); mputl(log,root+"LD2/LD2_SELFTEST_LAST.txt");
     if ~ok then disp(log); error("LD2 bazinė savikontrolė nepraėjo."); end
     for invalid=["0" "65" "1.5" "1+2" "1e1" "%nan" "" "abc"]
@@ -151,8 +151,24 @@ try
         table10($+1)=msprintf("LD10-V%02d;%g;%.2f;%g;%g;%.1f",n,c.E,c.R,c.LmH,c.CnF,f0);
     end
     mputl(table10,root+"LD10/VARIANTAI.csv");
+    table11="Variantas;E;R;L_mH;Ck_uF;cos_fi0";
+    for n=1:64
+        c=ld11_variant_config(n); [v11,w11]=ld11_validate_config(c);
+        assert_checktrue(v11);
+        // Kompensacija įmanoma: cos φ0 tikrai < 1, Ck realiame diapazone.
+        w=2*%pi*50; xl=w*c.L; z=sqrt(c.R^2+xl^2);
+        cf=c.R/z;
+        assert_checktrue(cf>0.02 & cf<0.98);
+        assert_checktrue(c.Ck*1e6>0.5 & c.Ck*1e6<500);
+        // Po kompensacijos: I krinta, P tas pats, cos φ → 1.
+        g=c.R/(z*z); b2=w*c.Ck-xl/(z*z);
+        i1=c.E*sqrt(g^2+(xl/(z*z))^2); i2=c.E*sqrt(g^2+b2^2);
+        assert_checktrue(i2<i1);
+        table11($+1)=msprintf("LD11-V%02d;%g;%g;%g;%.2f;%.3f",n,c.E,c.R,c.LmH,c.Ck*1e6,cf);
+    end
+    mputl(table11,root+"LD11/VARIANTAI.csv");
     // Instrukcijų <-> registrų konsistencija (analogas: tools/check_instruction_registry.py).
-    codes1=ld1_all_codes(); codes2=ld2_all_codes(); codes3=ld3_all_codes(); codes4=ld4_all_codes(); codes5=ld5_all_codes(); codes6=ld6_all_codes(); codes7=ld7_all_codes(); codes8=ld8_all_codes(); codes9=ld9_all_codes(); codes10=ld10_all_codes();
+    codes1=ld1_all_codes(); codes2=ld2_all_codes(); codes3=ld3_all_codes(); codes4=ld4_all_codes(); codes5=ld5_all_codes(); codes6=ld6_all_codes(); codes7=ld7_all_codes(); codes8=ld8_all_codes(); codes9=ld9_all_codes(); codes10=ld10_all_codes(); codes11=ld11_all_codes();
     n1=size(codes1,1); n2=size(codes2,1); n3=size(codes3,1);
     if n1<40 then error("LD1 registras per mažas: "+string(n1)+" kodų (tikėtasi ne mažiau 40)."); end
     if n2<50 then error("LD2 registras per mažas: "+string(n2)+" kodų (tikėtasi ne mažiau 50)."); end
@@ -191,6 +207,10 @@ try
     if n10<35 then error("LD10 registras per mažas: "+string(n10)); end
     if size(unique(codes10),1)<>n10 then error("LD10 registre pasikartoja kodai."); end
     if size(find(codes10=="T01"),"*")==0 | size(find(codes10=="B01"),"*")==0 then error("LD10 registre trūksta T01/B01."); end
+    n11=size(codes11,1);
+    if n11<35 then error("LD11 registras per mažas: "+string(n11)); end
+    if size(unique(codes11),1)<>n11 then error("LD11 registre pasikartoja kodai."); end
+    if size(find(codes11=="T01"),"*")==0 | size(find(codes11=="B01"),"*")==0 then error("LD11 registre trūksta T01/B01."); end
     // Deklaracijos (REGISTRY-CODES) ir generatoriaus (ld*_all_codes) tapatumas abi kryptimis.
     function r=ldx_digit(ch)
         r=%f;
@@ -240,6 +260,7 @@ try
     [decl8,pb8]=ldx_declared(root+"LD8/ld8_ids.sci");
     [decl9,pb9]=ldx_declared(root+"LD9/ld9_ids.sci");
     [decl10,pb10]=ldx_declared(root+"LD10/ld10_ids.sci");
+    [decl11,pb11]=ldx_declared(root+"LD11/ld11_ids.sci");
     if pb1<>[] then error("LD1 deklaracijos klaida: "+strcat(pb1,"; ")); end
     if pb2<>[] then error("LD2 deklaracijos klaida: "+strcat(pb2,"; ")); end
     if pb3<>[] then error("LD3 deklaracijos klaida: "+strcat(pb3,"; ")); end
@@ -250,6 +271,7 @@ try
     if pb8<>[] then error("LD8 deklaracijos klaida: "+strcat(pb8,"; ")); end
     if pb9<>[] then error("LD9 deklaracijos klaida: "+strcat(pb9,"; ")); end
     if pb10<>[] then error("LD10 deklaracijos klaida: "+strcat(pb10,"; ")); end
+    if pb11<>[] then error("LD11 deklaracijos klaida: "+strcat(pb11,"; ")); end
     for c=1:n1
         if size(find(decl1==codes1(c)),"*")==0 then error("LD1 generuotas kodas "+codes1(c)+" nėra REGISTRY-CODES deklaracijoje."); end
     end
@@ -304,8 +326,14 @@ try
     for c=1:size(decl10,"*")
         if size(find(codes10==decl10(c)),"*")==0 then error("LD10 deklaruotas kodas "+decl10(c)+" negeneruojamas."); end
     end
-    mprintf("REGISTRY_OK: LD1 %d, LD2 %d, LD3 %d, LD4 %d, LD5 %d, LD6 %d, LD7 %d, LD8 %d, LD9 %d, LD10 %d kodų — unikalūs, pavyzdiniai T01/B01 rasti\n",n1,n2,n3,n4,n5,n6,n7,n8,n9,n10);
-    mprintf("HEADLESS_PASS: 64 LD1 + 64 LD2 + 64 LD3 + 64 LD4 + 64 LD5 + 64 LD6 + 64 LD7 + 64 LD8 + 64 LD9 + 64 LD10 variantai, įvesties atmetimas, 768 LD2 etapų, Ohmo modelis, sesijos atkūrimas\n");
+    for c=1:n11
+        if size(find(decl11==codes11(c)),"*")==0 then error("LD11 generuotas kodas "+codes11(c)+" nėra deklaracijoje."); end
+    end
+    for c=1:size(decl11,"*")
+        if size(find(codes11==decl11(c)),"*")==0 then error("LD11 deklaruotas kodas "+decl11(c)+" negeneruojamas."); end
+    end
+    mprintf("REGISTRY_OK: LD1 %d, LD2 %d, LD3 %d, LD4 %d, LD5 %d, LD6 %d, LD7 %d, LD8 %d, LD9 %d, LD10 %d, LD11 %d kodų — unikalūs, pavyzdiniai T01/B01 rasti\n",n1,n2,n3,n4,n5,n6,n7,n8,n9,n10,n11);
+    mprintf("HEADLESS_PASS: 64 LD1 + 64 LD2 + 64 LD3 + 64 LD4 + 64 LD5 + 64 LD6 + 64 LD7 + 64 LD8 + 64 LD9 + 64 LD10 + 64 LD11 variantai, įvesties atmetimas, 768 LD2 etapų, Ohmo modelis, sesijos atkūrimas\n");
     exit(0);
 catch
     mprintf("HEADLESS_FAIL: %s\n",strcat(lasterror()," | ")); exit(1);

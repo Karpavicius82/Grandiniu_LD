@@ -1,6 +1,6 @@
 # Bendras C++ branduolys ir automatinis vertinimas
 
-Versija 0.3.0. Įgyvendintas **LD1–LD10** ataskaitų vertinimas, kiekvienam po 64 pastovius variantus. Kitų 3 darbų ši versija dar nevertina. [Ankstesnis 2026-09-13 patikros protokolas](../audits/closure-2026-09-13/README.md). Tai vidiniams priėmimo bandymams skirtas leidimas, ne išorinė aprobacija.
+Versija 0.3.0. Įgyvendintas **LD1–LD11** ataskaitų vertinimas, kiekvienam po 64 pastovius variantus. Kitų 2 darbų ši versija dar nevertina. [Ankstesnis 2026-09-13 patikros protokolas](../audits/closure-2026-09-13/README.md). Tai vidiniams priėmimo bandymams skirtas leidimas, ne išorinė aprobacija.
 
 Studentas atveria `STENDAS.sce`, įveda vardą, grupę ir eilės numerį. Atsiskaitymo režime mygtukas **Įrašyti ir toliau** išsaugo ir klaidingus atsakymus. Pabaigoje **Išsaugoti ataskaitą** sukuria vieną HTML failą naudotojo aplanke `Grandiniu_LD_darbai`. Tą failą studentas persiunčia dėstytojui. Ataskaitą galima sukurti ir nebaigus darbo, per Pagalbą. Mokymosi režimas, pavyzdžiai ir juodraščio atvėrimas yra Pagalboje.
 
@@ -23,6 +23,8 @@ LD8, bankas `LD8-64-A-2026`, rubrika `LD8-1`: 21 vienodo svorio kriterijus – 1
 LD9, bankas `LD9-64-A-2026`, rubrika `LD9-1`: 28 vienodo svorio kriterijai – 12 atsakymų (teorinis f0, kokybė Q, UL−UC, įtampų trikampis, Z, cos φ, P/Q/S, išvados), 15 matavimo reikšmių (3 dažnio taškai × I, UR, UL, UC, U) ir 1 sujungimo įrodymas. Fizika — tas pats `ld::ac` nuoseklio RLC modelys ties 0,5·f0, f0 ir 2·f0. Nauji ataskaitos vienetai `mvar` ir `mVA` reaktyviajai bei pilnutinei galiai. Tolerancijos: 1 % f0 ir Q, UL−UC iki 0,02 V, 2 % trikampių dydžiams; pasirinkimai tikslūs.
 
 LD10, bankas `LD10-64-A-2026`, rubrika `LD10-1`: 28 vienodo svorio kriterijai – 12 atsakymų (teorinis f0, srovių kokybė Q, IL−IC, srovių trikampis, laidis Y, cos φ, P/Q/S, išvados), 15 matavimo reikšmių (3 taškai × U, IR, IL, IC, I bendroji) ir 1 sujungimo įrodymas. Fizika — naujas `ld::ac` kind 4 (lygiagretis RLC per MNA): ties f0 bendroji srovė minimali ir lygi U/R. Naujas ataskaitos vienetas `mS` pilnutiniam laidžiui. Tolerancijos: 1 % f0 ir Q, IL−IC iki 0,02 mA, 2 % trikampių dydžiams; pasirinkimai tikslūs.
+
+LD11, bankas `LD11-64-A-2026`, rubrika `LD11-1`: 20 vienodo svorio kriterijų – 12 atsakymų (cos φ0, S/Q/cos φ be Ck, teorinis Ck, S2/Q2/cos φ2/ΔS su Ck, išvados), 6 matavimo reikšmės (U, I, P abiejuose režimuose) ir 2 sujungimo įrodymai. Fizika — `ld::ac` kind 5 (R, L nuosekliai su lygiagrečiu C; C = 0 – be kondensatoriaus) analitiškai: G = R/Z², B = ωC − XL/Z²; po pilnos kompensacijos I = E·G ir cos φ = 1. Naujas ataskaitos vienetas `uF` kondensatoriui. Tolerancijos: 1 % cos φ0, 3 % Ck, 2 % galioms; pasirinkimai tikslūs.
 
 `LD1-2` (automatinis stendo paruošimas): 15 studento atsakymų kriterijų. Penki matavimai ir du sujungimai išlieka diagnostikoje, tačiau turi 0 balų svorį.
 

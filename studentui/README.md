@@ -33,6 +33,14 @@ Pavyzdžio peržiūra nekeičia jūsų matavimų ir jos negalima pateikti kaip a
 LD5 skaičiavimams ir ataskaitų vertinimui naudojamas bendras C++ branduolys.
 LD5 turi 64 pastovius variantus: `LD5/VARIANTAI.csv`.
 
+**LD11 – aktyvioji, reaktyvioji ir pilnutinė galia; cos φ gerinimas:** šeši
+etapai, rišlė (R, L nuosekliai) prie 50 Hz generatoriaus; stende ampermetras,
+voltmetras ir vatmetras (P). Režimai [B10] be Ck ir [B11] su Ck — kompensuojančiu
+kondensatoriumi lygiagrečiai rišlei. Pirmas matavimas: S = U·I, Q = √(S²−P²),
+cos φ = P/S. Studentas apskaičiuoja teorinį Ck = XL/(ω(R²+XL²)) ir palygina:
+po kompensacijos P nepakinta, S bei I sumažėja, cos φ → 1 (galios trikampio
+susispaudimas). 64 variantai: `LD11/VARIANTAI.csv`, bankas `LD11-64-A-2026`.
+
 **LD10 – lygiagretė RLC grandinė: srovių rezonansas:** šeši etapai, generatorius →
 jungiklis → ampermetras → mazgas, kuriame R, L ir C šakos jungiamos lygiagrečiai.
 Tie patys trys dažnio taškai [B10]–[B12]; ampermetras perkeliamas mygtukais
@@ -108,7 +116,7 @@ Paketai nėra pasirašyti Apple Developer sertifikatu ar notarizuoti.
 Linux: `./PALEISTI.sh`. Scilab aplinkoje: vykdykite `STENDAS.sce` ir pasirinkite darbą.
 Windows: dukart paspauskite `PALEISTI.bat` arba vykdykite `STENDAS.sce` grafiniame
 Scilab lange. `bin/ldcheck.exe` skirtas dėstytojo ataskaitų tikrinimui.
-Atskirai galima vykdyti atitinkamą `LD1/LD1.sce`–`LD10/LD10.sce` failą.
+Atskirai galima vykdyti atitinkamą `LD1/LD1.sce`–`LD11/LD11.sce` failą.
 Paleidiklis ieško įdiegto Scilab; prireikus nurodykite `SCILAB_BIN=/visas/kelias/bin/scilab`.
 
 Paketą platinkite atsisiuntimo nuoroda. Gmail gali blokuoti archyvą dėl jame esančių
