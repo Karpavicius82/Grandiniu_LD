@@ -73,4 +73,19 @@ patikrinimo Python kintamasis `a` užgožė komandų parametrus. Vidinis testas
 pataisytas naudojant `wire_a` / `wire_b`; jo visa paskesnė vertinimo dalis
 patikrinta su jau išsaugotomis tikromis ataskaitomis. Studento kodas nesikeitė.
 
-Galutiniai platformų rezultatai ir paketų SHA256 bus pridėti po CI.
+## Galutinis platformų rezultatas
+
+Patikrinta programos versija: `1ae83a55ca29d8753418c8fc0cb8470f510d4481`.
+[Windows ir Linux](https://github.com/Karpavicius82/Grandiniu_LD/actions/runs/36167179434)
+ir [macOS ARM / Intel](https://github.com/Karpavicius82/Grandiniu_LD/actions/runs/36167179573): **PASS**.
+Visose keturiose aplinkose praėjo 15 CTest rinkinių, 769 tikrų ataskaitų,
+LD12 trijų studento eigų, 122 vertinimo palyginimų, 26 geometrijos scenarijų
+ir papildomų klaidų atkūrimo patikros. Bendras bandymas atidarė visus dvylika
+stendų. Naudoti Windows Server 2022, Ubuntu 22.04, macOS 15 ARM ir Intel.
+
+`verified-packages.json` sieja CI archyvų ir C++ failų SHA256 su patikrinta
+versija. `147` Scilab bei paleidimo failų ir visų
+dvylikos variantų bankų turinys sutikrintas su šaltiniu. Pateikiamų paketų
+SHA256 yra `distributed-sha256.json`; macOS ZIP pateikti nepakeisti iš CI.
+Linux PNG užfiksuoti galutinės versijos bandyme. Windows / Linux jungtinis
+ZIP papildomai patikrintas dėl failų SHA256 ir vykdymo teisių.

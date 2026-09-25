@@ -1,0 +1,1 @@
+LD12_PASS: 3 actual assessment workflows; 26 fixed-canvas geometry cases; 122 grading comparisons; seven independently recorded channels; no fabricated measurements; close/help recovery; eight malformed drafts; save failure; demo isolation; stale callbacks ignored

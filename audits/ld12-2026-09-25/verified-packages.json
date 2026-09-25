@@ -1,0 +1,130 @@
+{
+  "source_commit": "1ae83a55ca29d8753418c8fc0cb8470f510d4481",
+  "runtime_files": 147,
+  "platforms": {
+    "Windows": {
+      "ci_archive_sha256": "a0ec38829e60e7a8e565e57489f80908b4bd0a6d50ab1f77c95b76dd603d6c45",
+      "native_sha256": {
+        "ldcheck.exe": "a9d69b25ad1f3b4e510a758dbe8191dffa4fa5a4c13d92bdb5956dc59657af86",
+        "ldcore.dll": "ec87aea3e0fcf1b51daec36073644c3e4534538196acbc05fea3b5ef0030d385",
+        "mokytojas.exe": "9c5393f6d70a38bf062fc305c2e49093c1d4e041502a659bb7e50905fee3d8a4"
+      },
+      "ld12": {
+        "status": "PASS",
+        "tolerance_cases": 122,
+        "actual_gui_reports": 3,
+        "variants": [
+          1,
+          17,
+          64
+        ],
+        "geometry_cases": 26,
+        "collinear_wire_overlaps": 0,
+        "assessment_reports_selected": true,
+        "close_autosave_restore": true,
+        "edge_cases": true,
+        "malformed_drafts_rejected": 8,
+        "report_traceability": true,
+        "submission_sha256": {
+          "LD12-V01-20260925T173057-6036-660-107.html": "e4e1e5bda08d8d700a4e2e4dba4e88b71e4fb8a46347e5e3fc5270decf6b1751",
+          "LD12-V17-20260925T173104-6036-996-214.html": "d8aa49ed1eb4fe6cfede4adc52026bce9348d26f6c2490027cbe9c8a31c8ed2a",
+          "LD12-V64-20260925T173111-6036-852-321.html": "e7aaa6ae8769b5de876715b21d563b47d78a6514bf33a4270a643736a4336b4f"
+        },
+        "platform": "nt"
+      }
+    },
+    "Linux": {
+      "ci_archive_sha256": "76b019bc01b0b23fe404c2d6e9ce15ec5593efcf1a9cfeb2edb69bd83f5a9337",
+      "native_sha256": {
+        "ldcheck": "023479d1d8ef2bd7667bd2bf00c402610b6bad55df120ce798c4d867bbedb774",
+        "ldcore.so": "4c37ffda528486966de50aa5a3e0954d0eda466194d6b10dbe1c9177505022ec",
+        "mokytojas": "059b7dfdaff25b505acc1d42b29726c553e4d788e613c35284c1c0a86cd92411"
+      },
+      "ld12": {
+        "status": "PASS",
+        "tolerance_cases": 122,
+        "actual_gui_reports": 3,
+        "variants": [
+          1,
+          17,
+          64
+        ],
+        "geometry_cases": 26,
+        "collinear_wire_overlaps": 0,
+        "assessment_reports_selected": true,
+        "close_autosave_restore": true,
+        "edge_cases": true,
+        "malformed_drafts_rejected": 8,
+        "report_traceability": true,
+        "submission_sha256": {
+          "LD12-V01-20260925T172935-2682-808-107.html": "c7b683ac6580f0e5ee46622bdbb8a79c90fde2df0bd00d2e5a9fb852821f0c81",
+          "LD12-V17-20260925T172943-2682-947-214.html": "a3a1893b036a63bbca58cfc055681d6f630bc35d422312b4834ff07b7d19dcae",
+          "LD12-V64-20260925T172951-2682-832-321.html": "921179151b0588bc788ef73ae8ae5964932f0661bf13bfc064d3539b0c6ff7bb"
+        },
+        "platform": "posix"
+      }
+    },
+    "macOS-arm64": {
+      "ci_archive_sha256": "f63a3e311810811362c835645cc7baceeb055450652cd5ca6bba3ca54e5b5568",
+      "native_sha256": {
+        "ldcheck": "e5e8595cdb045308dcdc847323f42365d390a0eefaf814e53825ce3b363cff2d",
+        "ldcore.dylib": "4db45c07029a2077b0b4f3735853cfc01bccc9f5536208d5edf31572ec3edaa7",
+        "mokytojas": "096c1a926398a4707408eb518897b9a6e0e4eda24ed2d7faabd6b13a8fe5c5dc"
+      },
+      "ld12": {
+        "status": "PASS",
+        "tolerance_cases": 122,
+        "actual_gui_reports": 3,
+        "variants": [
+          1,
+          17,
+          64
+        ],
+        "geometry_cases": 26,
+        "collinear_wire_overlaps": 0,
+        "assessment_reports_selected": true,
+        "close_autosave_restore": true,
+        "edge_cases": true,
+        "malformed_drafts_rejected": 8,
+        "report_traceability": true,
+        "submission_sha256": {
+          "LD12-V01-20260925T172924-2882-362-107.html": "7600d2ed1ca8a3735f1d2ee50848860d47e656d6fc3500c1037bd19bfc18a0ca",
+          "LD12-V17-20260925T172939-2882-917-214.html": "9fbd54185ec754f0d3aa54048c6e2ab9d4f51193e33869ca317b8b2483fd5697",
+          "LD12-V64-20260925T172954-2882-677-321.html": "4325a68e02ecbc8d271948f7c235ebe3bab2c0c471255182dc945c34eb69f9c9"
+        },
+        "platform": "posix"
+      }
+    },
+    "macOS-x86_64": {
+      "ci_archive_sha256": "1efa34e271d15c14cd786c12cc443abd403059c49a90904dd463360e99c4f6a5",
+      "native_sha256": {
+        "ldcheck": "96a1d7c6916009b17b118a0755211c19d0bd0578cf976bbc5645662c352e25f2",
+        "ldcore.dylib": "003e5dc6a88ed61eaf4f9c7f8b4e0cdb749d6887781c6a001aa285657912d40d",
+        "mokytojas": "25f9b84343ae77fa8ac8a846d868018c0b8bacefd0acc476c96af17d33ac0e65"
+      },
+      "ld12": {
+        "status": "PASS",
+        "tolerance_cases": 122,
+        "actual_gui_reports": 3,
+        "variants": [
+          1,
+          17,
+          64
+        ],
+        "geometry_cases": 26,
+        "collinear_wire_overlaps": 0,
+        "assessment_reports_selected": true,
+        "close_autosave_restore": true,
+        "edge_cases": true,
+        "malformed_drafts_rejected": 8,
+        "report_traceability": true,
+        "submission_sha256": {
+          "LD12-V64-20260925T173428-10473-822-321.html": "d2b18b47b589b90868ec8bdddd5ed473483a8277877a37005ecf0d5ef486b844",
+          "LD12-V01-20260925T173343-10473-518-107.html": "2ebe82dbbdb663039f26b18892d04b9a653e3550288a54c79c923a20b5e50c87",
+          "LD12-V17-20260925T173407-10473-663-214.html": "d8cf091aa1c771dc71aa0d127abc44feeee0cb00d66ef83c54939ffc87a17926"
+        },
+        "platform": "posix"
+      }
+    }
+  }
+}

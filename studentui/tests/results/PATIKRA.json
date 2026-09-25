@@ -1,147 +1,142 @@
 {
-  "time_utc": "2026-09-25T12:53:15.873637+00:00",
+  "time_utc": "2026-09-25T17:38:49.221206+00:00",
   "scilab": "2026.1.0",
-  "command": "GitHub Actions native.yml and macos.yml: 14 CTest suites, 705 actual reports, LD1-LD11 GUI and student delivery",
+  "command": "GitHub Actions native.yml and macos.yml: 15 CTest suites, 769 actual reports, LD12 GUI and 12-lab student delivery",
   "status": "PASS",
   "coverage": {
-    "source_commit": "68a34ae418f6f56ab4651af3635540edbb8c23af",
+    "source_commit": "1ae83a55ca29d8753418c8fc0cb8470f510d4481",
     "status": "PASS",
-    "linux_ci": "https://github.com/Karpavicius82/Grandiniu_LD/actions/runs/36135193103",
-    "windows_ci": "https://github.com/Karpavicius82/Grandiniu_LD/actions/runs/36136848507",
-    "macos_ci": "https://github.com/Karpavicius82/Grandiniu_LD/actions/runs/36135193136",
+    "native_ci": "https://github.com/Karpavicius82/Grandiniu_LD/actions/runs/36167179434",
+    "macos_ci": "https://github.com/Karpavicius82/Grandiniu_LD/actions/runs/36167179573",
     "platforms": [
       "Windows Server 2022",
       "Ubuntu 22.04",
       "macOS 15 arm64",
       "macOS 15 x86_64"
     ],
-    "ctest_suites_per_platform": 14,
-    "actual_reports_per_platform": 705,
+    "ctest_suites_per_platform": 15,
+    "actual_reports_per_platform": 769,
     "packages": {
       "Windows": {
-        "ci_commit": "68a34ae418f6f56ab4651af3635540edbb8c23af",
-        "ci_url": "https://github.com/Karpavicius82/Grandiniu_LD/actions/runs/36136848507",
-        "ci_archive_sha256": "993fd4fb397b06c7369fef2c47d8a1ea18a366f2cf41d2cee3c15a6ca2022f4c",
+        "ci_archive_sha256": "a0ec38829e60e7a8e565e57489f80908b4bd0a6d50ab1f77c95b76dd603d6c45",
         "native_sha256": {
-          "ldcheck.exe": "88b9fa78fee6f9d00d577a9861a51e4b95fe531080d49dcd01306273cd2aec8a",
-          "ldcore.dll": "c5169b397280977e90f06d2e6547f0644a12b4be7ede9977e630aaf4591a0b3f",
-          "mokytojas.exe": "34732e50b42ba34f72b9dac4924b6d741a1c89e184a85a3151b168c4a13d392b"
+          "ldcheck.exe": "a9d69b25ad1f3b4e510a758dbe8191dffa4fa5a4c13d92bdb5956dc59657af86",
+          "ldcore.dll": "ec87aea3e0fcf1b51daec36073644c3e4534538196acbc05fea3b5ef0030d385",
+          "mokytojas.exe": "9c5393f6d70a38bf062fc305c2e49093c1d4e041502a659bb7e50905fee3d8a4"
         },
-        "ld11": {
+        "ld12": {
           "status": "PASS",
-          "tolerance_cases": 146,
+          "tolerance_cases": 122,
           "actual_gui_reports": 3,
           "variants": [
             1,
             17,
             64
           ],
-          "geometry_cases": 23,
+          "geometry_cases": 26,
+          "collinear_wire_overlaps": 0,
           "assessment_reports_selected": true,
           "close_autosave_restore": true,
           "edge_cases": true,
-          "malformed_drafts_rejected": 6,
+          "malformed_drafts_rejected": 8,
           "report_traceability": true,
           "submission_sha256": {
-            "LD11-V01-20260925T125022-5764-65-83.html": "0e3785c98e707d10a6d8eaf6ebd5cb49855acd6b5353befbdcf88c25df1b88b4",
-            "LD11-V17-20260925T125032-5764-620-166.html": "7a35a188e372c747b5005e302eae8f458c85ac98e6e40bfddf5fce96f3ecefec",
-            "LD11-V64-20260925T125042-5764-856-249.html": "8fb374af81b43af380bd56d78b72a115ea4275cf89afe42a47d2ff6ce0657238"
+            "LD12-V01-20260925T173057-6036-660-107.html": "e4e1e5bda08d8d700a4e2e4dba4e88b71e4fb8a46347e5e3fc5270decf6b1751",
+            "LD12-V17-20260925T173104-6036-996-214.html": "d8aa49ed1eb4fe6cfede4adc52026bce9348d26f6c2490027cbe9c8a31c8ed2a",
+            "LD12-V64-20260925T173111-6036-852-321.html": "e7aaa6ae8769b5de876715b21d563b47d78a6514bf33a4270a643736a4336b4f"
           },
           "platform": "nt"
         }
       },
       "Linux": {
-        "ci_commit": "afa6a527ac766457dfc4a1d5f8906bef6656cfdd",
-        "ci_url": "https://github.com/Karpavicius82/Grandiniu_LD/actions/runs/36135193103",
-        "ci_archive_sha256": "6ce2888e9345c278224fc0512f23a1909b0651a448670b04e6bf89235bb7df17",
+        "ci_archive_sha256": "76b019bc01b0b23fe404c2d6e9ce15ec5593efcf1a9cfeb2edb69bd83f5a9337",
         "native_sha256": {
           "ldcheck": "023479d1d8ef2bd7667bd2bf00c402610b6bad55df120ce798c4d867bbedb774",
-          "ldcore.so": "c6ac5a80f84ee0b18342c6e184968fcfdf4fcf1e574db6fa79043e9163fcae66",
+          "ldcore.so": "4c37ffda528486966de50aa5a3e0954d0eda466194d6b10dbe1c9177505022ec",
           "mokytojas": "059b7dfdaff25b505acc1d42b29726c553e4d788e613c35284c1c0a86cd92411"
         },
-        "ld11": {
+        "ld12": {
           "status": "PASS",
-          "tolerance_cases": 146,
+          "tolerance_cases": 122,
           "actual_gui_reports": 3,
           "variants": [
             1,
             17,
             64
           ],
-          "geometry_cases": 23,
+          "geometry_cases": 26,
+          "collinear_wire_overlaps": 0,
           "assessment_reports_selected": true,
           "close_autosave_restore": true,
           "edge_cases": true,
-          "malformed_drafts_rejected": 6,
+          "malformed_drafts_rejected": 8,
           "report_traceability": true,
           "submission_sha256": {
-            "LD11-V17-20260925T123708-5822-110-166.html": "5165cd321d39570c1007b91e0aaff94821eb7d110796c73bd8dd9b42d60a977a",
-            "LD11-V01-20260925T123701-5822-718-83.html": "76ba55c2cb6e196ec0a9bfcfdf9b91ef446bc7dd1f0b3709f23b9a7c9ca5fc5f",
-            "LD11-V64-20260925T123714-5822-186-249.html": "682a362fd02879f24c4d3658dd77be31f445f768aa30cbb7c9dc3bb7e4ec4cf7"
+            "LD12-V01-20260925T172935-2682-808-107.html": "c7b683ac6580f0e5ee46622bdbb8a79c90fde2df0bd00d2e5a9fb852821f0c81",
+            "LD12-V17-20260925T172943-2682-947-214.html": "a3a1893b036a63bbca58cfc055681d6f630bc35d422312b4834ff07b7d19dcae",
+            "LD12-V64-20260925T172951-2682-832-321.html": "921179151b0588bc788ef73ae8ae5964932f0661bf13bfc064d3539b0c6ff7bb"
           },
           "platform": "posix"
         }
       },
       "macOS-arm64": {
-        "ci_commit": "afa6a527ac766457dfc4a1d5f8906bef6656cfdd",
-        "ci_url": "https://github.com/Karpavicius82/Grandiniu_LD/actions/runs/36135193136",
-        "ci_archive_sha256": "449c8fb704ffe117cf96480403e2630d7edfa31b2c0d95559f79a27dfb2c8618",
+        "ci_archive_sha256": "f63a3e311810811362c835645cc7baceeb055450652cd5ca6bba3ca54e5b5568",
         "native_sha256": {
           "ldcheck": "e5e8595cdb045308dcdc847323f42365d390a0eefaf814e53825ce3b363cff2d",
-          "ldcore.dylib": "dd233cd6b0691e25fcb52a58c064895c4a490088ea87f231775da1685c61908c",
+          "ldcore.dylib": "4db45c07029a2077b0b4f3735853cfc01bccc9f5536208d5edf31572ec3edaa7",
           "mokytojas": "096c1a926398a4707408eb518897b9a6e0e4eda24ed2d7faabd6b13a8fe5c5dc"
         },
-        "ld11": {
+        "ld12": {
           "status": "PASS",
-          "tolerance_cases": 146,
+          "tolerance_cases": 122,
           "actual_gui_reports": 3,
           "variants": [
             1,
             17,
             64
           ],
-          "geometry_cases": 23,
+          "geometry_cases": 26,
+          "collinear_wire_overlaps": 0,
           "assessment_reports_selected": true,
           "close_autosave_restore": true,
           "edge_cases": true,
-          "malformed_drafts_rejected": 6,
+          "malformed_drafts_rejected": 8,
           "report_traceability": true,
           "submission_sha256": {
-            "LD11-V17-20260925T123856-11538-577-166.html": "e41db766e6f6e11ccd29766e685d37519470f812d7fd3528013c62449de93a3f",
-            "LD11-V01-20260925T123847-11538-366-83.html": "63295dcf35ba4af0cb8ace47e8bae07f3da9dab73458579a44a8a674c049dc3d",
-            "LD11-V64-20260925T123904-11538-840-249.html": "0e5832578935cb61262e102e15b2a1163dc6f9b45445b4318c484ba582afc1e6"
+            "LD12-V01-20260925T172924-2882-362-107.html": "7600d2ed1ca8a3735f1d2ee50848860d47e656d6fc3500c1037bd19bfc18a0ca",
+            "LD12-V17-20260925T172939-2882-917-214.html": "9fbd54185ec754f0d3aa54048c6e2ab9d4f51193e33869ca317b8b2483fd5697",
+            "LD12-V64-20260925T172954-2882-677-321.html": "4325a68e02ecbc8d271948f7c235ebe3bab2c0c471255182dc945c34eb69f9c9"
           },
           "platform": "posix"
         }
       },
       "macOS-x86_64": {
-        "ci_commit": "afa6a527ac766457dfc4a1d5f8906bef6656cfdd",
-        "ci_url": "https://github.com/Karpavicius82/Grandiniu_LD/actions/runs/36135193136",
-        "ci_archive_sha256": "3304beef1211bda7abf0e4b6b1c1b83d4a5654c6e67556fffdccfb8cc299c351",
+        "ci_archive_sha256": "1efa34e271d15c14cd786c12cc443abd403059c49a90904dd463360e99c4f6a5",
         "native_sha256": {
           "ldcheck": "96a1d7c6916009b17b118a0755211c19d0bd0578cf976bbc5645662c352e25f2",
-          "ldcore.dylib": "50fdb7c1677024e2ff1f10c6fdcdb4921ab4337f39082f1019db7f8c10f8855b",
+          "ldcore.dylib": "003e5dc6a88ed61eaf4f9c7f8b4e0cdb749d6887781c6a001aa285657912d40d",
           "mokytojas": "25f9b84343ae77fa8ac8a846d868018c0b8bacefd0acc476c96af17d33ac0e65"
         },
-        "ld11": {
+        "ld12": {
           "status": "PASS",
-          "tolerance_cases": 146,
+          "tolerance_cases": 122,
           "actual_gui_reports": 3,
           "variants": [
             1,
             17,
             64
           ],
-          "geometry_cases": 23,
+          "geometry_cases": 26,
+          "collinear_wire_overlaps": 0,
           "assessment_reports_selected": true,
           "close_autosave_restore": true,
           "edge_cases": true,
-          "malformed_drafts_rejected": 6,
+          "malformed_drafts_rejected": 8,
           "report_traceability": true,
           "submission_sha256": {
-            "LD11-V64-20260925T124555-29272-732-249.html": "3abacfbbc67c045af56e62193d63de189d34d8a35de46c2cf69d9a038cd9ba2d",
-            "LD11-V01-20260925T124531-29272-96-83.html": "7ede49650fceeb92653fc41fde6a3bd9eb9c8c3021a9efa2aa8b4f346d7e2ee2",
-            "LD11-V17-20260925T124543-29272-774-166.html": "7be44963c884492f6ee2f995e272564ea365c880552eef9410ef5a068c63631f"
+            "LD12-V64-20260925T173428-10473-822-321.html": "d2b18b47b589b90868ec8bdddd5ed473483a8277877a37005ecf0d5ef486b844",
+            "LD12-V01-20260925T173343-10473-518-107.html": "2ebe82dbbdb663039f26b18892d04b9a653e3550288a54c79c923a20b5e50c87",
+            "LD12-V17-20260925T173407-10473-663-214.html": "d8cf091aa1c771dc71aa0d127abc44feeee0cb00d66ef83c54939ffc87a17926"
           },
           "platform": "posix"
         }
@@ -150,7 +145,7 @@
   },
   "source_sha256": {
     "DESTYTOJUI.sce": "6518ec1acc2679736b3bd2b334381aded90c03e6f313559fde5ca1df46af1aa4",
-    "GUI_PATIKRA.sce": "539446b12cbfdc1a79a2c8b6770c25a5ebe269850af3a342a4d94b7db2d27fa5",
+    "GUI_PATIKRA.sce": "90f2f30dec34d322079691f068417c7a2de357a79844cc249385f45054703bf2",
     "LD1/LD1.sce": "369863c411bca178ef30347fe4b4ae90a4ba00904abacff9b8b41a81b3eec611",
     "LD1/LD1_LOAD.sce": "0d68fa3867d82a2085c2d0d494b725acfe774cd32ca0cb7bc955cb810190a379",
     "LD1/ld1_assist.sci": "687d418bee6d66e232c84b1da41a52e6583dff3c301c69806709847d954217f6",
@@ -179,6 +174,15 @@
     "LD11/ld11_ids.sci": "ab30210db43b4fd162ac3f15c115478ab5d8504c07af213a2aaa32ed70a87144",
     "LD11/ld11_student.sci": "5922d19fdbf3e3526dba1bd441fd642494d618f805618a1a527076f9c768dde0",
     "LD11/ld11_utils.sci": "82e6a1adbc2708daa1b0d3e72b337c7d58094a80d9631de2b96c895e533f74aa",
+    "LD12/LD12.sce": "7de0643e5269d42abe397133357469a887cfe2777faa01329ab869a717e53805",
+    "LD12/LD12_LOAD.sce": "acc0db3d4289f05b19a8bf26197320f72f512d3dd441bc9fe10b3d5ef4b78344",
+    "LD12/ld12_callbacks.sci": "3d330713e69b9d44422444151f01db8c35a15df55240be7089e0f266af02c63a",
+    "LD12/ld12_circuit.sci": "217a7ae98c1326cf9aa09294796ccfc3b3daeb6e3fba35efb58508606a8d9db8",
+    "LD12/ld12_config.sci": "a21b24f68394805bac9f8379625b051b77768aacde2d7ae86186c8bbf1b4bdc8",
+    "LD12/ld12_gui.sci": "78f522fad09d73960f033ab6ff00c6de60689818c6f45bc160d0ad38ad25ec04",
+    "LD12/ld12_ids.sci": "a002c6e986d453f39fb1aaba35b196f88d13e13bc4e23d4075cc7f6da409a697",
+    "LD12/ld12_student.sci": "1b8671d6838915136588d16ffe87ab2ac159016420b777e2165f74f71e379bdc",
+    "LD12/ld12_utils.sci": "f61dbab0de88c45d92d609e4c5203ced9b04a0026a16fac45e6ea487a09d475b",
     "LD2/LD2.sce": "b0e34e873ae9e12a1ddeb2e117fcbd49947ebae2d47fdfa39d6f98ff71765798",
     "LD2/LD2_GUI_TEST.sce": "56597c99ab27b2ee167336a6a3d851deb23e01a7fc24c77f9f4056ff8e0471a9",
     "LD2/LD2_LOAD.sce": "7573605d823c74ce33b94b153db9f4fc70c7c17d2845fd99727fc14e42557412",
@@ -268,6 +272,7 @@
     "PERZIURA.sce": "53fa236f6574984056d2f21386392b5d4941c5de74fd2ac48fcac6cbffcee0cc",
     "PERZIURA_LD10.sce": "7de6d232f64a668251fdb22615fd4df7965ebd0d8738170d4eac3661e1e01b7a",
     "PERZIURA_LD11.sce": "3b99c4e2701233e5be5409ef621e407cc6213640e344f0c2de41538146b45152",
+    "PERZIURA_LD12.sce": "0a3140504ac2f569d23af5e79f5ebdb8d59aab9b305dca5f0e3b0f3c370a808e",
     "PERZIURA_LD2.sce": "64461ba07fcf298f561d061979c518213bfd81b439d918dbf98c0f8c1a6e7a35",
     "PERZIURA_LD3.sce": "17ff85ef2dd5d0e5c25d9096e1691f8c94b46b4748fa27d16cdbe7a45746d23b",
     "PERZIURA_LD4.sce": "1dbd04909b487b5586d41b2dc9ce650e3c29e92443841768e5f7fe86826050d8",
@@ -276,16 +281,16 @@
     "PERZIURA_LD7.sce": "5b5c73c6b380a5c0fded53ee2518f08c6f32795b7e679cfa7f1eaaec60b7eebd",
     "PERZIURA_LD8.sce": "0dc7a84c7a6cbbca9d96a87b72ab666c6c944d752d5dd62c108d5604e885d64a",
     "PERZIURA_LD9.sce": "6493e361fd0bbaf0795d28cb092c542efff7ab06d3eb0ea4e6b677dc8914876a",
-    "STENDAS.sce": "e4d409496456e1983bce74aa6336a129e002b46d4872cd902646c14b7a4eb10a",
-    "bench_common.sci": "175152d703f6d62d9e6a0f848e4b33d11a87dfe6673ad2317b94253893ffbe41",
-    "bench_report.sci": "3bb17d76a57f67b5fdacd8855660ab0e7efab8555c1c64a1d58afb5393b88646",
-    "bench_session.sci": "47334cae6a4ac239301ca518ab39155d627f7d8e3faf8af70c1103f51a693879",
+    "STENDAS.sce": "b6d99f5a3fcec5f1df944da3dc9cb120ed1d73f50ec241b31b60f123f2a30353",
+    "bench_common.sci": "e7976bc7e823e7c0a140aca77773868bce7a5f606679631c02378f27c5a933ab",
+    "bench_report.sci": "4edadf0b3712db798dd677659493a71edbbc71e6dd84558d1bce0397521740de",
+    "bench_session.sci": "1b102e44657861517a360fd93b05a3db5ee7506e1dbf6f6ab030542a8f34861e",
     "bench_teacher.sci": "ec1ce34f4358bace3694bc8a2d30320c41675399dd91f96425d1a6a614192911",
-    "student_profile.sci": "b15056f32544a8ef9eacc3515ee760dab2c246ab18527908df34adb0e7cf6269",
-    "student_style.sci": "a50dc32c8c73a11ec885b6118c7d0326e912a1af8d0f3bc13edfe97be1495ee2",
-    "tests/AUTOMATINIS.sce": "99d1c8bcf53b6a40b8bc96fbb0328437b211bde15c5b2c491b72b6d63e8df81e",
-    "tests/HEADLESS.sce": "c9a93e35dd080edf93eb1bee491544850582be83c2cda601e924051558411e2b",
-    "tests/workflows.sci": "d54aaa49b84ea5c4b3a7e1813378aa458f5056bedd7ca40f4656dd14953f5e28"
+    "student_profile.sci": "12086b5605d5a8501c28a5455d5a1884972e8f95398624c0d4dd9a67b93e762c",
+    "student_style.sci": "67c224698fbf58ec780fa4744a53db94a73cac5ed2f70d3a956f653deaecf9a4",
+    "tests/AUTOMATINIS.sce": "c3122b87b5b7b83ed02d9885d9c8cd070441cba0f10a559224e26f077c098e55",
+    "tests/HEADLESS.sce": "07460d9e16b41c565def1442ee638aa90331c1dab94ef1a9c4616d8211067e6a",
+    "tests/workflows.sci": "781c9f07e2f49ef1507fb1691814ed0292dcb58c6236531d161054f269bf8768"
   },
   "log_sha256": {}
 }

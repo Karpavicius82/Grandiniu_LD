@@ -1,0 +1,23 @@
+{
+  "status": "PASS",
+  "tolerance_cases": 122,
+  "actual_gui_reports": 3,
+  "variants": [
+    1,
+    17,
+    64
+  ],
+  "geometry_cases": 26,
+  "collinear_wire_overlaps": 0,
+  "assessment_reports_selected": true,
+  "close_autosave_restore": true,
+  "edge_cases": true,
+  "malformed_drafts_rejected": 8,
+  "report_traceability": true,
+  "submission_sha256": {
+    "LD12-V01-20260925T173057-6036-660-107.html": "e4e1e5bda08d8d700a4e2e4dba4e88b71e4fb8a46347e5e3fc5270decf6b1751",
+    "LD12-V17-20260925T173104-6036-996-214.html": "d8aa49ed1eb4fe6cfede4adc52026bce9348d26f6c2490027cbe9c8a31c8ed2a",
+    "LD12-V64-20260925T173111-6036-852-321.html": "e7aaa6ae8769b5de876715b21d563b47d78a6514bf33a4270a643736a4336b4f"
+  },
+  "platform": "nt"
+}
