@@ -1,6 +1,7 @@
 mode(-1); funcprot(0);
 root=getenv("LD10_TEST_RUNTIME")+"/"; out=getenv("LD10_TEST_OUT")+"/"; source=getenv("LD10_TEST_SOURCE")+"/";
-global LD10 LD10_CANCEL;
+global LD10 LD10_CANCEL LD10_CHOICES LD10_DRAFT;
+LD10_CHOICES=[]; LD10_DRAFT="";
 function values=x_mdialog(varargin)
     global LD10_CANCEL;
     if LD10_CANCEL then values=[]; else values=["17";"Patikra Žąsė";"TEST"]; end
@@ -8,6 +9,19 @@ endfunction
 function selected=messagebox(varargin)
     if varargin(2)<>"Jūsų priskirtos reikšmės" then error("Netikėtas dialogas"); end
     selected=1;
+endfunction
+function selected=x_choose(varargin)
+    global LD10_CHOICES;
+    assert_checktrue(size(LD10_CHOICES,"*")>0);
+    selected=LD10_CHOICES(1); LD10_CHOICES(1)=[];
+endfunction
+function path=uigetfile(varargin)
+    global LD10_DRAFT; path=LD10_DRAFT;
+endfunction
+function ld10_test_help()
+    global LD10;
+    handles=findobj(LD10.fig,"callback","ld10_show_actions()");
+    assert_checkequal(size(handles,"*"),1); bench_button(handles(1));
 endfunction
 function capture_ld10(name)
     global LD10;
@@ -19,7 +33,8 @@ endfunction
 try
     LD10=struct(); LD10_CANCEL=%t; exec(root+"LD10/LD10.sce",-1); assert_checkfalse(isfield(LD10,"fig"));
     LD10_CANCEL=%f; exec(root+"LD10/LD10.sce",-1); assert_checkequal(LD10.student.number,17);
-    assert_checkequal(LD10.student.bank,"LD10-64-A-2026"); delete(LD10.fig);
+    assert_checkequal(LD10.student.bank,"LD10-64-A-2026");
+    assert_checktrue(LD10.assessment & LD10.autosave_enabled); delete(LD10.fig);
     exec(root+"tests/workflows.sci",-1); exec(source+"tools/ergonomics.sci",-1);
     for number=[1 17 64]; bench_ld10_workflow(number,root,%t); end
     LD10=struct("cfg",ld10_variant_config(1),"student",student_profile(1,"Patikra Žąsė","TEST","LD10"),"ui",struct("headless",%f));
@@ -32,28 +47,33 @@ try
     try report=bench_report_data("LD10"); catch rejected=%t; end
     assert_checktrue(rejected); ld10_measure(); ld10_check_step(); assert_checkfalse(or(LD10.done));
     ld10_toggle_solution(); assert_checkequal(size(LD10.journal,1),0); assert_checkequal(size(LD10.wires,1),0);
-    descriptor=mopen(out+"geometry.tsv","wt"); sizes=[1280 720;1280 800;1600 900];
-    for dimension=1:3
-        geometry_size(LD10.fig,sizes(dimension,:));
+    descriptor=mopen(out+"geometry.tsv","wt"); sizes=[1280 720];
+    screen=get(0,"screensize_px"); viewport=min(sizes,max([320 240],screen(3:4)-[40 120]));
+    for dimension=1
+        assert_checkequal(matrix(LD10.fig.axes_size,1,-1),viewport);
+        assert_checkequal(student_size(LD10.ui.circuitFrame.parent),sizes);
         for step=1:6
             LD10.step=step; LD10.wires=ld10_canonical_wires();
+            if or(step==[2 3 4]) then LD10.freqPoint=step-1; LD10.target=1; end
+            if step==5 then LD10.freqPoint=1; LD10.target=4; end
             LD10.powerOn=%t; LD10.switchOn=%t; ld10_render_stage();
             label=msprintf("LD10-E%d-%dx%d",step,sizes(dimension,1),sizes(dimension,2));
             geometry_dump(LD10.fig,label,descriptor);
             LD10.wires=LD10.wires(:,[2 1]); ld10_render_wires(); geometry_dump(LD10.fig,label+"-reverse",descriptor);
-            if dimension==2 & step>=2 then capture_ld10("E"+string(step)); end
+            LD10.wires=LD10.wires($:-1:1,:); ld10_render_wires(); geometry_dump(LD10.fig,label+"-shuffled",descriptor);
+            if step>=2 then capture_ld10("E"+string(step)); end
         end
     end
     // Invoke the registered native resize callback without re-rendering a stage.
     // This checks the callback contract; it does not emulate an OS drag event.
     LD10.ui.answerEdits(10).string="1,0";
-    for dimension=[1 3 2]
-        geometry_size(LD10.fig,sizes(dimension,:));
+    for dimension=1
+        assert_checkequal(matrix(LD10.fig.axes_size,1,-1),viewport);
         assert_checktrue(LD10.fig.resizefcn<>""); execstr(LD10.fig.resizefcn);
         assert_checkequal(LD10.ui.answerEdits(10).string,"1,0");
         geometry_dump(LD10.fig,"LD10-resize-"+string(dimension),descriptor);
     end
-    mclose(descriptor);
+
     report=bench_report_data("LD10"); assert_checkequal(length(report.evidence.wiring.s1.pairs),0);
     LD10.cfg=ld10_variant_config(64); LD10.student=student_profile(64,"Patikra Žąsė","TEST","LD10");
     // Rodmenys visuose trijuose taškuose ir visuose taikiniuose.
@@ -64,9 +84,11 @@ try
         kk=[0.5 1 2]; f=kk(step-1)/sqrt(LD10.cfg.L*LD10.cfg.C)/(2*%pi);
         for target=1:4
             LD10.target=target; ld10_render_wires();
+            geometry_dump(LD10.fig,msprintf("LD10-measure-%d-%d",step,target),descriptor);
             v=bench_cpp_ac(4,LD10.cfg.E,f,LD10.cfg.R,LD10.cfg.L,LD10.cfg.C);
             cur=v(4)*1000; if target==1 then cur=v(5)*1000; elseif target==2 then cur=v(6)*1000; elseif target==3 then cur=v(7)*1000; end
-            handle=findobj("tag","reading:A"); assert_checkequal(handle.string,msprintf("%.3f mA",cur));
+            handle=findobj("tag","reading:PROBE"); assert_checkequal(handle.string,msprintf("%.3f mA",cur));
+            handle=findobj("tag","reading:A"); assert_checkequal(handle.string,msprintf("%.3f mA",v(4)*1000));
         end
         handle=findobj("tag","reading:V"); assert_checkequal(handle.string,msprintf("%.4f V",LD10.cfg.E));
         if step==3 then
@@ -77,8 +99,9 @@ try
         // Atstatome išjungtą maitinimą, nes measure_point pats perjungia.
         LD10.powerOn=%f; LD10.switchOn=%f; LD10.target=4;
         bench_ld10_measure_point(step);
-        geometry_size(LD10.fig,[1280 800]); execstr(LD10.fig.resizefcn); capture_ld10("taskas-f"+string(step-1));
+        execstr(LD10.fig.resizefcn); capture_ld10("taskas-f"+string(step-1));
     end
+    mclose(descriptor);
     assert_checkequal(size(LD10.journal,1),12);
     journal=LD10.journal; bench_ld10_action("ld10_measure()"); assert_checkequal(LD10.journal,journal);
     ld10_set_step(5); LD10.ui.answerEdits(4).string="10,321";
@@ -87,7 +110,7 @@ try
     assert_checkequal(LD10.ui.answerEdits(4).string,"10,321"); assert_checkequal(LD10.journal,journal);
     assert_checkfalse(LD10.powerOn); assert_checkfalse(LD10.switchOn);
     ld10_set_step(3); ld10_toggle_solution(); assert_checkequal(size(LD10.journal,1),4); ld10_toggle_solution(); assert_checkequal(LD10.journal,journal);
-    ld10_set_step(5); LD10.done(5)=%t; LD10.ui.answerEdits(4).string="1+2"; bench_ld10_primary();
+    LD10.assessment=%f; ld10_set_step(5); LD10.done(5)=%t; LD10.ui.answerEdits(4).string="1+2"; bench_ld10_primary();
     assert_checkfalse(LD10.done(5)); assert_checkequal(LD10.step,5); assert_checkequal(LD10.ui.answerEdits(4).string,"1+2");
     expected=ld10_expected_answers(); bench_ld10_answers(5,expected(5,1:6));
     LD10.ui.answerEdits(4).string=strsubst(LD10.ui.answerEdits(4).string,".",","); bench_ld10_primary();
@@ -97,7 +120,29 @@ try
     report=bench_report_data("LD10"); assert_checkequal(length(report.evidence.wiring.s1.pairs),0);
     ld10_show_wiring_guide(); window=gcf(); assert_checktrue(window<>LD10.fig); delete(window);
     ld10_show_stand_map(); window=gcf(); assert_checktrue(window<>LD10.fig); delete(window);
-    delete(LD10.fig);
+    // Assessment accepts raw wrong answers, but requires a nonempty field.
+    LD10.assessment=%t; ld10_set_step(5); expected=ld10_expected_answers();
+    bench_ld10_answers(5,expected(5,1:6)); LD10.ui.answerEdits(8).string="";
+    bench_ld10_primary(); assert_checkequal(LD10.step,5); assert_checkfalse(LD10.done(5));
+    LD10.ui.answerEdits(8).string="1+2"; bench_ld10_primary();
+    assert_checkequal(LD10.step,6); assert_checkequal(LD10.answers(5,5),"1+2");
+    // Close flushes an edit without Enter; actual Help restores the saved work.
+    LD10.ui.answerEdits(10).string="2,0";
+    closing=LD10.fig; execstr(closing.closerequestfcn);
+    if is_handle_valid(closing) then error("LD10_CLOSE_FAILED: "+LD10.autosave_error); end
+    ld10_show_actions(); ld10_render_stage(); ld10_render_journal(); // queued events after close
+    LD10_DRAFT=LD10.autosave_paths($);
+    saved=bench_read_snapshot(LD10_DRAFT,"LD10"); assert_checkequal(saved.state.answers(6,1),"2,0");
+    assert_checkequal(saved.state.answers(5,5),"1+2");
+    LD10=struct(); exec(root+"LD10/LD10.sce",-1);
+    LD10_CHOICES=1; ld10_test_help();
+    assert_checkequal(LD10.step,6); assert_checkequal(LD10.student.number,64);
+    assert_checkequal(LD10.ui.answerEdits(10).string,"2,0");
+    assert_checktrue(LD10.assessment); assert_checktrue(LD10.autosave_enabled);
+    LD10_CHOICES=[4 2]; ld10_test_help(); assert_checkfalse(LD10.assessment); assert_checktrue(LD10.practice_used);
+    LD10_CHOICES=[4 1]; ld10_test_help(); assert_checktrue(LD10.assessment); assert_checktrue(LD10.practice_used);
+    LD10_CHOICES=6; ld10_test_help(); window=gcf(); assert_checktrue(window<>LD10.fig); delete(window);
+    mprintf("LD10_EDGE_BEGIN\n"); exec(source+"tools/test_ld10_edges.sci",-1); ld10_edge_checks(); mprintf("LD10_EDGE_END\n");
     cases=list(); specs=[1 1 .01;3 1 .03;3 2 0;5 1 .02;5 2 .02;5 3 .02;5 4 .02;5 5 .02;5 6 .02];
     for number=[1 17 64]
         bench_ld10_workflow(number,root,%f); expected=ld10_expected_answers(); original=LD10.answers;
@@ -133,7 +178,7 @@ try
         end
     end
     mputl(toJSON(cases),out+"tolerance-cases.json");
-    mputl("LD10_PASS: 3 GUI variants; single parallel RLC wiring; three frequency points; four ammeter targets; IL=IC at resonance with minimal total current; current triangle from own measurements; actual report button; comma input without Enter; demo isolation; draft restore; 39 geometry cases including resize callback; 144 grading comparisons",out+"verdict.log"); exit(0);
+    mputl("LD10_PASS: 3 GUI variants; single parallel RLC wiring; three frequency points; four ammeter targets; IL=IC at resonance and minimal total current; triangles from own measurements; actual report button; comma input without Enter; demo isolation; draft restore; 31 fixed-canvas geometry cases; 146 grading comparisons; actual assessment and draft recovery; six malformed drafts rejected; failed-write recovery; late callbacks ignored; batch measurements",out+"verdict.log"); exit(0);
 catch
     mputl("LD10_FAIL: "+strcat(lasterror()," | "),out+"verdict.log"); disp(lasterror()); exit(1);
 end

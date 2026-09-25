@@ -1,4 +1,6 @@
 import copy
+import ctypes as ct
+import csv
 import json
 import math
 from pathlib import Path
@@ -16,7 +18,36 @@ def variant_values(number):
     return l, c, r
 
 
+def check_native(library):
+    lib=ct.CDLL(str(library))
+    lib.ld_ac.argtypes=[ct.POINTER(ct.c_int),ct.POINTER(ct.c_double),ct.POINTER(ct.c_double),ct.POINTER(ct.c_int)]
+    def solve(params):
+        kind=ct.c_int(4); status=ct.c_int(99); output=(ct.c_double*10)()
+        lib.ld_ac(ct.byref(kind),(ct.c_double*5)(*params),output,ct.byref(status))
+        return status.value,list(output)
+    for number in range(1,65):
+        l,c,r=variant_values(number); f0=1/(2*math.pi*math.sqrt(l*c))
+        for ratio in [.5,1,2]:
+            f=ratio*f0; w=2*math.pi*f; xl=w*l; xc=1/(w*c)
+            ir=5/r; il=5/xl; ic=5/xc; total=math.hypot(ir,ic-il)
+            expected=[xl,xc,5/total,total,ir,il,ic,abs(il-ic),25/r,math.degrees(math.atan2(il-ic,ir))]
+            status,actual=solve([5,f,r,l,c]); assert status==0
+            for index,(a,b) in enumerate(zip(actual,expected)):
+                assert math.isclose(a,b,rel_tol=1e-10,abs_tol=1e-10),(number,ratio,index,a,b)
+    for index,bad in [(0,float('nan')),(1,0),(1,-1),(2,0),(3,0),(4,0),(4,float('inf'))]:
+        params=[5,1000,1000,.01,1e-7];params[index]=bad
+        assert solve(params)[0]!=0,(index,bad)
+
+
 def main(executable):
+    with (Path(__file__).resolve().parents[2] / 'studentui/LD10/VARIANTAI.csv').open(encoding='utf-8') as bank:
+        rows=list(csv.DictReader(bank, delimiter=';'))
+    assert len(rows)==64
+    for number,row in enumerate(rows,1):
+        l,c,r=variant_values(number)
+        assert row['Variantas']==f'LD10-V{number:02}' and float(row['E_V_RMS'])==5
+        for name,value in [('R_Ohm',r),('L_H',l),('C_F',c),('L_mH',l*1e3),('C_nF',c*1e9)]:
+            assert math.isclose(float(row[name]),value,rel_tol=1e-12), (number,name)
     for number in range(1, 65):
         l, c, r = variant_values(number)
         f0 = 1 / (2 * math.pi * math.sqrt(l * c))
@@ -71,4 +102,6 @@ def main(executable):
                               current_resonance=True, minimum_total_current=True, seconds=round(seconds, 3))))
 
 
-if __name__ == '__main__': main(Path(sys.argv[1]).resolve())
+if __name__ == '__main__':
+    check_native(Path(sys.argv[2]).resolve())
+    main(Path(sys.argv[1]).resolve())

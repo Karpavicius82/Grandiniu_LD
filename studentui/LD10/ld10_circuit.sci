@@ -2,7 +2,7 @@
 // LD10 grandinės modelis: viena lygiagretė RLC grandinė, trys dažnio taškai
 // (0,5·f0, f0, 2·f0) ir keturi ampermetro taikiniai (R, L, C šaka, pagrindinė).
 // Fizika — ld_ac kind 4: [XL XC |Z| I_bendra IR IL IC |IL−IC| P φ].
-// Žurnalas: [I mA, U V, taškas 1–3, f Hz, taikinys 1–4].
+// Žurnalas: [U V, I mA, taškas 1–3, f Hz, taikinys 1–4].
 // ============================================================================
 
 function wires = ld10_canonical_wires()
@@ -36,7 +36,7 @@ function [ok, reason] = ld10_wiring_valid(wires)
 endfunction
 
 function values = ld10_reference(k)
-    // [U_taikiniui, I mA, UR, UL, UC, U] ties dažniu k·f0 (k = 0,5/1/2).
+    // [I_taikiniui mA, U V, IR mA, IL mA, IC mA, I mA] ties dažniu k·f0 (k = 0,5/1/2).
     global LD10;
     cfg = LD10.cfg; target = LD10.target;
     if argn(2) < 1 then k = ld10_stage_freq(LD10.step); end
@@ -63,7 +63,7 @@ function [voltage, current, ok, message] = ld10_measure_values()
     [valid, message] = ld10_wiring_valid(LD10.wires);
     if ~valid then return; end
     if LD10.freqPoint == 0 then message = "Pasirinkite dažnį [B10]–[B12]."; return; end
-    if LD10.target == 0 then message = "Pasirinkite voltmetro taikinį [B13]–[B16]."; return; end
+    if LD10.target == 0 then message = "Pasirinkite ampermetro vietą [B13]–[B16]."; return; end
     bench_core_require();
     kk = [0.5 1 2];
     f = kk(LD10.freqPoint)/sqrt(LD10.cfg.L*LD10.cfg.C)/(2*%pi);
@@ -75,6 +75,7 @@ endfunction
 
 function ld10_init_state()
     global LD10;
+    LD10.assessment=%t; LD10.practice_used=%f;
     LD10.step = 1; LD10.done = zeros(1, 6) == 1; LD10.skipped = zeros(1, 6) == 1;
     LD10.powerOn = %f; LD10.switchOn = %f; LD10.freqPoint = 0; LD10.target = 0;
     LD10.wires = emptystr(0, 2); LD10.journal = [];

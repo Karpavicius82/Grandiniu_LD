@@ -18,6 +18,7 @@ endfunction
 
 function ld10_start()
     global LD10;
+    // Darbo pradžia inicializuoja būseną (kaip ld7_start): cfg/student išlieka.
     if ~isfield(LD10, "step") then
         cfg = LD10.cfg; st = LD10.student;
         ld10_init_state();
@@ -28,15 +29,17 @@ function ld10_start()
         if isfield(LD10.ui, "headless") then
             if LD10.ui.headless then needgui = %f; end
         end
-        if isfield(LD10.ui, "circuitFrame") then needgui = %f; end
+        if isfield(LD10.ui, "circuitFrame") then needgui = %f; end  // jau pastatyta
     end
+    if ~isfield(LD10,"autosave_enabled") then LD10.autosave_enabled=needgui; end
     if needgui & ~isfield(LD10, "fig") then
         ld10_build_gui();
     end
-    ld10_set_status("Sveiki! Pradėkite nuo [E01]: sujunkite nuoseklią RLC grandinę.", "info", "Seką rasite: Pagalba → [B04] Kaip sujungti.");
+    ld10_set_status("Sveiki! Pradėkite nuo [E01]: sujunkite lygiagrečią RLC grandinę.", "info", "Seką rasite: Pagalba → [B04] Kaip sujungti.");
 endfunction
 
 function ld10_student_primary()
+    if ~ld10_can_act() then return; end
     global LD10;
     if LD10.demoMode then ld10_toggle_solution(); return; end
     ld10_save_answers();
@@ -46,17 +49,18 @@ function ld10_student_primary()
     end
     // Vienas paspaudimas: patikrinti ir, pavykus, iškart pereiti (LD2 semantika).
     if ~LD10.done(LD10.step) then
-        ld10_check_step();
+        ld10_check_step(~LD10.assessment);
     end
     if LD10.done(LD10.step) & LD10.step < 6 then
         ld10_next_step();
     elseif LD10.step == 6 & LD10.done(6) & ~and(LD10.done) then
         pending = find(~LD10.done); ld10_set_step(pending(1));
     end
-    ld10_student_sync();
+    ld10_student_sync(); bench_autosave("LD10");
 endfunction
 
 function ld10_jump_step(n)
+    if ~ld10_can_act() then return; end
     global LD10;
     if ~ld10_valid_index(n, 6) then return; end
     if n <= LD10.step | LD10.done(n) | LD10.skipped(n) then
@@ -70,6 +74,12 @@ function ld10_student_sync()
     global LD10;
     if ~isfield(LD10, "ui") then return; end
     if isfield(LD10.ui, "headless") then if LD10.ui.headless then return; end end
+    if isfield(LD10.ui,"studentBack") then
+        if is_handle_valid(LD10.ui.studentBack) then
+            LD10.ui.studentBack.enable="on";
+            if LD10.step==1 then LD10.ui.studentBack.enable="off"; end
+        end
+    end
     if isfield(LD10.ui, "studentPrimary") & is_handle_valid(LD10.ui.studentPrimary) then
         if LD10.demoMode then
             LD10.ui.studentPrimary.string = "GRĮŽTI Į SAVO DARBĄ";
@@ -79,6 +89,8 @@ function ld10_student_sync()
             LD10.ui.studentPrimary.string = "UŽBAIGTI PRALEISTĄ ETAPĄ";
         elseif LD10.done(LD10.step) then
             LD10.ui.studentPrimary.string = "TOLIAU →";
+        elseif LD10.assessment then
+            LD10.ui.studentPrimary.string = "ĮRAŠYTI IR TOLIAU →";
         else
             LD10.ui.studentPrimary.string = "TIKRINTI";
         end
