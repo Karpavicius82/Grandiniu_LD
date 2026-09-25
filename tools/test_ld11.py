@@ -34,7 +34,7 @@ with (out / 'scilab.log').open('wb') as log:
     result = subprocess.run(args, env=env, stdout=log, stderr=subprocess.STDOUT, timeout=420)
 verdict = (out / 'verdict.log').read_text(encoding='utf-8') if (out / 'verdict.log').exists() else (out / 'scilab.log').read_text(encoding='utf-8', errors='replace')
 assert result.returncode == 0 and 'LD11_PASS:' in verdict, verdict
-print(verdict.strip())
+print(verdict.strip().encode("ascii","replace").decode())
 result = subprocess.run([str(a.checker.resolve()), str(out / 'geometry.tsv')], capture_output=True, text=True)
 (out / 'geometry.log').write_text(result.stdout + result.stderr, encoding='utf-8')
 print(result.stdout)

@@ -130,7 +130,7 @@ try
         end
     end
     mputl(toJSON(cases),out+"tolerance-cases.json");
-    mputl("LD11_PASS: 3 GUI variants; coil wiring with and without Ck; wattmeter readings; compensation keeps P, cuts S and I, cos φ toward 1; actual report button; comma input without Enter; demo isolation; draft restore; 39 geometry cases including resize callback; 148 grading comparisons",out+"verdict.log"); exit(0);
+    mputl("LD11_PASS: 3 GUI variants; coil wiring with and without Ck; wattmeter readings; compensation keeps P, cuts S and I, cos phi toward 1; actual report button; comma input without Enter; demo isolation; draft restore; 39 geometry cases including resize callback; 148 grading comparisons",out+"verdict.log"); exit(0);
 catch
     mputl("LD11_FAIL: "+strcat(lasterror()," | "),out+"verdict.log"); disp(lasterror()); exit(1);
 end
