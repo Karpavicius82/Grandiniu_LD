@@ -926,3 +926,103 @@ function bench_ld9_workflow(number,root,gui)
         delete(LD9.fig);
     end
 endfunction
+
+// ------------------------------- LD10 ----------------------------------------
+function bench_ld10_action(callback)
+    global LD10;
+    if LD10.ui.headless then execstr(callback); return; end
+    for k=1:size(LD10.ui.dynamic,"*")
+        h=LD10.ui.dynamic(k);
+        if h.callback==callback then bench_button(h); return; end
+    end
+    error("Nėra matomo LD10 mygtuko: "+callback);
+endfunction
+
+function bench_ld10_click(id)
+    bench_ld10_action(msprintf("ld10_terminal_click(""%s"")",id));
+endfunction
+
+function bench_ld10_primary()
+    global LD10;
+    if LD10.ui.headless then ld10_student_primary();
+    else bench_button(LD10.ui.studentPrimary); end
+endfunction
+
+function bench_ld10_answers(step,values)
+    global LD10;
+    if LD10.ui.headless then ld10_test_answers(step,values); return; end
+    value_index=1;
+    for index=1:12
+        [answer_step,slot]=ld10_answer_slot(index);
+        if answer_step==step then
+            LD10.ui.answerEdits(index).string=msprintf("%.17g",values(value_index));
+            value_index=value_index+1;
+        end
+    end
+endfunction
+
+function bench_ld10_connect()
+    global LD10;
+    wires=ld10_canonical_wires();
+    assert_checkequal(size(LD10.wires,1),0);
+    for index=1:size(wires,1)
+        bench_ld10_click(wires(index,1)); bench_ld10_click(wires(index,2));
+    end
+    bench_ld10_click(wires($,1)); bench_ld10_click(wires($,2));
+    [valid,message]=ld10_wiring_valid(LD10.wires); assert_checkfalse(valid);
+    bench_ld10_click(wires($,2)); bench_ld10_click(wires($,1));
+    [valid,message]=ld10_wiring_valid(LD10.wires); assert_checktrue(valid);
+endfunction
+
+function bench_ld10_measure_point(step)
+    // Nustato etapo dažnį ir išmatuoja visus keturis taikinius.
+    global LD10;
+    bench_ld10_action("ld10_set_freq("+string(step-1)+")");
+    bench_ld10_action("ld10_toggle_power()"); bench_ld10_action("ld10_toggle_switch()");
+    for target=1:4
+        bench_ld10_action("ld10_set_target("+string(target)+")");
+        bench_ld10_action("ld10_measure()");
+    end
+    bench_ld10_action("ld10_toggle_power()");
+    assert_checkequal(size(ld10_journal_rows(step-1,4),1),1);
+endfunction
+
+function bench_ld10_workflow(number,root,gui)
+    global LD10;
+    if argn(2)<3 then gui=%f; end
+    cfg=ld10_variant_config(number); [valid,message]=ld10_validate_config(cfg); assert_checktrue(valid);
+    LD10=struct("cfg",cfg,"student",student_profile(number,"Automatinė Patikra","TEST","LD10"),"ui",struct("headless",~gui));
+    ld10_start();
+    expected=ld10_expected_answers();
+    for step=1:6
+        assert_checkequal(LD10.step,step);
+        select step
+        case 1 then
+            bench_ld10_connect();
+            bench_ld10_answers(step,[expected(1,1)]);
+        case 2 then
+            bench_ld10_measure_point(2);
+        case 3 then
+            bench_ld10_measure_point(3);
+            bench_ld10_answers(step,[expected(3,1) expected(3,2)]);
+        case 4 then
+            bench_ld10_measure_point(4);
+        case 5 then
+            bench_ld10_answers(step,expected(5,1:6));
+        case 6 then
+            bench_ld10_answers(step,[1 1 1]);
+        end
+        bench_ld10_primary();
+        if ~LD10.done(step) then error("LD10 variantas "+string(number)+", etapas "+string(step)); end
+        if gui then mprintf("PASS LD10 V%02d: etapas %d\n",number,step); end
+    end
+    assert_checktrue(and(LD10.done)); assert_checkequal(size(LD10.journal,1),12);
+    if gui then
+        LD10.assessment=%t;
+        before=size(listfiles(bench_documents()+"/*.html"),"*");
+        bench_ld10_primary();
+        assert_checkequal(size(listfiles(bench_documents()+"/*.html"),"*"),before+1);
+        assert_checktrue(strindex(LD10.ui.statusMain.string,"Ataskaita išsaugota")<>[]);
+        delete(LD10.fig);
+    end
+endfunction

@@ -50,17 +50,40 @@ Bank bank(int variant) {
     const double l9=ls[a]*1e-3, c9=cs[b]*1e-9;
     const double qt9=2.0+0.5*((a+b)%4);
     const double e9r=std::round(100.0*std::sqrt(l9/c9)/qt9)/100.0;
+    // LD10-64-A-2026: lygiagretus RLC ir srovių rezonansas — L pagal stulpelį,
+    // C pagal eilutę (sukelta-retas tinklelis); R = Qt·sqrt(L/C), Qt = 2..3,5
+    // pagal (a+b)%4 — srovių kokybė Q = IL/I > 1,5 visuose variantuose.
+    const double l10=ls[b]*1e-3, c10=cs[a]*1e-9;
+    const double qt10=2.0+0.5*((a+b)%4);
+    const double e10r=std::round(100.0*qt10*std::sqrt(l10/c10))/100.0;
     return {dc[a],dc[b],dc[(a+b)%8],rc[a],35+5.0*(b+1),rl[b],35+5.0*(a+1),
             std::round(std::sqrt(l/c)/(2.8+.35*(a+1)+.20*(b+1))),l,c,
             uu[b][0],uu[b][1],uu[b][2],rld[a],
             n1[a],n2[b],a1,a2,
             pp[b][0],pp[b][1],pp[b][2],
-            (double)e2v[b],r6,(double)r6n[a],ev7[b],(double)rv7[a],w7[0],w7[1],w7[2],w7[3],w7[4],e8a,e8b,e8c,l9,c9,e9r};
+            (double)e2v[b],r6,(double)r6n[a],ev7[b],(double)rv7[a],w7[0],w7[1],w7[2],w7[3],w7[4],e8a,e8b,e8c,l9,c9,e9r,l10,c10,e10r};
 }
 Values ac(int kind,double E,double f,double R,double L,double C) {
     for(double v:{E,f,R,L,C}) if(!std::isfinite(v)) throw std::runtime_error("non_finite");
-    if(kind<1 || kind>3 || E<0 || E>1e6 || f<0 || f>1e9 || R<=0 ||
+    if(kind<1 || kind>4 || E<0 || E>1e6 || f<0 || f>1e9 || R<=0 ||
        (kind!=1 && L<=0) || (kind!=2 && C<=0)) throw std::runtime_error("model_input");
+    if(kind==4) {
+        // Lygiagretus RLC: [XL, XC, |Z|, I_bendra, IR, IL, IC, |IL−IC|, P, phi].
+        const double w=2*std::acos(-1.0)*f;
+        if(f==0) throw std::runtime_error("model_input");
+        std::vector<std::array<double,5>> rows={{{4,1,0,E,0}},{{1,1,0,R,0}},{{2,1,0,L,0}},{{3,1,0,C,0}}};
+        int m=4,n=1,st=1;
+        std::vector<double> table(m*5),v((n+1)*2),i(m*2);
+        for(int k=0;k<m;++k) for(int col=0;col<5;++col) table[col*m+k]=rows[k][col];
+        ld_mna(table.data(),&m,&n,&f,v.data(),i.data(),&st);
+        if(st!=0) throw std::runtime_error("reference_model_"+std::to_string(st));
+        const double xl=w*L, xc=1/(w*C);
+        std::complex<double> y(1.0/R, w*C-1.0/(w*L));
+        std::complex<double> z=1.0/y;
+        const double it=std::abs(std::complex<double>(i[0],i[m]));
+        return {xl,xc,std::abs(z),it,E/R,E/xl,E/xc,std::abs(E/xl-E/xc),E*E/R,
+                std::atan2(z.imag(),z.real())*180/std::acos(-1.0)};
+    }
     int m=kind==3?4:3,n=kind==3?3:2,st=1;
     std::vector<std::array<double,5>> rows={{{4,1,0,E,0}},{{1,1,2,R,0}}};
     if(kind==1) rows.push_back({3,2,0,C,0});

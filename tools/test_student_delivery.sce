@@ -1,6 +1,6 @@
 mode(-1);funcprot(0);
 root=getenv("DELIVERY_ROOT")+"/";out=getenv("DELIVERY_OUT")+"/";
-global LD1 LD2 LD3 LD4 LD5 LD6 LD7 LD8 LD9 BENCH_REPORT_WINDOW BENCH_LAST_REPORT DELIVERY_OPEN;
+global LD1 LD2 LD3 LD4 LD5 LD6 LD7 LD8 LD9 LD10 BENCH_REPORT_WINDOW BENCH_LAST_REPORT DELIVERY_OPEN;
 function values=x_mdialog(varargin)
     values=["17";"Patikra Žąsė";"TEST"];
 endfunction
@@ -22,6 +22,7 @@ try
         case 7 then f=LD7.fig;
         case 8 then f=LD8.fig;
         case 9 then f=LD9.fig;
+        case 10 then f=LD10.fig;
         end
         assert_checkequal(f.axes_size,expected);assert_checkequal(f.resize,"off");
         delete(f);

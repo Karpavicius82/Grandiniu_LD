@@ -37,7 +37,7 @@ A_RANGE_RE = re.compile(r"^A(\d{2})\.(\d{2}):A(\d{2})\.(\d{2})$")
 # Registrų failai pagal LD (keliai nuo repo šaknies). Vienintelis runtime —
 # studentui medis; root LD1/, LD2/ archyvuoti (istorija github'e).
 REGISTRIES = [("LD1", "studentui/LD1/ld1_ids.sci"), ("LD2", "studentui/LD2/ld2_ids.sci"),
-             ("LD3", "studentui/LD3/ld3_ids.sci"), ("LD4", "studentui/LD4/ld4_ids.sci"), ("LD5", "studentui/LD5/ld5_ids.sci"), ("LD6", "studentui/LD6/ld6_ids.sci"), ("LD7", "studentui/LD7/ld7_ids.sci"), ("LD8", "studentui/LD8/ld8_ids.sci"), ("LD9", "studentui/LD9/ld9_ids.sci")]
+             ("LD3", "studentui/LD3/ld3_ids.sci"), ("LD4", "studentui/LD4/ld4_ids.sci"), ("LD5", "studentui/LD5/ld5_ids.sci"), ("LD6", "studentui/LD6/ld6_ids.sci"), ("LD7", "studentui/LD7/ld7_ids.sci"), ("LD8", "studentui/LD8/ld8_ids.sci"), ("LD9", "studentui/LD9/ld9_ids.sci"), ("LD10", "studentui/LD10/ld10_ids.sci")]
 SCAN_DIRS = ("studentui",)  # kur ieškome [kodo] nuorodų
 SCAN_SUFFIXES = (".sci", ".sce")
 

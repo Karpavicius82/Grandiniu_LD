@@ -33,6 +33,15 @@ Pavyzdžio peržiūra nekeičia jūsų matavimų ir jos negalima pateikti kaip a
 LD5 skaičiavimams ir ataskaitų vertinimui naudojamas bendras C++ branduolys.
 LD5 turi 64 pastovius variantus: `LD5/VARIANTAI.csv`.
 
+**LD10 – lygiagretė RLC grandinė: srovių rezonansas:** šeši etapai, generatorius →
+jungiklis → ampermetras → mazgas, kuriame R, L ir C šakos jungiamos lygiagrečiai.
+Tie patys trys dažnio taškai [B10]–[B12]; ampermetras perkeliamas mygtukais
+[B13]–[B16] (IR, IL, IC šakose ir pagrindinėje linijoje); U vienoda visose šakose.
+Ties f0 bendroji srovė minimali (lygi U/R), IL = IC abi viršija ją (srovių
+kokybė Q). Skaičiuojami srovių trikampis √(IR²+(IL−IC)²), laidis Y = I/U,
+cos φ = IR/I ir galios P, Q, S. Išvados atspindi kontrastą su nuosekliąja grandine.
+64 variantai: `LD10/VARIANTAI.csv`, bankas `LD10-64-A-2026`, ataskaitos revizija 1.
+
 **LD9 – nuosekli RLC grandinė: trikampiai ir įtampų rezonansas:** šeši etapai,
 viena nuosekli grandinė generatorius → jungiklis → ampermetras → R → L → C.
 Dažnis nustatomas mygtukais [B10]–[B12] (0,5·f0, f0, 2·f0); vienas voltmetras
@@ -99,7 +108,7 @@ Paketai nėra pasirašyti Apple Developer sertifikatu ar notarizuoti.
 Linux: `./PALEISTI.sh`. Scilab aplinkoje: vykdykite `STENDAS.sce` ir pasirinkite darbą.
 Windows: dukart paspauskite `PALEISTI.bat` arba vykdykite `STENDAS.sce` grafiniame
 Scilab lange. `bin/ldcheck.exe` skirtas dėstytojo ataskaitų tikrinimui.
-Atskirai galima vykdyti atitinkamą `LD1/LD1.sce`–`LD9/LD9.sce` failą.
+Atskirai galima vykdyti atitinkamą `LD1/LD1.sce`–`LD10/LD10.sce` failą.
 Paleidiklis ieško įdiegto Scilab; prireikus nurodykite `SCILAB_BIN=/visas/kelias/bin/scilab`.
 
 Paketą platinkite atsisiuntimo nuoroda. Gmail gali blokuoti archyvą dėl jame esančių
