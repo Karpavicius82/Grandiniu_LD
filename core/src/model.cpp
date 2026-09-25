@@ -86,9 +86,9 @@ Values ac(int kind,double E,double f,double R,double L,double C) {
         const double w=2*std::acos(-1.0)*f, xl=w*L, zrl=std::hypot(R,xl);
         const double g=R/(zrl*zrl), b=w*C-xl/(zrl*zrl);
         const double it=E*std::hypot(g,b);
-        const double p=E*E*g, q=E*E*b;
+        const double p=E*E*g, q=-E*E*b; // passive load: inductive Q > 0
         return {xl,zrl,R/zrl,it,E/zrl,p,q,E*it,
-                std::atan2(b,g)*180/std::acos(-1.0),C>0?E*w*C:0.0};
+                std::atan2(-b,g)*180/std::acos(-1.0),C>0?E*w*C:0.0};
     }
     if(kind==4) {
         // Lygiagretus RLC: [XL, XC, |Z|, I_bendra, IR, IL, IC, |IL−IC|, P, phi].

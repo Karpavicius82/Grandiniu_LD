@@ -10,7 +10,7 @@ function n=messagebox(varargin)
 endfunction
 try
     screen=get(0,"screensize_px");expected=min([1280 720],max([320 240],screen(3:4)-[40 120]));
-    for lab=1:10
+    for lab=1:11
         exec(root+"LD"+string(lab)+"/LD"+string(lab)+".sce",-1);
         select lab
         case 1 then f=LD1.fig;
@@ -25,6 +25,10 @@ try
         case 10 then f=LD10.fig;
         case 11 then f=LD11.fig;
         end
+        // Swing/WM applies decorations asynchronously after making a window visible.
+        // Observe the settled client size without modifying the tested window.
+        sleep(200);
+        mprintf("LD%d client: %d x %d; expected %d x %d\n",lab,f.axes_size(1),f.axes_size(2),expected(1),expected(2));
         assert_checkequal(f.axes_size,expected);assert_checkequal(f.resize,"off");
         delete(f);
         mprintf("LD%d: vienodas pastovus langas PASS\n",lab);
@@ -54,7 +58,7 @@ try
         if h.string=="Atverti ataskaitų aplanką" then execstr(h.callback);assert_checkequal(DELIVERY_OPEN,fileparts(BENCH_LAST_REPORT));end
     end
     assert_checkequal(buttons,3);delete(BENCH_REPORT_WINDOW);
-    mputl("PASS: ten fixed windows; small-screen scrolling; LD2/LD3 full GUI; report and folder buttons",out+"verdict.log");exit(0);
+    mputl("PASS: eleven fixed windows; small-screen scrolling; LD2/LD3 full GUI; report and folder buttons",out+"verdict.log");exit(0);
 catch
     problem=strcat(lasterror()," | ");mputl("FAIL: "+problem,out+"verdict.log");disp(problem);exit(1);
 end

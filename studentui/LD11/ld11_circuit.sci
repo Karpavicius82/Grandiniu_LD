@@ -1,5 +1,5 @@
 // ============================================================================
-// LD11 grandinės modelis: rišlė (R, L nuosekliai) su paraleliniu kompensuo-
+// LD11 grandinės modelis: ritė (R, L nuosekliai) su paraleliniu kompensuo-
 // jančiu kondensatoriumi Ck. Fizika — ld_ac kind 5 (C = 0 – be kondensatoriaus):
 // [XL, Z_RL, cosφ0, I bendra, I_RL, P, Q, S, φ°, IC]. Žurnalas: [U V, I mA,
 // režimas 1–2, P mW, režimas]; režimas 1 – be Ck, 2 – su Ck. f = 50 Hz.
@@ -11,12 +11,12 @@ function wires = ld11_canonical_wires(mode)
     base = ["GEN_P" "K1";"K2" "A_P";"A_N" "RL_A";"RL_B" "GEN_N"];
     select mode
     case 1 then wires = base;
-    case 2 then wires = [base;"RL_A" "C_A";"C_B" "GEN_N"];
+    case 2 then wires = [base;"RL_A" "C_A";"C_B" "RL_B"];
     end
 endfunction
 
 function mode = ld11_stage_mode(step)
-    mapping = [1 1 2 2 2 1]; mode = mapping(step);
+    mapping = [1 1 1 2 2 2]; mode = mapping(step);
 endfunction
 
 function editable = ld11_wiring_editable()
@@ -32,6 +32,12 @@ function [ok, reason] = ld11_wiring_valid(wires)
     if wires == [] then return; end
     if type(wires) <> 10 | size(wires, 2) <> 2 then reason = "Netinkami sujungimo duomenys."; return; end
     if size(wires, 1) > size(canonical, 1) then reason = "Per daug laidų."; return; end
+    // Previous reports/drafts used the same return node at GEN_N.
+    if LD11.wireMode==2 then
+        for k=1:size(wires,1)
+            if and(wires(k,:)==["C_B" "GEN_N"]) | and(wires(k,:)==["GEN_N" "C_B"]) then wires(k,:)=["C_B" "RL_B"]; end
+        end
+    end
     for index = 1:size(canonical, 1)
         present = %f;
         for row = 1:size(wires, 1)
@@ -62,6 +68,7 @@ endfunction
 
 function ld11_init_state()
     global LD11;
+    LD11.assessment=%t; LD11.practice_used=%f;
     LD11.step = 1; LD11.done = zeros(1, 6) == 1; LD11.skipped = zeros(1, 6) == 1;
     LD11.powerOn = %f; LD11.switchOn = %f; LD11.wireMode = 1;
     LD11.wires = emptystr(0, 2); LD11.journal = [];
@@ -76,14 +83,12 @@ function expected = ld11_expected_answers()
     global LD11;
     cfg = LD11.cfg;
     expected = %nan * ones(6, 8);
-    w = 2*%pi*50; xl = w*cfg.L; z = sqrt(cfg.R^2 + xl^2);
-    g = cfg.R/(z*z); b0 = -xl/(z*z); b2 = w*cfg.Ck - xl/(z*z);
-    i1 = cfg.E*sqrt(g^2 + b0^2); i2 = cfg.E*sqrt(g^2 + b2^2);
-    p = cfg.E^2*g; s1 = cfg.E*i1; s2 = cfg.E*i2;
-    expected(1, 1) = cfg.R/z;
-    expected(2, 1:3) = [s1*1000, abs(cfg.E^2*b0)*1000, p/s1];
-    expected(3, 1) = cfg.Ck*1e6;
-    expected(5, 1:4) = [s2*1000, abs(cfg.E^2*b2)*1000, p/s2, (s1-s2)*1000];
+    before=bench_cpp_ac(5,cfg.E,50,cfg.R,cfg.L,0);
+    after=bench_cpp_ac(5,cfg.E,50,cfg.R,cfg.L,cfg.Ck);
+    expected(1,1)=before(3);
+    expected(2,1:3)=[before(8)*1000,abs(before(7))*1000,before(6)/before(8)];
+    expected(3,1)=cfg.Ck*1e6;
+    expected(5,1:4)=[after(8)*1000,abs(after(7))*1000,after(6)/after(8),(before(8)-after(8))*1000];
     expected(6, 1:3) = [1 1 1];
 endfunction
 

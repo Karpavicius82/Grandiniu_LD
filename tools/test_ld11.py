@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 """Internal feedback only: bounded native Scilab LD11 UI acceptance on both OSes."""
 import argparse
+import hashlib
+import re
 import json
 import sys
 import os
@@ -57,17 +59,31 @@ for result in verdicts['results']:
     assert result['points'] == expected[result['file']], result
     if result['file'] == '001.html':
         assert result['practice_used'] and not result['selected_for_summary'], result
+submissions = {}
+for path in (out / 'Ataskaitos Žąsė').glob('*.html'):
+    data = path.read_bytes()
+    match = re.search(r'<script type="application/json" id="ld-data">(.*?)</script>', data.decode('utf-8'), re.S)
+    assert match, path
+    submissions[path.name] = (path, hashlib.sha256(data).hexdigest(), json.loads(match.group(1)))
 actual, _ = run(a.grader.resolve(), out / 'Ataskaitos Žąsė', out / 'student-grading')
 reports = [r for r in actual['results'] if r['file'].endswith('.html')]
 drafts = [r for r in actual['results'] if r['file'].endswith('.sod')]
 assert len(reports) == 3 and len(drafts) >= 3
 assert len(actual['results']) == len(reports) + len(drafts)
 for result in reports:
+    path, digest, payload = submissions[result['file']]
+    assert hashlib.sha256(path.read_bytes()).hexdigest() == digest, 'Grading modified the submitted file'
+    for key in ['submission_id', 'student', 'variant', 'bank_id', 'lab_revision', 'rubric_version', 'mode', 'practice_used']:
+        assert result[key] == payload[key], (key, result)
+    items = {item['id']: item for item in result['items']}
+    for answer in payload['answers']:
+        assert items[answer['id']]['raw'] == answer['raw'], answer
     assert result['mode'] == 'assessment' and result['selected_for_summary'], result
     assert result['status'] == 'graded' and (result['points'], result['max_points']) == (20, 20), result
 for result in drafts:
     assert result['status'] == 'review' and result['reason'] == 'unsupported_file' and result['grade_10'] is None, result
 summary = dict(status='PASS', tolerance_cases=len(expected), actual_gui_reports=3,
-               variants=[1, 17, 64], geometry_cases=39, assessment_reports_selected=True, close_autosave_restore=True, platform=os.name)
+               variants=[1, 17, 64], geometry_cases=23, assessment_reports_selected=True, close_autosave_restore=True, edge_cases=True, malformed_drafts_rejected=6, report_traceability=True,
+               submission_sha256={name: entry[1] for name, entry in submissions.items()}, platform=os.name)
 (out / 'acceptance.json').write_text(json.dumps(summary, indent=2)+'\n', encoding='utf-8')
 print(json.dumps(summary))

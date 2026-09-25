@@ -1060,8 +1060,9 @@ endfunction
 function bench_ld11_connect(mode)
     global LD11;
     wires=ld11_canonical_wires(mode);
-    assert_checkequal(size(LD11.wires,1),0);
-    for index=1:size(wires,1)
+    first=1;
+    if mode==2 then assert_checkequal(size(LD11.wires,1),4); first=5; end
+    for index=first:size(wires,1)
         bench_ld11_click(wires(index,1)); bench_ld11_click(wires(index,2));
     end
     bench_ld11_click(wires($,1)); bench_ld11_click(wires($,2));
@@ -1084,7 +1085,7 @@ function bench_ld11_workflow(number,root,gui)
             bench_ld11_connect(1);
             bench_ld11_answers(step,expected(1,1));
         case 2 then
-            bench_ld11_action("ld11_toggle_power()"); bench_ld11_action("ld11_toggle_switch()"); bench_ld11_action("ld11_measure()");
+            bench_ld11_action("ld11_measure_all()");
             bench_ld11_action("ld11_toggle_power()");
             bench_ld11_answers(step,expected(2,1:3));
         case 3 then
@@ -1092,7 +1093,7 @@ function bench_ld11_workflow(number,root,gui)
         case 4 then
             bench_ld11_action("ld11_set_mode(2)");
             bench_ld11_connect(2);
-            bench_ld11_action("ld11_toggle_power()"); bench_ld11_action("ld11_toggle_switch()"); bench_ld11_action("ld11_measure()");
+            bench_ld11_action("ld11_measure_all()");
             bench_ld11_action("ld11_toggle_power()");
         case 5 then
             bench_ld11_answers(step,expected(5,1:4));
@@ -1105,7 +1106,7 @@ function bench_ld11_workflow(number,root,gui)
     end
     assert_checktrue(and(LD11.done)); assert_checkequal(size(LD11.journal,1),2);
     if gui then
-        LD11.assessment=%t;
+        assert_checktrue(LD11.assessment);
         before=size(listfiles(bench_documents()+"/*.html"),"*");
         bench_ld11_primary();
         assert_checkequal(size(listfiles(bench_documents()+"/*.html"),"*"),before+1);

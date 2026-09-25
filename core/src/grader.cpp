@@ -709,6 +709,10 @@ bool ld11_wiring(const Json& pairs,bool& valid,int mode=1) {
             if(a.empty()||b2.empty()) {valid=false;return false;}
             if(!unique.insert({std::min(a,b2),std::max(a,b2)}).second) return false;
         }
+        if(unique==canonical) return true; // legacy C_B -> GEN_N
+        if(mode==2) {
+            canonical.erase({"C_B","GEN_N"}); canonical.insert({"C_B","RL_B"});
+        }
         return unique==canonical;
     } catch(const std::exception&) {valid=false;return false;}
 }
@@ -728,9 +732,9 @@ void grade_ld11(Grader& grader,const Json& report,const Bank& variant) {
     grader.answer("s2.q1","Pilnutinė galia be Ck: S = U·I",s1*1000,"mVA","S = U[V]·I[mA].",.02,1e-9);
     grader.answer("s2.q2","Reaktyvioji galia be Ck: Q = √(S² − P²)",std::abs(q1)*1000,"mvar","Q iš galios trikampio.",.02,1e-9);
     grader.answer("s2.q3","Galios faktorius be Ck: cos φ = P / S",no_cap[5]/s1,"1","cos φ = P/S.",.02,1e-9);
-    grader.answer("s3.q1","Kompensuojantis kondensatorius: Ck = XL/(ω·(R²+XL²))",Ck*1e6,"uF","ω = 2π·50; atsakymas mikromadais.",.03,1e-9);
+    grader.answer("s3.q1","Kompensuojantis kondensatorius: Ck = XL/(ω·(R²+XL²))",Ck*1e6,"uF","ω = 2π·50; atsakymas mikrofaradais.",.03,1e-9);
     grader.answer("s5.q1","Pilnutinė galia su Ck: S2 = U·I2",s2*1000,"mVA","S2 = U[V]·I2[mA].",.02,1e-9);
-    grader.answer("s5.q2","Reaktyvioji galia su Ck: Q2",std::abs(q2)*1000,"mvar","Q2 iš naujo trikampio.",.02,1e-9);
+    grader.answer("s5.q2","Reaktyvioji galia su Ck: Q2",std::abs(q2)*1000,"mvar","Q2 = |Q − 1000·ω·Ck[F]·U²|; leidžiama 0,001 mvar + 2 %.",.02,.001);
     grader.answer("s5.q3","Galios faktorius su Ck: cos φ2 = P2/S2",with_cap[5]/s2,"1","cos φ2 = P2/S2.",.02,1e-9);
     grader.answer("s5.q4","Pilnutinės galios sumažėjimas: ΔS = S − S2",(s1-s2)*1000,"mVA","ΔS = S − S2.",.02,1e-9);
     grader.answer("s6.q1","Išvada: aktyvioji galia P po kompensacijos nepakito",1,"choice","1 – Taip, 2 – Ne.",0,0);

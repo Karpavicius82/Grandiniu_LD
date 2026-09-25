@@ -18,6 +18,7 @@ endfunction
 
 function ld11_start()
     global LD11;
+    // Darbo pradžia inicializuoja būseną (kaip ld7_start): cfg/student išlieka.
     if ~isfield(LD11, "step") then
         cfg = LD11.cfg; st = LD11.student;
         ld11_init_state();
@@ -28,15 +29,17 @@ function ld11_start()
         if isfield(LD11.ui, "headless") then
             if LD11.ui.headless then needgui = %f; end
         end
-        if isfield(LD11.ui, "circuitFrame") then needgui = %f; end
+        if isfield(LD11.ui, "circuitFrame") then needgui = %f; end  // jau pastatyta
     end
+    if ~isfield(LD11,"autosave_enabled") then LD11.autosave_enabled=needgui; end
     if needgui & ~isfield(LD11, "fig") then
         ld11_build_gui();
     end
-    ld11_set_status("Sveiki! Pradėkite nuo [E01]: sujunkite nuoseklią RLC grandinę.", "info", "Seką rasite: Pagalba → [B04] Kaip sujungti.");
+    ld11_set_status("Sveiki! Pradėkite nuo [E01]: sujunkite ritės grandinę be Ck.", "info", "Seką rasite: Pagalba → [B04] Kaip sujungti.");
 endfunction
 
 function ld11_student_primary()
+    if ~ld11_can_act() then return; end
     global LD11;
     if LD11.demoMode then ld11_toggle_solution(); return; end
     ld11_save_answers();
@@ -46,17 +49,18 @@ function ld11_student_primary()
     end
     // Vienas paspaudimas: patikrinti ir, pavykus, iškart pereiti (LD2 semantika).
     if ~LD11.done(LD11.step) then
-        ld11_check_step();
+        ld11_check_step(~LD11.assessment);
     end
     if LD11.done(LD11.step) & LD11.step < 6 then
         ld11_next_step();
     elseif LD11.step == 6 & LD11.done(6) & ~and(LD11.done) then
         pending = find(~LD11.done); ld11_set_step(pending(1));
     end
-    ld11_student_sync();
+    ld11_student_sync(); bench_autosave("LD11");
 endfunction
 
 function ld11_jump_step(n)
+    if ~ld11_can_act() then return; end
     global LD11;
     if ~ld11_valid_index(n, 6) then return; end
     if n <= LD11.step | LD11.done(n) | LD11.skipped(n) then
@@ -70,6 +74,12 @@ function ld11_student_sync()
     global LD11;
     if ~isfield(LD11, "ui") then return; end
     if isfield(LD11.ui, "headless") then if LD11.ui.headless then return; end end
+    if isfield(LD11.ui,"studentBack") then
+        if is_handle_valid(LD11.ui.studentBack) then
+            LD11.ui.studentBack.enable="on";
+            if LD11.step==1 then LD11.ui.studentBack.enable="off"; end
+        end
+    end
     if isfield(LD11.ui, "studentPrimary") & is_handle_valid(LD11.ui.studentPrimary) then
         if LD11.demoMode then
             LD11.ui.studentPrimary.string = "GRĮŽTI Į SAVO DARBĄ";
@@ -79,6 +89,8 @@ function ld11_student_sync()
             LD11.ui.studentPrimary.string = "UŽBAIGTI PRALEISTĄ ETAPĄ";
         elseif LD11.done(LD11.step) then
             LD11.ui.studentPrimary.string = "TOLIAU →";
+        elseif LD11.assessment then
+            LD11.ui.studentPrimary.string = "ĮRAŠYTI IR TOLIAU →";
         else
             LD11.ui.studentPrimary.string = "TIKRINTI";
         end

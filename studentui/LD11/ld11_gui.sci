@@ -74,7 +74,7 @@ function route = ld11_route(a, b)
     elseif (a == "RL_A" & b == "C_A") | (a == "C_A" & b == "RL_A") then
         route = [[.725 .46];[.725 .74]];
     elseif (a == "C_B" & b == "GEN_N") | (a == "GEN_N" & b == "C_B") then
-        route = [[.935 .74];[.98 .74];[.98 .20];[.045 .20];[.045 .285]];
+        route = [[.935 .74];[.99 .74];[.99 .185];[.025 .185];[.025 .285];[.045 .285]];
     end
 endfunction
 
@@ -103,22 +103,22 @@ function ld11_render_wires()
         ld11_polyline(pts, [0.22 0.40 0.42]);
     end
     [tt, bb] = ld11_layout(); ids = ["GEN" "K" "A" "RL" "CK" "V" "W"];
-    names = ["GEN ~";"JUNGIKLIS";"AMPERMETRAS";"RIŠLĖ R, L";"Ck KONDENS.";"VOLTMETRAS";"VATMETRAS"];
+    names = ["GEN ~";"JUNGIKLIS";"AMPERMETRAS";"RITĖ R, L";"Ck KONDENS.";"VOLTMETRAS";"VATMETRAS"];
     switchText = "Atviras"; if LD11.switchOn then switchText = "Uždarytas"; end
     [u, i, valid, reason, pw] = ld11_measure_values();
     voltText = "— V";
     if valid then voltText = msprintf("%.4f V", u); end
     ampText = "— mA";
-    if valid then ampText = msprintf("%.3f mA", i); end
+    if valid then ampText = msprintf("%.6f mA", i); end
     wattText = "— mW";
-    if valid then wattText = msprintf("%.3f mW", pw); end
-    vals = [msprintf("50 Hz ~<br>%g V RMS", LD11.cfg.E), switchText, ampText, ...
-        msprintf("%g Ω<br>%g mH", LD11.cfg.R, LD11.cfg.LmH), ...
+    if valid then wattText = msprintf("%.6f mW", pw); end
+    vals = [msprintf("<html><center>50 Hz ~<br>%g V RMS</center></html>", LD11.cfg.E), switchText, ampText, ...
+        msprintf("<html><center>%g Ω<br>%g mH</center></html>", LD11.cfg.R, LD11.cfg.LmH), ...
         msprintf("%g µF", LD11.cfg.Ck*1e6), voltText, wattText];
     pairs = ["GEN_N" "GEN_P";"K1" "K2";"A_P" "A_N";"RL_A" "RL_B";"C_A" "C_B";"" "";"" ""];
     for k = 1:7
         r = bb(ids(k))/100; bg = [0.94 0.97 0.97];
-        if ids(k) == "R" then bg = [0.98 0.96 0.88]; end
+        if ids(k) == "RL" then bg = [0.98 0.96 0.88]; end
         if ids(k) == "A" | ids(k) == "V" then bg = [0.95 0.97 0.99]; end
         if pairs(k,1) <> "" then
             for j = 1:2
@@ -131,8 +131,8 @@ function ld11_render_wires()
         h = student_text(fr, [0.04 0.04 0.92 0.58], vals(k), 13, %t, bg); h.horizontalalignment = "center";
         h.tag = "reading:" + ids(k);
         if k == 6 then h.tooltipstring = "Voltmetras: įtampa U prie generatoriaus galų."; end
-        if k == 7 then h.tooltipstring = "Vatmetras: aktyrioji galia P, kurią suvartoja grandinė."; end
-        if k == 4 then h.tooltipstring = msprintf("Rišlė: R = %g Ω, L = %g mH (nuosekliai).", LD11.cfg.R, LD11.cfg.LmH); end
+        if k == 7 then h.tooltipstring = "Vatmetras: aktyvioji galia P, kurią suvartoja grandinė."; end
+        if k == 4 then h.tooltipstring = msprintf("Ritė: R = %g Ω, L = %g mH (nuosekliai).", LD11.cfg.R, LD11.cfg.LmH); end
         if k == 5 then h.tooltipstring = msprintf("Kompensuojantis kondensatorius Ck = %g µF (jungiamas [B11]).", LD11.cfg.Ck*1e6); end
     end
     tids = ld11_terminal_ids();
@@ -152,6 +152,15 @@ function ld11_render_wires()
     // controls(5) = Matuoti (2 režimai + maitinimas + jungiklis).
     LD11.ui.controls(5).enable = "off";
     if ~LD11.demoMode & or(LD11.step == [2 4]) & LD11.wireMode == ld11_stage_mode(LD11.step) then LD11.ui.controls(5).enable = "on"; end
+    for k=1:4
+        LD11.ui.controls(k).enable="on";
+        if LD11.demoMode then LD11.ui.controls(k).enable="off"; end
+    end
+    LD11.ui.measureAll.enable=LD11.ui.controls(5).enable;
+    power_label="Įjungti"; if LD11.powerOn then power_label="Išjungti"; end
+    switch_label="Uždaryti"; if LD11.switchOn then switch_label="Atverti"; end
+    LD11.ui.controls(3).string="[B01] "+power_label;
+    LD11.ui.controls(4).string="[B02] "+switch_label;
     ld11_font(p);
     LD11.fig.immediate_drawing = drawing;
 endfunction
@@ -160,12 +169,14 @@ function ld11_render_journal()
     global LD11;
     if ~isfield(LD11, "ui") then return; end
     if ~isfield(LD11.ui, "journalList") then return; end
+    if ~is_handle_valid(LD11.ui.journalList) then return; end
     rows = emptystr(0, 1);
     names = ["BE Ck";"SU Ck"];
     for tag = 1:2
         m = ld11_journal_rows(tag);
         for k = 1:size(m, 1)
-            rows($+1) = msprintf("%-7s  U=%.4f V  I=%.3f mA  P=%.3f mW", names(tag), m(k,1), m(k,2), m(k,4));
+            rows($+1)=msprintf("%s · U = %.4f V · I = %.6f mA",names(tag),m(k,1),m(k,2));
+            rows($+1)=msprintf("P = %.6f mW · f = 50 Hz",m(k,4));
         end
     end
     if rows == [] then rows = "Matavimų dar nėra."; end
@@ -177,6 +188,7 @@ function ld11_render_stage()
     if ~isfield(LD11, "ui") then return; end
     if isfield(LD11.ui, "headless") then if LD11.ui.headless then return; end; end
     if ~isfield(LD11.ui, "answerEdits") then return; end
+    if ~is_handle_valid(LD11.fig) then return; end
     row = 0;
     for k = 1:12
         [st, sl] = ld11_answer_slot(k); h = LD11.ui.answerEdits(k); lab = LD11.ui.answerLabels(k);
@@ -192,6 +204,7 @@ function ld11_render_stage()
     LD11.ui.progress.string = string(LD11.step) + " / 6 etapas";
     if LD11.demoMode then LD11.ui.progress.string = "PAVYZDYS"; end
     LD11.ui.identity.string = student_caption(LD11.student);
+    LD11.ui.identity.tooltipstring=student_caption(LD11.student);
     ld11_render_wires();
     ld11_render_journal(); ld11_student_sync();
 endfunction
@@ -219,7 +232,7 @@ function ld11_build_gui()
     student_button(f, [0.87 0.93 0.105 0.044], "Pagalba", "ld11_show_actions()");
     p = student_frame(f, [0.025 0.12 0.655 0.77]); LD11.ui.circuitFrame = p;
     right = student_frame(f, [0.70 0.12 0.275 0.77]); LD11.ui.right = right;
-    student_text(p, [0.40 0.63 0.30 0.10], student_wrap("Laidas: spauskite abu galus. Pakartoję — pašalinsite. Tarpas sankirtoje: nesujungta.", 20), 12, %f);
+    student_text(p,[0.31 0.730 0.38 0.025],"Laidas: abu galai. Pakartoję — pašalinsite.",11,%f);
     // Dviejų režimų matavimų žurnalas (be Ck ir su Ck).
     LD11.ui.journalList = uicontrol(p, "style", "listbox", "units", "normalized", ...
         "position", [0.04 0.80 0.64 0.18], "string", "Matavimai", ...
@@ -238,7 +251,7 @@ function ld11_build_gui()
     labels = ["[A01.01] cos φ0 = R/Z"; ...
         "[A02.01] S = U·I, mVA";"[A02.02] Q = √(S²−P²), mvar";"[A02.03] cos φ = P/S"; ...
         "[A03.01] Ck = XL/(ω(R²+XL²)), µF"; ...
-        "[A05.01] S2 = U·I2, mVA";"[A05.02] Q2, mvar";"[A05.03] cos φ2 = P2/S2";"[A05.04] ΔS = S−S2, mVA"; ...
+        "[A05.01] S2 = U·I2, mVA";"[A05.02] Q2 = |Q−QC|, mvar";"[A05.03] cos φ2 = P2/S2";"[A05.04] ΔS = S−S2, mVA"; ...
         "[A06.01] P nepakito?";"[A06.02] I sumažėjo?";"[A06.03] cos φ padidėjo?"];
     LD11.ui.answerEdits = []; LD11.ui.answerLabels = [];
     for k = 1:12
@@ -251,22 +264,39 @@ function ld11_build_gui()
     end
     LD11.ui.studentPrimary = ld11_button(right, [0.07 0.085 0.86 0.075], "Tikrinti", "ld11_student_primary()", 15, [0.08 0.39 0.37]);
     controls($+1) = LD11.ui.studentPrimary;
-    controls($+1) = ld11_button(right, [0.07 0.015 0.37 0.045], "← Atgal", "ld11_jump_step(LD11.step-1)", 12);
+    LD11.ui.studentBack = ld11_button(right, [0.07 0.015 0.37 0.045], "← Atgal", "ld11_jump_step(LD11.step-1)", 12);
+    controls($+1)=LD11.ui.studentBack;
     controls($+1) = ld11_button(right, [0.48 0.015 0.45 0.045], "Žemėlapis", "ld11_show_stand_map()", 12);
+    LD11.ui.measureAll=ld11_button(p,[0.35 0.635 0.30 0.085],"Įjungti ir matuoti","ld11_measure_all()",13,[0.08 0.39 0.37]);
+    controls($+1)=LD11.ui.measureAll;
     LD11.ui.controls = controls; LD11.ui.dynamic = controls;
     LD11.ui.statusMain = student_text(f, [0.025 0.055 0.95 0.035], "", 13, %t, [0.94 0.96 0.96]);
     LD11.ui.statusFix = student_text(f, [0.025 0.020 0.95 0.035], "", 12, %f, [0.94 0.96 0.96]);
     ld11_font(f); student_finish_window(f); f.visible = "on"; ld11_render_stage();
+    f.closerequestfcn="ld11_close()";
     f.resizefcn = "ld11_resize(" + string(f.figure_id) + ")";
 endfunction
 
 function ld11_show_actions()
-    choice = messagebox("Pagalba ir darbo veiksmai", "LD11", "info", ...
-        ["[B04] Kaip sujungti" "[B05] Žemėlapis" "[B07] Pavyzdys" "[B08] Ataskaita" "[B06] Atkurti stendą" "[B09] Iš naujo" "Grįžti"], "modal");
+    global LD11;
+    if ~isfield(LD11,"fig") then return; end
+    if ~is_handle_valid(LD11.fig) then return; end
+    choice=x_choose(["Tęsti išsaugotą darbą";"[B04] Kaip sujungti";"[B08] Išsaugoti ataskaitą";"Mokymosi / atsiskaitymo režimas";"Daugiau veiksmų";"Studentas ir priskirtos reikšmės"],"LD11 · Pagalba");
     select choice
-    case 1 then ld11_show_wiring_guide(); case 2 then ld11_show_stand_map();
-    case 3 then ld11_toggle_solution(); case 4 then bench_export_current("LD11");
-    case 5 then ld11_restore_stage(); case 6 then ld11_restart();
+    case 1 then bench_open_snapshot("LD11");
+    case 2 then ld11_show_wiring_guide();
+    case 3 then bench_export_current("LD11");
+    case 4 then bench_mode("LD11"); ld11_student_sync(); bench_autosave("LD11");
+    case 6 then ld11_text_window("Studentas ir priskirtos reikšmės",[student_caption(LD11.student);"";student_parameter_lines("LD11",LD11.cfg)]);
+    case 5 then
+        extra=x_choose(["[B05] Žemėlapis";"[B07] Pavyzdys";"[B06] Atkurti stendą";"[B09] Pradėti iš naujo"],"LD11 · Daugiau veiksmų");
+        select extra
+        case 1 then ld11_show_stand_map();
+        case 2 then ld11_toggle_solution();
+        case 3 then ld11_restore_stage();
+        case 4 then
+            if messagebox("Pradėti darbą iš naujo? Atsakymai bus išvalyti.","LD11","question",["Pradėti" "Grįžti"],"modal")==1 then ld11_restart(); end
+        end
     end
 endfunction
 

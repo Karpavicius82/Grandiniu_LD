@@ -3,13 +3,14 @@ function ld11_invalidate_mode()
     mode = LD11.wireMode; LD11.report_wires(mode) = emptystr(0, 2);
     if LD11.journal <> [] then LD11.journal(find(LD11.journal(:,3) == mode), :) = []; end
     select mode
-    case 1 then LD11.done([1 2 3]) = %f;
+    case 1 then LD11.done([1 2 3 5]) = %f;
     case 2 then LD11.done([4 5]) = %f;
     end
     LD11.done(6) = %f; LD11.lastMeasurement = %nan;
 endfunction
 
 function ld11_terminal_click(id)
+    if ~ld11_can_act() then return; end
     global LD11;
     if ~ld11_wiring_editable() | ~or(ld11_terminal_ids() == id) then return; end
     if LD11.powerOn then ld11_set_status("Prieš keisdami laidus išjunkite [B01].", "error", ""); return; end
@@ -35,11 +36,14 @@ function ld11_terminal_click(id)
             LD11.switchOn = %f; ld11_invalidate_mode();
         end
     end
-    ld11_render_wires(); ld11_render_journal(); ld11_student_sync();
+    LD11.wires_by_mode(LD11.wireMode)=LD11.wires;
+    ld11_render_wires(); ld11_render_journal(); ld11_student_sync(); bench_autosave("LD11");
 endfunction
 
 function ld11_toggle_power()
+    if ~ld11_can_act() then return; end
     global LD11;
+    if LD11.demoMode then return; end
     LD11.powerOn = ~LD11.powerOn;
     if ~LD11.powerOn then LD11.switchOn = %f; end
     ld11_render_wires();
@@ -48,7 +52,9 @@ function ld11_toggle_power()
 endfunction
 
 function ld11_toggle_switch()
+    if ~ld11_can_act() then return; end
     global LD11;
+    if LD11.demoMode then return; end
     if ~LD11.powerOn then ld11_set_status("Pirma įjunkite [B01].", "error", ""); return; end
     LD11.switchOn = ~LD11.switchOn; ld11_render_wires();
     if LD11.switchOn then ld11_set_status("Jungiklis uždarytas.", "ok", "Rodmenis įrašykite [B03].");
@@ -56,6 +62,7 @@ function ld11_toggle_switch()
 endfunction
 
 function ld11_set_mode(mode)
+    if ~ld11_can_act() then return; end
     global LD11;
     if LD11.demoMode | ~ld11_valid_index(mode, 2) then return; end
     if mode <> LD11.wireMode then
@@ -63,12 +70,13 @@ function ld11_set_mode(mode)
         LD11.wireMode = mode; LD11.wires = LD11.wires_by_mode(mode);
         LD11.powerOn = %f; LD11.switchOn = %f; LD11.pending = ""; LD11.lastMeasurement = %nan;
     end
-    ld11_render_wires();
-    names = ["BE Ck — tik rišlė (R, L)";"SU Ck — kondensatorius lygiagrečiai rišlei"];
+    ld11_render_wires(); bench_autosave("LD11");
+    names = ["BE Ck — tik ritė (R, L)";"SU Ck — kondensatorius lygiagrečiai ritei"];
     ld11_set_status("Režimas: " + names(mode), "info", "Šio režimo laidai išliko. Seką rasite Pagalboje.");
 endfunction
 
 function ld11_measure()
+    if ~ld11_can_act() then return; end
     global LD11;
     if LD11.demoMode then return; end
     if ~or(LD11.step == [2 4]) | LD11.wireMode <> ld11_stage_mode(LD11.step) then
@@ -83,7 +91,7 @@ function ld11_measure()
     LD11.journal($+1,:) = [u, i, tag, p, tag];
     LD11.report_wires(LD11.wireMode) = LD11.wires;
     LD11.lastMeasurement = i;
-    ld11_render_journal(); ld11_render_wires();
+    ld11_render_journal(); ld11_render_wires(); bench_autosave("LD11");
     ld11_set_status(msprintf("Užfiksuota: U = %.4f V; I = %.3f mA; P = %.3f mW.", u, i, p), "ok", "Vatmetras rodo aktyviąją galią.");
 endfunction
 
@@ -95,20 +103,22 @@ function ok = ld11_close_enough(value, expected, relative, absolute)
     ok = abs(value - expected) <= absolute + relative*abs(expected);
 endfunction
 
-function ld11_check_step()
+function ld11_check_step(check_answers)
+    if ~ld11_can_act() then return; end
     global LD11;
     if LD11.demoMode then return; end
+    if argn(2)<1 then check_answers=%t; end
     ld11_save_answers(); step = LD11.step;
     if ~ld11_valid_index(step, 6) then return; end
     if LD11.done(step) then return; end
     select step
     case 1 then
-        if LD11.wireMode <> 1 then ld11_set_status("Pirma sujunkite rišlę [B10].", "error", ""); return; end
+        if LD11.wireMode <> 1 then ld11_set_status("Pirma sujunkite ritę [B10].", "error", ""); return; end
         [valid, message] = ld11_wiring_valid(LD11.wires);
         if ~valid then ld11_set_status(message, "error", "Pagalba → Kaip sujungti."); return; end
         LD11.report_wires(1) = LD11.wires;
     case 4 then
-        if LD11.wireMode <> 2 then ld11_set_status("Sujungite Ck lygiagrečiai rišlei [B11].", "error", ""); return; end
+        if LD11.wireMode <> 2 then ld11_set_status("Sujungite Ck lygiagrečiai ritei [B11].", "error", ""); return; end
         [valid, message] = ld11_wiring_valid(LD11.wires);
         if ~valid then ld11_set_status(message, "error", "Pagalba → Kaip sujungti."); return; end
     end
@@ -123,9 +133,16 @@ function ld11_check_step()
     for index = 1:12
         [answer_step, slot] = ld11_answer_slot(index);
         if answer_step <> step then continue; end
+        if ~check_answers then
+            if stripblanks(LD11.answers(step,slot))=="" then
+                ld11_set_status("Įrašykite ["+ld11_answer_code(step,slot)+"].","error","Atsakymą vertins dėstytojo programa."); return;
+            end
+            continue;
+        end
         value = ld11_parse_number(LD11.answers(step, slot)); relative = .02; absolute = 1e-9;
         if step == 1 | step == 3 then relative = .01; end
         if step == 3 & slot == 1 then relative = .03; end
+        if step == 5 & slot == 2 then absolute=.001; end
         if step == 6 then relative = 0; absolute = 0; end
         if ~ld11_close_enough(value, expected(step, slot), relative, absolute) then
             ld11_set_status("Patikrinkite [" + ld11_answer_code(step, slot) + "].", "error", "Peržiūrėkite formulę užduotyje ir vienetus."); return;
@@ -136,28 +153,37 @@ function ld11_check_step()
 endfunction
 
 function ld11_next_step()
+    if ~ld11_can_act() then return; end
     global LD11;
     if LD11.step >= 6 | ~LD11.done(LD11.step) then return; end
     ld11_set_step(LD11.step + 1);
 endfunction
 
 function ld11_set_step(step)
+    if ~ld11_can_act() then return; end
     global LD11;
     if ~ld11_valid_index(step, 6) then return; end
     if LD11.demoMode then ld11_toggle_solution(); end
     ld11_save_answers(); LD11.pending = ""; LD11.step = step;
-    ld11_set_mode(ld11_stage_mode(step)); ld11_render_stage();
+    ld11_set_mode(ld11_stage_mode(step));
+    // Carry the student's existing base circuit into compensation only once.
+    if step==4 & LD11.wires==[] then
+        if LD11.wires_by_mode(1)<>[] then
+            LD11.wires=LD11.wires_by_mode(1); LD11.wires_by_mode(2)=LD11.wires;
+        end
+    end
+    ld11_render_stage(); bench_autosave("LD11");
 endfunction
 
 function text = ld11_step_instruction(step)
     global LD11;
     cfg = LD11.cfg;
     select step
-    case 1 then text = msprintf("[B10] Sujungite rišlę be maitinimo: generatorius → jungiklis → ampermetras → rišlė (R, L) → grįžimas. Seka: Pagalba → [B04]. [A01.01] Apskaičiuokite pradinį galios faktorių cos φ0 = R/Z; R = %g Ω, L = %g mH, f = 50 Hz.", cfg.R, cfg.LmH);
-    case 2 then text = "Įjunkite [B01], uždarykite [B02] ir matuokite [B03]: žurnale atsiras U, I ir P (vatmetras). [A02.01] S = U·I; [A02.02] Q = √(S²−P²); [A02.03] cos φ = P/S (I — mA, tad S — mVA).";
-    case 3 then text = "[A03.01] Apskaičiuokite kompensuojantį kondensatorių: Ck = XL/(ω·(R²+XL²)), ω = 2π·50. Atsakymą rašykite mikromadais (µF). Stende Ck paruoštas — tikrinkite [B11].";
-    case 4 then text = "[B11] Sujungite Ck lygiagrečiai rišlei (abu nauji laidai). Įjunkite, uždarykite jungiklį ir matuokite [B03]: U2, I2, P2.";
-    case 5 then text = "Iš antrojo matavimo: [A05.01] S2 = U·I2; [A05.02] Q2 = √(S2²−P2²); [A05.03] cos φ2 = P2/S2; [A05.04] ΔS = S − S2. Palyginkite S2 < S, I2 < I, cos φ2 > cos φ.";
+    case 1 then text = msprintf("Sujunkite 4 laidus: Pagalba → [B04]. Apskaičiuokite cos φ0 = R/Z, Z = √(R²+XL²), XL = 2π·50·L. Formulei L = %g H; R = %g Ω.", cfg.L, cfg.R);
+    case 2 then text = "[B12] įjunkite ir išmatuokite U, I ir P. S = U·I; Q = √(S²−P²); cos φ = P/S. Žurnale I — mA, P — mW; gausite S — mVA, Q — mvar.";
+    case 3 then text = "Ck = XL/(ω·(R²+XL²)); ω = 2π·50; XL = ω·L (L — H). Gautą F reikšmę dauginkite iš 10⁶ ir įrašykite µF. Kitame etape prijungsite Ck prie tos pačios ritės.";
+    case 4 then text = "Pirmieji 4 laidai išliko. Pridėkite tik du: [T07]–[T09] ir [T08]–[T10] — Ck lygiagrečiai ritei. [B12] įjunkite ir įrašykite U2, I2, P2.";
+    case 5 then text = "Q2 = |Q − QC|; QC = 0,001·ω·Ck·U² (Ck — µF; Q iš 2 etapo — mvar). ω = 2π·50. Ši formulė patikima ir kai Q2 beveik nulis. Q2 leidžiama ±0,001 mvar + 2 %.";
     case 6 then text = "[A06.01] Ar aktyvioji galia P po kompensacijos nepakito? [A06.02] Ar srovė I sumažėjo? [A06.03] Ar cos φ padidėjo? 1 – Taip, 2 – Ne.";
     else text = "";
     end
@@ -189,20 +215,22 @@ function ld11_test_answers(step, values)
 endfunction
 
 function ld11_show_wiring_guide()
+    if ~ld11_can_act() then return; end
     global LD11;
-    text = ["LD11 · " + names_rezhimas(); ""; "Išjunkite generatorių prieš jungdami laidus."];
+    text = ["LD11 · " + ld11_mode_name(); ""; "Išjunkite generatorių prieš jungdami laidus."];
     wires = ld11_canonical_wires(LD11.wireMode);
     for index = 1:size(wires, 1)
-        text($+1) = msprintf("%d. [%s]–[%s]: %s → %s", index, ld11_terminal_code(wires(index,1)), ld11_terminal_code(wires(index,2)), wires(index,1), wires(index,2));
+        text($+1) = msprintf("%d. [%s]–[%s]: %s → %s", index, ld11_terminal_code(wires(index,1)), ld11_terminal_code(wires(index,2)), ld11_terminal_name(wires(index,1)), ld11_terminal_name(wires(index,2)));
     end
-    text = [text; ""; "Režimas renkamas mygtukais [B10] (be Ck) ir [B11] (su Ck)."; "Vatmetras rodo aktyviąją galią P — jo jungti nereikia."; "Kompensacija: Ck lygiagrečiai rišlei tarp tų pačių mazgų."];
+    text = [text; ""; "Režimas renkamas mygtukais [B10] (be Ck) ir [B11] (su Ck)."; "Vatmetras rodo aktyviąją galią P — jo jungti nereikia."; "Kompensacija: Ck lygiagrečiai ritei tarp tų pačių mazgų."];
     ld11_text_window("Kaip sujungti", text);
 endfunction
 
 function ld11_show_stand_map()
+    if ~ld11_can_act() then return; end
     [ids, callbacks, labels, hints] = ld11_button_registry();
     text = ["LD11 · STENDO ŽEMĖLAPIS";"T01/T02 – generatorius (~, 50 Hz).";"T03/T04 – jungiklis."; ...
-        "T05/T06 – ampermetras; T07/T08 – rišlė (R, L)."; "T09/T10 – kondensatorius Ck."; ...
+        "T05/T06 – ampermetras; T07/T08 – ritė (R, L)."; "T09/T10 – kondensatorius Ck."; ...
         "Vatmetras P ir voltmetras U — pagalbinės kortelės."; ""];
     for index = 1:size(ids, "*"); text($+1) = "[" + ids(index) + "] " + labels(index); end
     text = [text; ""; "Etapai E01–E06. V02 – dviejų režimų matavimų žurnalas."; ...
@@ -219,23 +247,24 @@ function ld11_text_window(title, lines)
     uicontrol(window, "style", "listbox", "units", "normalized", "position", [.02 .10 .96 .84], ...
         "string", lines, "fontname", "SansSerif", "fontunits", "pixels", "fontsize", 12);
     uicontrol(window, "style", "pushbutton", "units", "normalized", "position", [.35 .02 .30 .06], ...
-        "string", "[H01] Uždaryti", "tag", "H01", "callback", "close()");
+        "string", "[H01] Uždaryti", "tag", "H01", "callback", msprintf("close(%d)",window.figure_id));
 endfunction
 
 function ld11_toggle_solution()
+    if ~ld11_can_act() then return; end
     global LD11;
     if LD11.demoMode then
         LD11.demoMode = %f;
         for field = ["wires" "answers" "wireMode" "journal" "powerOn" "switchOn" "lastMeasurement"]
             LD11(field) = LD11.backup(field);
         end
-        LD11.pending = ""; ld11_render_stage(); ld11_set_status("Grįžta į savo darbą.", "info", ""); return;
+        LD11.pending = ""; ld11_render_stage(); ld11_set_status("Grįžta į savo darbą.", "info", ""); bench_autosave("LD11"); return;
     end
     ld11_save_answers(); LD11.backup = struct();
     for field = ["wires" "answers" "wireMode" "journal" "powerOn" "switchOn" "lastMeasurement"]
         LD11.backup(field) = LD11(field);
     end
-    LD11.practice_used = %t; LD11.demoMode = %t; LD11.pending = "";
+    LD11.practice_used = %t; bench_autosave("LD11"); LD11.demoMode = %t; LD11.pending = "";
     LD11.wires = ld11_canonical_wires(LD11.wireMode); LD11.powerOn = %t; LD11.switchOn = %t;
     LD11.journal = [];
     [u, i, ok, message, p] = ld11_measure_values();
@@ -244,24 +273,50 @@ function ld11_toggle_solution()
 endfunction
 
 function ld11_restore_stage()
+    if ~ld11_can_act() then return; end
     global LD11;
     if LD11.demoMode then ld11_toggle_solution(); return; end
+    ld11_save_answers();
     LD11.powerOn = %f; LD11.switchOn = %f; LD11.pending = ""; LD11.lastMeasurement = %nan;
     if ld11_wiring_editable() then
-        LD11.wires = emptystr(0, 2); ld11_invalidate_mode();
+        LD11.wires = emptystr(0, 2); LD11.wires_by_mode(LD11.wireMode)=LD11.wires; ld11_invalidate_mode();
     end
-    ld11_render_stage(); ld11_set_status("Šio etapo stendas atkurtas.", "info", "");
+    ld11_render_stage(); ld11_set_status("Šio etapo stendas atkurtas.", "info", ""); bench_autosave("LD11");
 endfunction
 
 function ld11_restart()
-    ld11_init_state(); ld11_render_stage(); ld11_set_status("Darbas pradėtas iš naujo.", "info", "Studentas ir variantas išliko.");
+    if ~ld11_can_act() then return; end
+    ld11_init_state(); ld11_render_stage(); ld11_set_status("Darbas pradėtas iš naujo.", "info", "Studentas ir variantas išliko."); bench_autosave("LD11");
 endfunction
 
 function ld11_answers_changed()
-    ld11_save_answers(); ld11_student_sync();
+    if ~ld11_can_act() then return; end
+    ld11_save_answers(); ld11_student_sync(); bench_autosave("LD11");
 endfunction
 
-function name = names_rezhimas()
+function name = ld11_mode_name()
     global LD11;
-    if LD11.wireMode == 1 then name = "Rišlė be kondensatoriaus"; else name = "Rišlė su Ck"; end
+    if LD11.wireMode == 1 then name = "Ritė be kondensatoriaus"; else name = "Ritė su Ck"; end
+endfunction
+
+function ld11_close()
+    global LD11;
+    if ~isfield(LD11,"fig") then return; end
+    if ~is_handle_valid(LD11.fig) then return; end
+    if LD11.demoMode then ld11_toggle_solution(); end
+    bench_autosave("LD11");
+    if isfield(LD11,"autosave_error") then
+        if LD11.autosave_error<>"" then return; end
+    end
+    delete(LD11.fig);
+endfunction
+
+function ld11_measure_all()
+    if ~ld11_can_act() then return; end
+    global LD11;
+    if LD11.demoMode | ~or(LD11.step==[2 4]) then return; end
+    ld11_set_mode(ld11_stage_mode(LD11.step));
+    [valid,why]=ld11_wiring_valid(LD11.wires);
+    if ~valid then ld11_set_status(why,"error","Sujunkite grandinę pagal Pagalbą."); return; end
+    LD11.powerOn=%t; LD11.switchOn=%t; ld11_measure();
 endfunction
