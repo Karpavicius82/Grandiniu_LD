@@ -33,6 +33,14 @@ Pavyzdžio peržiūra nekeičia jūsų matavimų ir jos negalima pateikti kaip a
 LD5 skaičiavimams ir ataskaitų vertinimui naudojamas bendras C++ branduolys.
 LD5 turi 64 pastovius variantus: `LD5/VARIANTAI.csv`.
 
+**LD12 – trifazės grandinės: žvaigždė ir trikampis:** šeši etapai, simetrinis
+trifazis šaltinis (Ul pagal variantą, 50 Hz) ir trys vienodi imtuvai R. Jungimas
+mygtukais [B10] žvaigžde (imtuvai tarp linijų ir neutralio N) ir [B11] trikampiu
+(tarp linijų L1–L2, L2–L3, L3–L1); matuojama fazė renkama [B12]–[B14]. Fizika —
+trifazė MNA branduolyje (ld_ac kind 6). Studentas skaičiuoja Uf = Ul/√3, fazines
+ir linijines sroves, Il = √3·If bei abiejų jungimų galias ir palygina:
+P(trikampis) = 3·P(žvaigždė). 64 variantai: `LD12/VARIANTAI.csv`.
+
 **LD11 – aktyvioji, reaktyvioji ir pilnutinė galia; cos φ gerinimas:** šeši
 etapai, rišlė (R, L nuosekliai) prie 50 Hz generatoriaus; stende ampermetras,
 voltmetras ir vatmetras (P). Režimai [B10] be Ck ir [B11] su Ck — kompensuojančiu
@@ -116,7 +124,7 @@ Paketai nėra pasirašyti Apple Developer sertifikatu ar notarizuoti.
 Linux: `./PALEISTI.sh`. Scilab aplinkoje: vykdykite `STENDAS.sce` ir pasirinkite darbą.
 Windows: dukart paspauskite `PALEISTI.bat` arba vykdykite `STENDAS.sce` grafiniame
 Scilab lange. `bin/ldcheck.exe` skirtas dėstytojo ataskaitų tikrinimui.
-Atskirai galima vykdyti atitinkamą `LD1/LD1.sce`–`LD11/LD11.sce` failą.
+Atskirai galima vykdyti atitinkamą `LD1/LD1.sce`–`LD12/LD12.sce` failą.
 Paleidiklis ieško įdiegto Scilab; prireikus nurodykite `SCILAB_BIN=/visas/kelias/bin/scilab`.
 
 Paketą platinkite atsisiuntimo nuoroda. Gmail gali blokuoti archyvą dėl jame esančių

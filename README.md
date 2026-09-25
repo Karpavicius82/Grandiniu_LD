@@ -1,6 +1,8 @@
 # Grandinių virtualūs laboratoriniai darbai (Scilab)
 
-Interaktyvūs elektros grandinių laboratoriniai darbai: Scilab sąsaja, bendras C++ branduolys ir automatinis LD1–LD11 ataskaitų vertinimas.
+Interaktyvūs elektros grandinių laboratoriniai darbai: Scilab sąsaja, bendras C++ branduolys ir automatinis LD1–LD12 ataskaitų vertinimas.
+
+LD12: simetrinė trifazė grandinė — trys vienodi imtuvai žvaigždėje ir trikampyje; Uf = Ul/√3, fazinės ir linijinės srovės, Il = √3·If bei galios P = √3·Ul·Il = 3PY (trikampis tris kartus galingesnis); 64 variantai, šeši etapai ir automatinis 19 kriterijų vertinimas.
 
 LD11: rišlė (R, L) su 50 Hz generatoriumi, ampermetru, voltmetru ir vatmetru; aktyvioji P, reaktyvioji Q ir pilnutinė S galia bei cos φ prieš kompensaciją; teorinis kompensuojantis kondensatorius Ck ir matavimai su juo — P nepakinta, S ir I sumažėja, cos φ artėja į 1; 64 variantai, šeši etapai ir automatinis 20 kriterijų vertinimas.
 
@@ -67,7 +69,7 @@ Fizinių ekranų ir visų DPI skalių patikra neatlikta.
 
 ## Turinys
 
-- `studentui/` – vienintelis aktyvus šaltinis: bendra studento sąsaja, LD1–LD11
+- `studentui/` – vienintelis aktyvus šaltinis: bendra studento sąsaja, LD1–LD12
   variantai, elementų numerių registrai (T/B/E/F/V/H/W/D/A kodai) ir automatinė patikra.
 - `audits/` – LD2 nepriklausomo kryžminio audito medžiaga, naudota prieš v2.0.
 - `dist/` – paruoštas savarankiškas studento versijos ZIP paketas.
