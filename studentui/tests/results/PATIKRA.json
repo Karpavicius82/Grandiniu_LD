@@ -1,30 +1,30 @@
 {
-  "time_utc": "2026-09-25T06:10:07.069201+00:00",
+  "time_utc": "2026-09-25T11:46:53.812219+00:00",
   "scilab": "2026.1.0",
-  "command": "GitHub Actions native.yml and macos.yml: 12 CTest suites, 577 actual reports, LD1-LD9 GUI and student delivery",
+  "command": "GitHub Actions native.yml and macos.yml: 13 CTest suites, 641 actual reports, LD1-LD10 GUI and student delivery",
   "status": "PASS",
   "coverage": {
-    "source_commit": "a5c2097f846a6d4e049ac5e1ceb791dccb644a6a",
+    "source_commit": "910dd0946639c5f304c769075fe86560d5fbefc0",
     "status": "PASS",
-    "native_ci": "https://github.com/Karpavicius82/Grandiniu_LD/actions/runs/36020040014",
-    "macos_ci": "https://github.com/Karpavicius82/Grandiniu_LD/actions/runs/36020040143",
+    "native_ci": "https://github.com/Karpavicius82/Grandiniu_LD/actions/runs/36128739009",
+    "macos_ci": "https://github.com/Karpavicius82/Grandiniu_LD/actions/runs/36128739176",
     "platforms": [
       "Windows Server 2022",
       "Ubuntu 22.04",
       "macOS 15 arm64",
       "macOS 15 x86_64"
     ],
-    "ctest_suites_per_platform": 12,
-    "actual_reports_per_platform": 577,
+    "ctest_suites_per_platform": 13,
+    "actual_reports_per_platform": 641,
     "packages": {
       "Windows": {
-        "ci_archive_sha256": "7d5e1bb8811a9c1f284dc9410d649778791a802bfd48ed4260b89c2aeb3053f1",
+        "ci_archive_sha256": "0751b65a9131d3116138f5b6c7e87c166af35d02093cb22e884df80c3479f037",
         "native_sha256": {
-          "ldcheck.exe": "3c12e009349090df189520f96c52e6b6186cb908bb125d87e339d4b8abcd8c3c",
-          "ldcore.dll": "06dc43e62387b476e05f8190ae10618bf45e4385bfab9e8164725b4a864e5f15",
-          "mokytojas.exe": "03d033b1f5874ec78bf6ba42bc88e07b7b31a3b556a0534b6eee9c3311aec2d1"
+          "ldcheck.exe": "7da50c5d77a8993fbd30388b16c5cf84f88a386cc514a992ab6b2867665db426",
+          "ldcore.dll": "fc764b9d07c16b1cd8654db706d00ff6f76041a99149f7b67637fb62fbfc511f",
+          "mokytojas.exe": "f4bf6d156f3ff8a49781d9e6a6bb59101365a815a84548263c15325e5fb16779"
         },
-        "ld9": {
+        "ld10": {
           "status": "PASS",
           "tolerance_cases": 146,
           "actual_gui_reports": 3,
@@ -40,21 +40,21 @@
           "malformed_drafts_rejected": 6,
           "report_traceability": true,
           "submission_sha256": {
-            "LD9-V01-20260924T153538-1048-214-61.html": "a2f555d61da20ef5aede24bd53c33531b683e29767a56a2c905f162cf5175338",
-            "LD9-V17-20260924T153547-1048-925-122.html": "d12fadf197c0654fb56966a381457a60b479017f76d533b44d2c6825d6102cb3",
-            "LD9-V64-20260924T153557-1048-275-183.html": "3ac8d73e53245e757bd03e225ffdcb7691198075e97d15c1e42bbe162efa48b3"
+            "LD10-V01-20260925T113042-3292-752-69.html": "6104ace5cf21424c8b092299bd3198ea976d1d176cb021df78794bb3165a75d7",
+            "LD10-V17-20260925T113053-3292-592-138.html": "dacb13d7e0abf6ee0317b7ee80aa306b2740156c66056069744c5528ac212839",
+            "LD10-V64-20260925T113104-3292-108-207.html": "70262b0b665f65706236a247491b70cfbd7408738bcd9de1db8f38ad5a835dce"
           },
           "platform": "nt"
         }
       },
       "Linux": {
-        "ci_archive_sha256": "f630df9aacaad35e93ff0f23c45ce1001744256cf67fc0495dd4c315e934d4ab",
+        "ci_archive_sha256": "c999169d27621e43573c8b561e99da892aa80fa2eafebdf4a42641c30fc6042d",
         "native_sha256": {
           "ldcheck": "023479d1d8ef2bd7667bd2bf00c402610b6bad55df120ce798c4d867bbedb774",
-          "ldcore.so": "0c1260e3b41bb3f119dcb45776c35f648489575ce036add11d42d422bf37cd99",
+          "ldcore.so": "ca8912848390e636b2ea67071adb14a474b46aea4882a52c5493163c4c0263fd",
           "mokytojas": "059b7dfdaff25b505acc1d42b29726c553e4d788e613c35284c1c0a86cd92411"
         },
-        "ld9": {
+        "ld10": {
           "status": "PASS",
           "tolerance_cases": 146,
           "actual_gui_reports": 3,
@@ -70,21 +70,21 @@
           "malformed_drafts_rejected": 6,
           "report_traceability": true,
           "submission_sha256": {
-            "LD9-V01-20260924T153136-4646-74-61.html": "ae12d5c585c6ec0d835e84c6ba06385b4c561860b9989b42045204edcd762b7b",
-            "LD9-V17-20260924T153142-4646-996-122.html": "5ccfcdcc5812a77e0d092a00013dcec4d1d1e151e5cc8ee92c2d2abfb833b303",
-            "LD9-V64-20260924T153149-4646-605-183.html": "ffff164ed87e027524c958220f328dd065a375b78ee153bde8f4e6ce4cfed294"
+            "LD10-V17-20260925T112630-5250-726-138.html": "959a8be7b891b743a7c27365be0ddba45a41fdb71ef041bc0d40d29ded685ba6",
+            "LD10-V64-20260925T112638-5250-298-207.html": "69629b2d67ce6b6914a9e1b014164ff4c65573d6d084bf31065f997b4d4e88bc",
+            "LD10-V01-20260925T112622-5250-867-69.html": "8e6ce3c96581da383f9164faa4798985979295e3df725e564dea32270c2bc286"
           },
           "platform": "posix"
         }
       },
       "macOS-arm64": {
-        "ci_archive_sha256": "d53604b0112c1c12233d33ca469df3520a87bfa639ab18349b540340ca6c4d6c",
+        "ci_archive_sha256": "021e88fe32f755aeeec28787337b7cb777407815afd51db19b890dabc94d9297",
         "native_sha256": {
           "ldcheck": "e5e8595cdb045308dcdc847323f42365d390a0eefaf814e53825ce3b363cff2d",
-          "ldcore.dylib": "ba5e9c134561eb53b83dc179873bc465348b95320e0d68bdf7a5334f400dd357",
+          "ldcore.dylib": "d8fccd2c5cd2808b2e0ea7752ae0d512ae86ab650d7f5cda0332e5b4362bb9ba",
           "mokytojas": "096c1a926398a4707408eb518897b9a6e0e4eda24ed2d7faabd6b13a8fe5c5dc"
         },
-        "ld9": {
+        "ld10": {
           "status": "PASS",
           "tolerance_cases": 146,
           "actual_gui_reports": 3,
@@ -100,21 +100,21 @@
           "malformed_drafts_rejected": 6,
           "report_traceability": true,
           "submission_sha256": {
-            "LD9-V17-20260924T153635-13045-791-122.html": "19e275cf913f5fdfc9b9a91008a364c7249bb3fcd4682a9549e4e24dbb6b12f0",
-            "LD9-V01-20260924T153621-13045-81-61.html": "9c43ef41733d55977386bf719dcb18029387e068a82668da6cc8086b571c986e",
-            "LD9-V64-20260924T153647-13045-535-183.html": "c4bab1008314e168dd19e045ff827c720ce0069c5fb6fb7560155dfdae2bc284"
+            "LD10-V17-20260925T114055-21796-530-138.html": "cd6cd8a4b9e213fca8a55ea67c7a229e3f1d6b63b2437a879b6d73eac08c1109",
+            "LD10-V01-20260925T114026-21796-170-69.html": "b77b81a5b2d09e3f51eb0c82fd44619b38b4eb9011bd4bffe91205c66f1c7a66",
+            "LD10-V64-20260925T114124-21796-586-207.html": "b65deb9d16437ac109e4a6d979cdaac22abb3793084d8c4a3d71285e286dffa3"
           },
           "platform": "posix"
         }
       },
       "macOS-x86_64": {
-        "ci_archive_sha256": "caecedb701550d223f4cfc1147d996dd499ba473139cf69ff5aab308a67682c9",
+        "ci_archive_sha256": "42f12183941ed9a321c7f72ed583d9929cb3df2f38a7735d69d7323172fb8017",
         "native_sha256": {
           "ldcheck": "96a1d7c6916009b17b118a0755211c19d0bd0578cf976bbc5645662c352e25f2",
-          "ldcore.dylib": "2940a3a9d5d8c8356c87b6d0983c80c65be5200de2052632a363555fa495bf92",
+          "ldcore.dylib": "a7f85251b2ca30a0fb5cc6e7915ac38eb5b21262eba8f6a7646c8ac6ee99ca4e",
           "mokytojas": "25f9b84343ae77fa8ac8a846d868018c0b8bacefd0acc476c96af17d33ac0e65"
         },
-        "ld9": {
+        "ld10": {
           "status": "PASS",
           "tolerance_cases": 146,
           "actual_gui_reports": 3,
@@ -130,9 +130,9 @@
           "malformed_drafts_rejected": 6,
           "report_traceability": true,
           "submission_sha256": {
-            "LD9-V01-20260924T154745-26358-2-61.html": "0524004b3bdfddd9bff3ed12be4b21400fcf2e24a3d384c97780e8b8c8a3730d",
-            "LD9-V64-20260924T154823-26358-141-183.html": "6feaa7b4eaf76cb88a3fd598a2ca0b8afefeeade60d69950265a0e2da3330c55",
-            "LD9-V17-20260924T154804-26358-360-122.html": "4068e6f189b16edcefae1e90860e22cfb3a61ae3a53605a7ce39d51b5c44421e"
+            "LD10-V17-20260925T113829-30073-695-138.html": "58a791b08c5a0c23d046180cdb6acb43ca87cf70b94456f30184e8002460ba54",
+            "LD10-V64-20260925T113844-30073-375-207.html": "6e350e7caaff3a426d55323e49dd9eec4cfc6e4a989e798cdfd662e8c3370bb7",
+            "LD10-V01-20260925T113814-30073-352-69.html": "09b53619eb935006e2fd50a7dd51bf8d5833d250fac0ae517e8dbf02125438f4"
           },
           "platform": "posix"
         }
@@ -141,7 +141,7 @@
   },
   "source_sha256": {
     "DESTYTOJUI.sce": "6518ec1acc2679736b3bd2b334381aded90c03e6f313559fde5ca1df46af1aa4",
-    "GUI_PATIKRA.sce": "d10986b299ebf02183beb64aa2c9357ac824e0c0f8ab08443e5ebac8851c4e91",
+    "GUI_PATIKRA.sce": "47fc2bcff2c8a82d4f6c9da23ad21b1876a14257df9f4aecf19d630318098549",
     "LD1/LD1.sce": "369863c411bca178ef30347fe4b4ae90a4ba00904abacff9b8b41a81b3eec611",
     "LD1/LD1_LOAD.sce": "0d68fa3867d82a2085c2d0d494b725acfe774cd32ca0cb7bc955cb810190a379",
     "LD1/ld1_assist.sci": "687d418bee6d66e232c84b1da41a52e6583dff3c301c69806709847d954217f6",
@@ -152,6 +152,15 @@
     "LD1/ld1_ids.sci": "1e3a92fe5aca0a7644cde58784f224c98cdce3736238b3c10ba4cccdd8129ae4",
     "LD1/ld1_student.sci": "5335c9760ce8f59db26e8e18226856d3873bfc6dfa794d220ab780eaf9e089e4",
     "LD1/ld1_utils.sci": "129dc2acc1f230c7012f831dddaef1657af0d3f1c7f1681ef2f076d3c9dac620",
+    "LD10/LD10.sce": "877c7c441a0469f4f97508313b488a22b2bdf1cc35e639f9bdcc530fceaf0507",
+    "LD10/LD10_LOAD.sce": "49eceadf620e71b1cf9393a976ffc0fb7219ba9079cf32033225a6e4424fb3f7",
+    "LD10/ld10_callbacks.sci": "af64af8e58050cf80fda0fd4c0c68b7c0222cbf19dfd3ab59e7a44df9bdc0ff9",
+    "LD10/ld10_circuit.sci": "7ab6abf475b246e0f98374487e1f610748f83c39e997119003fba1a88070d1f3",
+    "LD10/ld10_config.sci": "a3eb57be5a5ed49b54d67cd53fe82eb901c9e22ed8622ac2dbcf92815d62ee9e",
+    "LD10/ld10_gui.sci": "cb1ac284ec36821d98850e24380ac099c1394148d130fd613397b28f7d25aea4",
+    "LD10/ld10_ids.sci": "d45ac36b34cac40802a500611e66d5ae875a94c13fd50d9e3668be284007bd96",
+    "LD10/ld10_student.sci": "57a58479132fb8628ea564346afdb93beb05ce20c1be00e1c4f2a017e3893f35",
+    "LD10/ld10_utils.sci": "bcd52f5621f29780acf9d4cd869304942641a48bb10e1875ec569498ae14dea2",
     "LD2/LD2.sce": "b0e34e873ae9e12a1ddeb2e117fcbd49947ebae2d47fdfa39d6f98ff71765798",
     "LD2/LD2_GUI_TEST.sce": "56597c99ab27b2ee167336a6a3d851deb23e01a7fc24c77f9f4056ff8e0471a9",
     "LD2/LD2_LOAD.sce": "7573605d823c74ce33b94b153db9f4fc70c7c17d2845fd99727fc14e42557412",
@@ -239,6 +248,7 @@
     "PALEISTI.sh": "630f98bd7e7238a09408387f1ee2548934e38e7f22d8fb20653287372a6953c2",
     "PATIKRINTI.sh": "a2d596ad6c9a5df00d2b7082373ebeb8929836c4f977668515871cec33a470b5",
     "PERZIURA.sce": "53fa236f6574984056d2f21386392b5d4941c5de74fd2ac48fcac6cbffcee0cc",
+    "PERZIURA_LD10.sce": "7de6d232f64a668251fdb22615fd4df7965ebd0d8738170d4eac3661e1e01b7a",
     "PERZIURA_LD2.sce": "64461ba07fcf298f561d061979c518213bfd81b439d918dbf98c0f8c1a6e7a35",
     "PERZIURA_LD3.sce": "17ff85ef2dd5d0e5c25d9096e1691f8c94b46b4748fa27d16cdbe7a45746d23b",
     "PERZIURA_LD4.sce": "1dbd04909b487b5586d41b2dc9ce650e3c29e92443841768e5f7fe86826050d8",
@@ -247,16 +257,16 @@
     "PERZIURA_LD7.sce": "5b5c73c6b380a5c0fded53ee2518f08c6f32795b7e679cfa7f1eaaec60b7eebd",
     "PERZIURA_LD8.sce": "0dc7a84c7a6cbbca9d96a87b72ab666c6c944d752d5dd62c108d5604e885d64a",
     "PERZIURA_LD9.sce": "6493e361fd0bbaf0795d28cb092c542efff7ab06d3eb0ea4e6b677dc8914876a",
-    "STENDAS.sce": "051ccf8046129f44d8f5921f78cec3ddefa252948bdaae0b934543e95b9e6bcf",
-    "bench_common.sci": "7707f5bcf90e35505094ad19d942486550b1970061aa7edb068eb86e8e0ee696",
-    "bench_report.sci": "4b3aa87eddc13af3abe8c7a787c83b3e9407fbf5d8ced2ef7bf95111d0aa4eee",
-    "bench_session.sci": "7c4dfda4591c2a129025b25e9ff6ec4dfb19fc5f8fdb2db26f60dd816a9a1d39",
+    "STENDAS.sce": "2c4405cb9240dc4451564866064031cb806ec9c86317dc6ef52145b121b1dfa8",
+    "bench_common.sci": "f8d7aa86f3a596860398625e1914ae360944d229d8e5693abb9099d9c32b85fc",
+    "bench_report.sci": "17d645da861c95e52c3db3f02c54f9003ffa78e310eb07a0c37219be86f1a04e",
+    "bench_session.sci": "21f52e03461bb9939bc762ee075eb0a4822d4a595f4e10e370f27e0f4e2cadb6",
     "bench_teacher.sci": "ec1ce34f4358bace3694bc8a2d30320c41675399dd91f96425d1a6a614192911",
-    "student_profile.sci": "adc77c85bf863911ba54253de22de7d4344e712d489d7f0e9e5a711f8beb0cde",
+    "student_profile.sci": "736d5760094da456ea10674399d1f2e80143ed274091f20e0976f3072ca42ee2",
     "student_style.sci": "a50dc32c8c73a11ec885b6118c7d0326e912a1af8d0f3bc13edfe97be1495ee2",
-    "tests/AUTOMATINIS.sce": "8652320783e8709070f20723ee40c819985ab2b544c0ef37c2314c24bc49bd6b",
-    "tests/HEADLESS.sce": "6c1ce1b008659a33c0d2036047b0d7fa5cb3995618b516515f70da7f312d38df",
-    "tests/workflows.sci": "9ca32005528b3592367d7eb6adbf19b8885f35ee325493d417296f9083548416"
+    "tests/AUTOMATINIS.sce": "bdd00762da104a8628666e9339230da3963ca15b97437dcbad1ae844f8e43d4a",
+    "tests/HEADLESS.sce": "aaa2685a9f2da9326c605950df7c2c2c976136a3c2d2c1f98f9945a70bdab645",
+    "tests/workflows.sci": "5c7b6278adb7ad4ff7cd11d3f068211d5a446d606ba5d870b48dc6f2e304541f"
   },
   "log_sha256": {}
 }

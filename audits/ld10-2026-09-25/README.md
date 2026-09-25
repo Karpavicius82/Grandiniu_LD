@@ -48,4 +48,19 @@ operacinės sistemos pelės paspaudimų ar visų DPI / ekranų bandymas.
 Windows CI naudoja Server 2022, ne konkretų vartotojo Windows 11 įrenginį.
 Ataskaitos nėra skaitmeniškai pasirašytos ir neįrodo studento autorystės.
 
-Galutiniai platformų rezultatai ir paketų SHA256 bus pridėti po CI.
+## Galutinis platformų rezultatas
+
+Patikrinta programos versija: `910dd0946639c5f304c769075fe86560d5fbefc0`.
+[Windows ir Linux](https://github.com/Karpavicius82/Grandiniu_LD/actions/runs/36128739009)
+ir [macOS ARM / Intel](https://github.com/Karpavicius82/Grandiniu_LD/actions/runs/36128739176): **PASS**.
+Visose keturiose aplinkose praėjo 13 CTest rinkinių, 641 tikrų ataskaitų,
+LD10 trijų studento eigų, 146 vertinimo palyginimų, 31 geometrijos scenarijaus
+ir papildomų klaidų atkūrimo patikros. Bendras bandymas atidarė visus dešimt
+stendų. Naudoti Windows Server 2022, Ubuntu 22.04, macOS 15 ARM ir Intel.
+
+`verified-packages.json` sieja CI archyvų ir C++ failų SHA256 su patikrinta
+versija. `127` Scilab bei paleidimo failų ir visų
+dešimties variantų bankų turinys sutikrintas su šaltiniu. Pateikiamų paketų
+SHA256 yra `distributed-sha256.json`; macOS ZIP pateikti nepakeisti iš CI.
+Linux PNG užfiksuoti galutinės versijos bandyme. Windows / Linux jungtinis
+ZIP papildomai patikrintas dėl failų SHA256 ir vykdymo teisių.
