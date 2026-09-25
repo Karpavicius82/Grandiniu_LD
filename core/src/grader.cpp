@@ -789,12 +789,12 @@ void grade_ld12(Grader& grader,const Json& report,const Bank& variant) {
     grader.measured("i3d","Matavimas (trikampis): fazinė I31",i_ph_delta,"mA",.02);
     grader.measured("ild","Matavimas (trikampis): linijinė I1",i_line_delta,"mA",.02);
     grader.answer("s1.q1","Fazinė įtampa žvaigždėje: Uf = Ul/√3",phase,"V","Uf = Ul/√3.",.01,1e-9);
-    grader.answer("s2.q1","Žvaigždės fazinė srovė: If = Uf/R",i_star,"mA","If = Uf/R, mA.",.02,1e-9);
+    grader.answer("s2.q1","Žvaigždės fazinė srovė: If = Uf/R",i_star,"mA","If[mA] = 1000·Uf[V]/R[Ω].",.02,1e-9);
     grader.answer("s3.q1","Trikampio fazinė įtampa",Ul,"V","Trikampyje Uf = Ul.",0,.005);
-    grader.answer("s4.q1","Trikampio fazinė srovė: If = Ul/R",i_ph_delta,"mA","If = Ul/R, mA.",.02,1e-9);
+    grader.answer("s4.q1","Trikampio fazinė srovė: If = Ul/R",i_ph_delta,"mA","If[mA] = 1000·Ul[V]/R[Ω].",.02,1e-9);
     grader.answer("s5.q1","Trikampio linijinė srovė: Il = √3·If",i_line_delta,"mA","Il = √3·If, mA.",.02,1e-9);
-    grader.answer("s5.q2","Trikampio galia: P = √3·Ul·Il",p_delta*1000,"mW","P = √3·Ul·Il, W → mW.",.02,1e-9);
-    grader.answer("s5.q3","Žvaigždės galia: P = 3·Uf·If",p_star*1000,"mW","P = 3·Uf·If, W → mW.",.02,1e-9);
+    grader.answer("s5.q2","Trikampio galia: P = √3·Ul·Il",p_delta*1000,"mW","Ul[V]·Il[mA]·√3 gaunama mW.",.02,1e-9);
+    grader.answer("s5.q3","Žvaigždės galia: P = 3·Uf·If",p_star*1000,"mW","3·Uf[V]·If[mA] gaunama mW; naudokite žvaigždės duomenis.",.02,1e-9);
     grader.answer("s6.q1","Išvada: žvaigždėje fazinė ir linijinė srovės vienodos",1,"choice","1 – Taip, 2 – Ne.",0,0);
     grader.answer("s6.q2","Išvada: trikampyje Il = √3·If",1,"choice","1 – Taip, 2 – Ne.",0,0);
     grader.answer("s6.q3","Išvada: trikampio galia tris kartus didesnė už žvaigždės",1,"choice","1 – Taip, 2 – Ne.",0,0);

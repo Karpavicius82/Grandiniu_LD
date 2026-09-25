@@ -1,5 +1,14 @@
 name: macOS Intel and Apple Silicon acceptance
-on: [push, pull_request, workflow_dispatch]
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      focus:
+        description: Full regression or LD12 plus core, reports and delivery
+        type: choice
+        default: all
+        options: [all, ld12]
 permissions:
   contents: read
 jobs:
@@ -43,7 +52,10 @@ jobs:
       - name: Scilab native integration and real reports
         run: python tools/test_automatic_reports.py --scilab "$SCILAB_BIN" --runtime studentui
       - name: Actual student windows
+        env:
+          LD_UI_FOCUS: ${{ inputs.focus }}
         run: |
+          if [ "$LD_UI_FOCUS" != "ld12" ]; then
           python tools/test_ld1_student.py --scilab "$SCILAB_BIN" --checker build/layoutcheck --grader build/ldcheck --output "$RUNNER_TEMP/ld1-ui"
           python tools/test_ld4.py --scilab "$SCILAB_BIN" --checker build/layoutcheck --output "$RUNNER_TEMP/ld4-ui"
           python tools/test_ld5.py --scilab "$SCILAB_BIN" --checker build/layoutcheck --grader build/ldcheck --output "$RUNNER_TEMP/ld5-ui"
@@ -53,6 +65,7 @@ jobs:
           python tools/test_ld9.py --scilab "$SCILAB_BIN" --checker build/layoutcheck --grader build/ldcheck --output "$RUNNER_TEMP/ld9-ui"
           python tools/test_ld10.py --scilab "$SCILAB_BIN" --checker build/layoutcheck --grader build/ldcheck --output "$RUNNER_TEMP/ld10-ui"
           python tools/test_ld11.py --scilab "$SCILAB_BIN" --checker build/layoutcheck --grader build/ldcheck --output "$RUNNER_TEMP/ld11-ui"
+          fi
           python tools/test_ld12.py --scilab "$SCILAB_BIN" --checker build/layoutcheck --grader build/ldcheck --output "$RUNNER_TEMP/ld12-ui"
           python tools/test_student_delivery.py --scilab "$SCILAB_BIN" --grader build/ldcheck --output "$RUNNER_TEMP/delivery"
       - uses: actions/upload-artifact@v4

@@ -86,24 +86,28 @@ Values ac(int kind,double E,double f,double R,double L,double C) {
        (kind!=1 && kind!=6 && L<=0) || (kind!=2 && kind!=5 && kind!=6 && C<=0) || (kind==5 && C<0))
         throw std::runtime_error("model_input");
     if(kind==6) {
-        // Simetrinė trifazė: [Uf_Y, If_Y, Uf_D, If_D, Il_D, P_Y, P_D, Ul, 0, 0].
-        // MNA su trimis EV šaltiniais (Ul/√3 ∠0/−120/+120 Hz f) ir trimis R.
-        const double uf=E/std::sqrt(3.0);
-        const double phase=E/std::sqrt(3.0);
-        const std::complex<double> e1(phase,0.0);
-        const std::complex<double> w2(std::cos(-2.0*std::acos(-1.0)/3.0),std::sin(-2.0*std::acos(-1.0)/3.0));
-        const std::complex<double> w3(std::cos(2.0*std::acos(-1.0)/3.0),std::sin(2.0*std::acos(-1.0)/3.0));
-        std::vector<std::array<double,5>> rows={{{4,1,0,e1.real(),e1.imag()}},
-                                                {{4,2,0,(phase*w2).real(),(phase*w2).imag()}},
-                                                {{4,3,0,(phase*w3).real(),(phase*w3).imag()}},
-                                                {{1,1,0,R,0}},{{1,2,0,R,0}},{{1,3,0,R,0}}};
-        int m=6,n=3,st=1;
-        std::vector<double> table(m*5),v((n+1)*2),i(m*2);
-        for(int k=0;k<m;++k) for(int col=0;col<5;++col) table[col*m+k]=rows[k][col];
-        ld_mna(table.data(),&m,&n,&f,v.data(),i.data(),&st);
-        if(st!=0) throw std::runtime_error("reference_model_"+std::to_string(st));
-        return {uf,phase/R*1000,E,E/R*1000,E/R*1000*std::sqrt(3.0),
-                3.0*uf*uf/R,3.0*E*E/R,E,0.0,0.0};
+        // Balanced three-phase loads. Actual MNA results for BOTH topologies.
+        // [Uf_Y V, If_Y mA, Uf_D V, If_D mA, Il_D mA, P_Y W, P_D W, Ul V, 0, 0].
+        if(f==0) throw std::runtime_error("model_input");
+        const double phase=E/std::sqrt(3.0), angle=2*std::acos(-1.0)/3;
+        auto solve=[&](bool delta) {
+            const auto e2=std::polar(phase,-angle), e3=std::polar(phase,angle);
+            std::vector<std::array<double,5>> rows={{{4,1,0,phase,0}},
+                {{4,2,0,e2.real(),e2.imag()}},{{4,3,0,e3.real(),e3.imag()}},
+                {{1,1,delta?2.0:0.0,R,0}},{{1,2,delta?3.0:0.0,R,0}},{{1,3,delta?1.0:0.0,R,0}}};
+            int m=6,n=3,status=1;
+            std::vector<double> table(m*5),voltage((n+1)*2),current(m*2);
+            for(int k=0;k<m;++k) for(int col=0;col<5;++col) table[col*m+k]=rows[k][col];
+            ld_mna(table.data(),&m,&n,&f,voltage.data(),current.data(),&status);
+            if(status) throw std::runtime_error("reference_model_"+std::to_string(status));
+            auto v=[&](int node){return std::complex<double>(voltage[node],voltage[n+1+node]);};
+            auto i=[&](int branch){return std::complex<double>(current[branch],current[m+branch]);};
+            double power=0;for(int k=3;k<6;++k) power+=std::norm(i(k))*R;
+            return std::array<double,5>{std::abs(v(1)-v(delta?2:0)),std::abs(i(3))*1000,
+                std::abs(i(0))*1000,power,std::abs(v(1)-v(2))};
+        };
+        const auto y=solve(false),d=solve(true);
+        return {y[0],y[1],d[0],d[1],d[2],y[3],d[3],d[4],0.0,0.0};
     }
     if(kind==5) {
         // RL ∥ C: [XL, Z_RL, cosφ0, I_bendra, I_RL, P, Q, S, φ°, IC].

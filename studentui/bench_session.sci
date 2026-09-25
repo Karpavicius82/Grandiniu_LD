@@ -442,6 +442,7 @@ function bench_restore_snapshot(session)
             ld11_render_stage();
             ld11_set_status("Juodraštis atkurtas: "+student_caption(LD11.student),"ok","Maitinimas išjungtas.");
         elseif session.lab=="LD12" then
+            ld12_validate_snapshot(session);
             LD12.cfg=session.cfg;LD12.student=session.student;
             for field=fieldnames(session.state)';LD12(field)=session.state(field);end
             if ~isfield(session.state,"report_wires") then
@@ -451,6 +452,13 @@ function bench_restore_snapshot(session)
             end
             LD12.powerOn=%f;LD12.switchOn=%f;LD12.demoMode=%f;LD12.pending="";
             LD12.lastMeasurement=%nan;
+            if LD12.phase==0 then LD12.phase=1;end
+            if ~isfield(session.state,"assessment") then LD12.assessment=%f;LD12.practice_used=%t;end
+            if ~isfield(session.state,"practice_used") then LD12.practice_used=%t;end
+            LD12.autosave_enabled=~LD12.ui.headless;
+            // Old drafts can contain only one selected phase. Keep it, require the rest.
+            if size(ld12_journal_rows(1),1)<>3 then LD12.done([2 5 6])=%f; end
+            if size(ld12_journal_rows(2),1)<>4 then LD12.done([4 5 6])=%f; end
             ld12_render_stage();
             ld12_set_status("Juodraštis atkurtas: "+student_caption(LD12.student),"ok","Maitinimas išjungtas.");
         else

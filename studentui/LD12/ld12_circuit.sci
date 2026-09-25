@@ -53,13 +53,14 @@ function [u, i, ok, message] = ld12_measure_values()
     if ~LD12.switchOn then message = "Uždarykite jungiklį [B02]."; return; end
     [valid, message] = ld12_wiring_valid(LD12.wires);
     if ~valid then return; end
-    if LD12.phase == 0 then message = "Pasirinkite matuojamą fazę [B13]–[B15]."; return; end
+    if LD12.phase == 0 then message = "Pasirinkite matuojamą fazę [B12]–[B14]."; return; end
     // Fizika — ld_ac kind 6 (trifazė MNA branduolyje):
     // v = [Uf_Y, If_Y, Uf_D, If_D, Il_D, P_Y, P_D, Ul].
     bench_core_require(); cfg = LD12.cfg;
     v = bench_cpp_ac(6, cfg.Ul, 50, cfg.R, 1, 1);
     if LD12.wireMode == 2 then u = v(3); i = v(4);
     else u = v(1); i = v(2); end
+    if LD12.phase==4 then u=v(8); i=v(5); end
     ok = %t;
 endfunction
 
@@ -72,8 +73,9 @@ endfunction
 
 function ld12_init_state()
     global LD12;
+    LD12.assessment=%t; LD12.practice_used=%f;
     LD12.step = 1; LD12.done = zeros(1, 6) == 1; LD12.skipped = zeros(1, 6) == 1;
-    LD12.powerOn = %f; LD12.switchOn = %f; LD12.wireMode = 1; LD12.phase = 0;
+    LD12.powerOn = %f; LD12.switchOn = %f; LD12.wireMode = 1; LD12.phase = 1;
     LD12.wires = emptystr(0, 2); LD12.journal = [];
     LD12.wires_by_mode = list(); LD12.report_wires = list();
     for index = 1:2

@@ -1168,7 +1168,7 @@ function bench_ld12_workflow(number,root,gui)
     if argn(2)<3 then gui=%f; end
     cfg=ld12_variant_config(number); [valid,message]=ld12_validate_config(cfg); assert_checktrue(valid);
     LD12=struct("cfg",cfg,"student",student_profile(number,"Automatinė Patikra","TEST","LD12"),"ui",struct("headless",~gui));
-    ld12_start();
+    ld12_start(); assert_checktrue(LD12.assessment);
     expected=ld12_expected_answers();
     for step=1:6
         assert_checkequal(LD12.step,step);
@@ -1177,8 +1177,7 @@ function bench_ld12_workflow(number,root,gui)
             bench_ld12_connect(1);
             bench_ld12_answers(step,expected(1,1));
         case 2 then
-            bench_ld12_action("ld12_set_phase(1)");
-            bench_ld12_action("ld12_toggle_power()"); bench_ld12_action("ld12_toggle_switch()"); bench_ld12_action("ld12_measure()");
+            bench_ld12_action("ld12_measure_all()");
             bench_ld12_action("ld12_toggle_power()");
             bench_ld12_answers(step,expected(2,1));
         case 3 then
@@ -1186,8 +1185,7 @@ function bench_ld12_workflow(number,root,gui)
             bench_ld12_connect(2);
             bench_ld12_answers(step,expected(3,1));
         case 4 then
-            bench_ld12_action("ld12_set_phase(1)");
-            bench_ld12_action("ld12_toggle_power()"); bench_ld12_action("ld12_toggle_switch()"); bench_ld12_action("ld12_measure()");
+            bench_ld12_action("ld12_measure_all()");
             bench_ld12_action("ld12_toggle_power()");
             bench_ld12_answers(step,expected(4,1));
         case 5 then
@@ -1199,9 +1197,9 @@ function bench_ld12_workflow(number,root,gui)
         if ~LD12.done(step) then error("LD12 variantas "+string(number)+", etapas "+string(step)); end
         if gui then mprintf("PASS LD12 V%02d: etapas %d\n",number,step); end
     end
-    assert_checktrue(and(LD12.done)); assert_checkequal(size(LD12.journal,1),2);
+    assert_checktrue(and(LD12.done)); assert_checkequal(size(LD12.journal,1),7);
     if gui then
-        LD12.assessment=%t;
+        assert_checktrue(LD12.assessment);
         before=size(listfiles(bench_documents()+"/*.html"),"*");
         bench_ld12_primary();
         assert_checkequal(size(listfiles(bench_documents()+"/*.html"),"*"),before+1);

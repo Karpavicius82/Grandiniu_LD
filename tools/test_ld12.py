@@ -1,12 +1,17 @@
 #!/usr/bin/env python3
 """Internal feedback only: bounded native Scilab LD12 UI acceptance on both OSes."""
 import argparse
+import hashlib
+import re
 import json
 import sys
 import os
 from pathlib import Path
 import shutil
 import subprocess
+
+# Windows CI may inherit cp1252; Scilab verdicts include Unicode symbols.
+sys.stdout.reconfigure(encoding="utf-8")
 
 p = argparse.ArgumentParser(description=__doc__)
 p.add_argument('--scilab', required=True, type=Path)
@@ -33,12 +38,29 @@ args = [str(exe), *mode, '-nb', '-f', str(repo / 'tools/test_ld12.sce')]
 with (out / 'scilab.log').open('wb') as log:
     result = subprocess.run(args, env=env, stdout=log, stderr=subprocess.STDOUT, timeout=420)
 verdict = (out / 'verdict.log').read_text(encoding='utf-8') if (out / 'verdict.log').exists() else (out / 'scilab.log').read_text(encoding='utf-8', errors='replace')
-assert 'LD12_PASS:' in verdict, verdict
+assert result.returncode == 0 and 'LD12_PASS:' in verdict, verdict
 print(verdict.strip().encode("ascii","replace").decode())
 result = subprocess.run([str(a.checker.resolve()), str(out / 'geometry.tsv')], capture_output=True, text=True)
 (out / 'geometry.log').write_text(result.stdout + result.stderr, encoding='utf-8')
 print(result.stdout)
 assert result.returncode == 0, 'LD12 geometry failed'
+
+# Collinear wires can hide one another without being a perpendicular crossing.
+from collections import defaultdict
+from itertools import combinations
+segments=defaultdict(list)
+for line in (out/'geometry.tsv').read_text().splitlines():
+    fields=line.split('\t')
+    if len(fields)!=13 or not fields[3].startswith('wire'):continue
+    x,y,w,h=map(float,fields[4:8])
+    if max(w,h)<=3.01:continue
+    horizontal=w>h
+    segments[fields[0]].append((horizontal,y+h/2 if horizontal else x+w/2,x if horizontal else y,(x+w) if horizontal else (y+h)))
+assert len(segments)==26,len(segments)
+for scenario,items in segments.items():
+    for a,b in combinations(items,2):
+        if a[0]==b[0] and abs(a[1]-b[1])<.5:
+            assert min(a[3],b[3])-max(a[2],b[2])<=3.01,(scenario,'collinear wire overlap',a,b)
 
 # Compare the actual Scilab step decisions with C++ grading of the same reports.
 sys.path.insert(0, str(repo / 'core/tests'))
@@ -57,17 +79,32 @@ for result in verdicts['results']:
     assert result['points'] == expected[result['file']], result
     if result['file'] == '001.html':
         assert result['practice_used'] and not result['selected_for_summary'], result
+submissions = {}
+for path in (out / 'Ataskaitos Žąsė').glob('*.html'):
+    data = path.read_bytes()
+    match = re.search(r'<script type="application/json" id="ld-data">(.*?)</script>', data.decode('utf-8'), re.S)
+    assert match, path
+    submissions[path.name] = (path, hashlib.sha256(data).hexdigest(), json.loads(match.group(1)))
 actual, _ = run(a.grader.resolve(), out / 'Ataskaitos Žąsė', out / 'student-grading')
 reports = [r for r in actual['results'] if r['file'].endswith('.html')]
 drafts = [r for r in actual['results'] if r['file'].endswith('.sod')]
 assert len(reports) == 3 and len(drafts) >= 3
 assert len(actual['results']) == len(reports) + len(drafts)
 for result in reports:
+    path, digest, payload = submissions[result['file']]
+    assert hashlib.sha256(path.read_bytes()).hexdigest() == digest, 'Grading modified the submitted file'
+    for key in ['submission_id', 'student', 'variant', 'bank_id', 'lab_revision', 'rubric_version', 'mode', 'practice_used']:
+        assert result[key] == payload[key], (key, result)
+    items = {item['id']: item for item in result['items']}
+    assert {o['id'] for o in payload['observations']} == {'i1s','i2s','i3s','i1d','i2d','i3d','ild'}
+    for answer in payload['answers']:
+        assert items[answer['id']]['raw'] == answer['raw'], answer
     assert result['mode'] == 'assessment' and result['selected_for_summary'], result
     assert result['status'] == 'graded' and (result['points'], result['max_points']) == (19, 19), result
 for result in drafts:
     assert result['status'] == 'review' and result['reason'] == 'unsupported_file' and result['grade_10'] is None, result
 summary = dict(status='PASS', tolerance_cases=len(expected), actual_gui_reports=3,
-               variants=[1, 17, 64], geometry_cases=39, assessment_reports_selected=True, close_autosave_restore=True, platform=os.name)
+               variants=[1, 17, 64], geometry_cases=26, collinear_wire_overlaps=0, assessment_reports_selected=True, close_autosave_restore=True, edge_cases=True, malformed_drafts_rejected=8, report_traceability=True,
+               submission_sha256={name: entry[1] for name, entry in submissions.items()}, platform=os.name)
 (out / 'acceptance.json').write_text(json.dumps(summary, indent=2)+'\n', encoding='utf-8')
 print(json.dumps(summary))

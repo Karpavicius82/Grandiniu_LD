@@ -1,4 +1,4 @@
-// LD12 · Nuosekliai sujungtos RLC grandinės: trikampiai ir įtampų rezonansas.
+// LD12 · Trifazės grandinės: žvaigždė ir trikampis.
 mode(-1);
 ld12_dir = get_absolute_file_path("LD12.sce");
 exec(ld12_dir + "LD12_LOAD.sce", -1);

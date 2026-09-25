@@ -18,6 +18,9 @@ function student_finish_window(f,screen)
     else
         f.axes_size=design; student_reflow(f,design);
     end
+    // Finalize the client size after Swing/WM decorates the visible window.
+    // All callers have built their controls; do not wrap the small canvas twice.
+    f.visible="on"; sleep(250); f.axes_size=viewport;
 endfunction
 
 function student_reflow(parent,sz)
